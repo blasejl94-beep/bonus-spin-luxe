@@ -30,7 +30,7 @@ const WinnerToast: React.FC = () => {
 
   return (
     <div className="fixed bottom-20 left-4 z-50 max-w-[280px] animate-in slide-in-from-left-5 fade-in-0 duration-300">
-      <div className="bg-card/95 backdrop-blur border border-border rounded-xl p-3 shadow-lg">
+      <div className="bg-card border border-border rounded-xl p-3 shadow-lg">
         <div className="flex items-start gap-2">
           <span className="text-lg mt-0.5">🏆</span>
           <div className="text-xs">
