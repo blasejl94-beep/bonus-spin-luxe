@@ -41,12 +41,12 @@ const Confetti: React.FC = () => {
     canvas.height = h * dpr;
     ctx.scale(dpr, dpr);
 
-    const particles: Particle[] = Array.from({ length: 40 }, () => ({
+    const particles: Particle[] = Array.from({ length: 120 }, () => ({
       x: Math.random() * w,
-      y: Math.random() * h * 0.3 - h * 0.1,
-      vx: (Math.random() - 0.5) * 6,
-      vy: Math.random() * 2 + 1,
-      size: Math.random() * 8 + 4,
+      y: Math.random() * h * 0.3 - h * 0.15,
+      vx: (Math.random() - 0.5) * 8,
+      vy: Math.random() * 3 + 1.5,
+      size: Math.random() * 10 + 4,
       color: COLORS[Math.floor(Math.random() * COLORS.length)],
       rotation: Math.random() * Math.PI * 2,
       rotationSpeed: (Math.random() - 0.5) * 0.3,
@@ -55,7 +55,7 @@ const Confetti: React.FC = () => {
     }));
 
     const start = performance.now();
-    const DURATION = 1200;
+    const DURATION = 2000;
     let raf: number;
 
     const animate = (now: number) => {
