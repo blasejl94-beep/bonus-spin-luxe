@@ -31,6 +31,8 @@ const GAMES = [
   { emoji: "🎲", label: "Dados" },
 ];
 
+const BRAND_NAME = "Smart Play";
+
 const Index = () => {
   const [step, setStep] = useState<FunnelStep>(() => {
     if (localStorage.getItem("casino_expired")) return "expired";
@@ -136,11 +138,11 @@ const Index = () => {
       {/* Hero Section */}
       <section className="relative z-10 flex flex-col items-center px-5 pt-10 pb-8 text-center max-w-lg mx-auto">
         {/* Logo / Brand */}
-        <div className="flex items-center gap-2 mb-6">
+        <div className="flex items-center gap-2.5 mb-6">
           <div className="w-10 h-10 rounded-xl gold-gradient flex items-center justify-center shadow-lg">
             <Star className="w-5 h-5 text-primary-foreground" fill="currentColor" />
           </div>
-          <span className="text-xl font-black tracking-tight gold-text">LUXEBET</span>
+          <span className="text-xl font-black tracking-tight gold-text">{BRAND_NAME}</span>
         </div>
 
         <h1 className="text-3xl sm:text-4xl font-black leading-[1.1] mb-3 gold-text max-w-md tracking-tight">
@@ -180,33 +182,33 @@ const Index = () => {
 
         {/* === RESULT: Victory Section === */}
         {step === "result" && (
-          <div className="flex flex-col items-center gap-4 w-full max-w-sm relative">
+          <div className="flex flex-col items-center gap-4 w-full max-w-sm relative victory-entrance">
             <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 radial-burst" />
 
-            {[...Array(8)].map((_, i) => (
+            {[...Array(10)].map((_, i) => (
               <div
                 key={i}
                 className="sparkle"
                 style={{
-                  top: `${15 + Math.random() * 50}%`,
-                  left: `${10 + Math.random() * 80}%`,
-                  animation: `sparkle ${1 + Math.random()}s ease-in-out ${0.5 + i * 0.3}s infinite`,
-                  width: 6 + Math.random() * 8,
-                  height: 6 + Math.random() * 8,
+                  top: `${10 + Math.random() * 60}%`,
+                  left: `${5 + Math.random() * 90}%`,
+                  animation: `sparkle ${1 + Math.random()}s ease-in-out ${0.3 + i * 0.2}s infinite`,
+                  width: 5 + Math.random() * 10,
+                  height: 5 + Math.random() * 10,
                 }}
               />
             ))}
 
             <div className="text-7xl emoji-celebrate">🎉</div>
             
-            <div className="glass-card-strong rounded-2xl p-6 w-full stagger-1">
+            <div className="glass-card-strong rounded-2xl p-6 w-full stagger-1 victory-card-glow">
               <h2 className="text-xl sm:text-2xl font-black text-foreground uppercase tracking-wide mb-1">
                 ¡Felicitaciones!
               </h2>
               <p className="text-sm text-muted-foreground mb-4">Ganaste un bono de bienvenida de</p>
               
               <div className="relative">
-                <span className="block text-7xl sm:text-8xl font-black glow-text tracking-tight leading-none">
+                <span className="block text-7xl sm:text-8xl font-black glow-text tracking-tight leading-none bonus-number-reveal">
                   {result}
                 </span>
                 <span className="block text-base font-bold text-muted-foreground mt-3 uppercase tracking-[0.2em]">
@@ -341,6 +343,54 @@ const Index = () => {
           ))}
         </div>
       </section>
+
+      {/* Divider */}
+      <div className="h-px w-4/5 mx-auto bg-gradient-to-r from-transparent via-border to-transparent" />
+
+      {/* Footer */}
+      <footer className="relative z-10 px-5 py-10 max-w-lg mx-auto text-center">
+        {/* Payment methods */}
+        <div className="mb-6">
+          <p className="text-[10px] text-muted-foreground/50 uppercase tracking-[0.2em] mb-3">Métodos de pago aceptados</p>
+          <div className="flex justify-center gap-3 flex-wrap">
+            {["💳 Visa", "💳 Mastercard", "📱 MercadoPago", "🏦 Transferencia"].map((method) => (
+              <span key={method} className="text-[11px] text-muted-foreground/60 glass-card rounded-md px-2.5 py-1.5">
+                {method}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        {/* Responsible gaming */}
+        <div className="glass-card rounded-xl px-4 py-3 mb-6 inline-block">
+          <p className="text-[11px] text-muted-foreground/60 flex items-center gap-1.5">
+            🔞 Jugá con responsabilidad — Solo para mayores de 18 años
+          </p>
+        </div>
+
+        {/* Legal links */}
+        <div className="flex justify-center gap-4 mb-4 flex-wrap">
+          {["Términos y condiciones", "Política de privacidad", "Juego responsable", "Contacto"].map((link) => (
+            <a key={link} href="#" className="text-[10px] text-muted-foreground/40 hover:text-muted-foreground/70 transition-colors underline-offset-2 hover:underline">
+              {link}
+            </a>
+          ))}
+        </div>
+
+        {/* Brand */}
+        <div className="flex items-center justify-center gap-2 mb-2">
+          <div className="w-6 h-6 rounded-md gold-gradient flex items-center justify-center">
+            <Star className="w-3 h-3 text-primary-foreground" fill="currentColor" />
+          </div>
+          <span className="text-sm font-bold gold-text">{BRAND_NAME}</span>
+        </div>
+        <p className="text-[10px] text-muted-foreground/30">
+          © {new Date().getFullYear()} {BRAND_NAME}. Todos los derechos reservados.
+        </p>
+        <p className="text-[9px] text-muted-foreground/20 mt-1">
+          Los bonos están sujetos a términos y condiciones. Aplican requisitos de apuesta.
+        </p>
+      </footer>
 
       <div className="h-24" />
 
