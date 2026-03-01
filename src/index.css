@@ -128,41 +128,6 @@
   }
 }
 
-/* Confetti animation */
-@keyframes confetti-fall {
-  0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
-  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
-}
-
-@keyframes confetti-sway {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(30px); }
-  75% { transform: translateX(-30px); }
-}
-
-.confetti-piece {
-  position: fixed;
-  top: -10px;
-  z-index: 100;
-  animation: confetti-fall 3s ease-in forwards, confetti-sway 1.5s ease-in-out infinite;
-}
-
-/* Center burst confetti */
-@keyframes confetti-burst-anim {
-  0% { transform: scale(0) translate(0, 0) rotate(0deg); opacity: 1; }
-  100% { 
-    transform: scale(1) translate(var(--burst-x, 100px), var(--burst-y, -200px)) rotate(720deg); 
-    opacity: 0; 
-  }
-}
-
-.confetti-burst {
-  position: fixed;
-  z-index: 100;
-  --burst-x: calc((var(--random-x, 0.5) - 0.5) * 600px);
-  --burst-y: calc((var(--random-y, 0.5) - 0.5) * 600px);
-  animation: confetti-burst-anim 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-}
 
 /* Suspense spinner */
 @keyframes suspense-spin {

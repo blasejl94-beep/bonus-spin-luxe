@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef } from "react";
+import ReactDOM from "react-dom";
 
 const COLORS = [
   "hsl(45, 100%, 51%)",
@@ -10,71 +11,98 @@ const COLORS = [
   "hsl(200, 80%, 55%)",
 ];
 
-interface Piece {
-  id: number;
-  left: number;
-  top: number;
-  color: string;
-  delay: number;
+interface Particle {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
   size: number;
-  type: "fall" | "burst";
-  burstX: number;
-  burstY: number;
+  color: string;
+  rotation: number;
+  rotationSpeed: number;
+  opacity: number;
+  aspect: number;
 }
 
 const Confetti: React.FC = () => {
-  const [pieces, setPieces] = useState<Piece[]>([]);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    const falling: Piece[] = Array.from({ length: 60 }, (_, i) => ({
-      id: i,
-      left: Math.random() * 100,
-      top: 0,
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const dpr = window.devicePixelRatio || 1;
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+    ctx.scale(dpr, dpr);
+
+    const particles: Particle[] = Array.from({ length: 40 }, () => ({
+      x: Math.random() * w,
+      y: Math.random() * h * 0.3 - h * 0.1,
+      vx: (Math.random() - 0.5) * 6,
+      vy: Math.random() * 2 + 1,
+      size: Math.random() * 8 + 4,
       color: COLORS[Math.floor(Math.random() * COLORS.length)],
-      delay: Math.random() * 1.2,
-      size: Math.random() * 10 + 4,
-      type: "fall",
-      burstX: 0,
-      burstY: 0,
+      rotation: Math.random() * Math.PI * 2,
+      rotationSpeed: (Math.random() - 0.5) * 0.3,
+      opacity: 1,
+      aspect: Math.random() > 0.5 ? 1.5 : 1,
     }));
 
-    const burst: Piece[] = Array.from({ length: 50 }, (_, i) => ({
-      id: 100 + i,
-      left: 45 + Math.random() * 10,
-      top: 35 + Math.random() * 10,
-      color: COLORS[Math.floor(Math.random() * COLORS.length)],
-      delay: Math.random() * 0.3,
-      size: Math.random() * 12 + 5,
-      type: "burst",
-      burstX: (Math.random() - 0.5) * 500,
-      burstY: (Math.random() - 0.5) * 500,
-    }));
+    const start = performance.now();
+    const DURATION = 1200;
+    let raf: number;
 
-    setPieces([...falling, ...burst]);
+    const animate = (now: number) => {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / DURATION, 1);
+
+      ctx.clearRect(0, 0, w, h);
+
+      for (const p of particles) {
+        p.x += p.vx;
+        p.vy += 0.15; // gravity
+        p.y += p.vy;
+        p.rotation += p.rotationSpeed;
+        p.opacity = Math.max(0, 1 - progress * 1.2);
+
+        ctx.save();
+        ctx.globalAlpha = p.opacity;
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rotation);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.size / 2, -p.size * p.aspect / 2, p.size, p.size * p.aspect);
+        ctx.restore();
+      }
+
+      if (progress < 1) {
+        raf = requestAnimationFrame(animate);
+      }
+    };
+
+    raf = requestAnimationFrame(animate);
+
+    return () => cancelAnimationFrame(raf);
   }, []);
 
-  return (
-    <div className="fixed inset-0 pointer-events-none z-50">
-      {pieces.map((p) => (
-        <div
-          key={p.id}
-          className={p.type === "burst" ? "confetti-burst" : "confetti-piece"}
-          style={{
-            left: `${p.left}%`,
-            top: p.type === "burst" ? `${p.top}%` : undefined,
-            width: p.size,
-            height: p.size * 1.5,
-            backgroundColor: p.color,
-            animationDelay: `${p.delay}s`,
-            borderRadius: Math.random() > 0.5 ? "50%" : "2px",
-            ...(p.type === "burst" ? {
-              "--burst-x": `${p.burstX}px`,
-              "--burst-y": `${p.burstY}px`,
-            } as React.CSSProperties : {}),
-          }}
-        />
-      ))}
-    </div>
+  return ReactDOM.createPortal(
+    <canvas
+      ref={canvasRef}
+      style={{
+        position: "fixed",
+        inset: 0,
+        width: "100vw",
+        height: "100dvh",
+        pointerEvents: "none",
+        zIndex: 9999,
+      }}
+    />,
+    document.body
   );
 };
 
