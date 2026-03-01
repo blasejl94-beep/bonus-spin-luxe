@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { playTick, playLandingClick } from "@/lib/sounds";
 import Confetti from "@/components/Confetti";
 
@@ -14,7 +14,7 @@ const SEGMENTS = [
 
 const SEGMENT_ANGLE = 360 / SEGMENTS.length;
 const NUM_SEGMENTS = SEGMENTS.length;
-const NUM_LEDS = 16;
+const NUM_LEDS = 32;
 
 interface SpinWheelProps {
   onSpinComplete: (result: string) => void;
@@ -23,146 +23,99 @@ interface SpinWheelProps {
 
 type WheelState = "idle" | "spinning" | "won";
 
+/* ── LED Ring ── */
+const LedRing: React.FC<{ state: WheelState }> = ({ state }) => {
+  const leds = useMemo(() =>
+    Array.from({ length: NUM_LEDS }, (_, i) => {
+      const angle = (i / NUM_LEDS) * 360 - 90;
+      const rad = (angle * Math.PI) / 180;
+      const x = 50 + 50 * Math.cos(rad);
+      const y = 50 + 50 * Math.sin(rad);
+      return { x, y, idx: i };
+    }), []
+  );
+
+  const stateClass = state === "spinning" ? "led-chase" : state === "won" ? "led-celebrate" : "led-idle";
+
+  return (
+    <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 5 }}>
+      {leds.map((led) => (
+        <div
+          key={led.idx}
+          className={stateClass}
+          style={{
+            position: "absolute",
+            left: `${led.x}%`,
+            top: `${led.y}%`,
+            width: 7,
+            height: 7,
+            marginLeft: -3.5,
+            marginTop: -3.5,
+            borderRadius: "50%",
+            background: state === "won" ? "hsl(42, 100%, 75%)" : "hsl(42, 100%, 65%)",
+            boxShadow: state === "won"
+              ? "0 0 10px 3px hsl(42 100% 60% / 0.8)"
+              : "0 0 6px 2px hsl(42 100% 55% / 0.6)",
+            animationDelay: state === "spinning"
+              ? `${(led.idx / NUM_LEDS) * 0.8}s`
+              : state === "won"
+              ? `${(led.idx / NUM_LEDS) * 0.3}s`
+              : `${(led.idx / NUM_LEDS) * 3}s`,
+          }}
+        />
+      ))}
+    </div>
+  );
+};
+
+/* ── Helpers ── */
 function getSegmentUnderPointer(rotationDeg: number): number {
+  // Pointer is at top (270° in standard math coords).
+  // Segment 0 spans from 0° to SEGMENT_ANGLE (starting at 3 o'clock).
+  // After rotating clockwise by `rotationDeg`, the angle under the pointer is:
   const angleUnderPointer = ((270 - (rotationDeg % 360)) % 360 + 360) % 360;
   return Math.floor(angleUnderPointer / SEGMENT_ANGLE) % NUM_SEGMENTS;
 }
-
-const LedRingCanvas: React.FC<{ state: WheelState }> = ({ state }) => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext("2d", { alpha: true });
-    if (!ctx) return;
-
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    let frame = 0;
-    let rafId = 0;
-    let lastW = 0;
-    let lastH = 0;
-
-    const resize = () => {
-      const rect = canvas.getBoundingClientRect();
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      const nextW = Math.max(1, Math.floor(rect.width * dpr));
-      const nextH = Math.max(1, Math.floor(rect.height * dpr));
-
-      if (nextW !== lastW || nextH !== lastH) {
-        canvas.width = nextW;
-        canvas.height = nextH;
-        lastW = nextW;
-        lastH = nextH;
-      }
-    };
-
-    let wonStart = 0;
-
-    const draw = () => {
-      frame += 1;
-      if (frame % 12 === 0) resize();
-
-      const w = canvas.width;
-      const h = canvas.height;
-      const cx = w * 0.5;
-      const cy = h * 0.5;
-      const radius = Math.min(w, h) * 0.42;
-      const dotRadius = Math.max(2, Math.min(w, h) * 0.0085);
-      const time = performance.now();
-
-      ctx.clearRect(0, 0, w, h);
-
-      const chaseHead = (time * 0.02) % NUM_LEDS;
-
-      for (let i = 0; i < NUM_LEDS; i += 1) {
-        const angle = -Math.PI / 2 + (i / NUM_LEDS) * Math.PI * 2;
-        const x = cx + radius * Math.cos(angle);
-        const y = cy + radius * Math.sin(angle);
-
-        let alpha = 0.22;
-
-        if (state === "spinning") {
-          const distance = (i - chaseHead + NUM_LEDS) % NUM_LEDS;
-          alpha = distance < 4 ? 0.2 + (4 - distance) * 0.16 : 0.1;
-        } else if (state === "won") {
-          if (!wonStart) wonStart = time;
-          alpha = reducedMotion ? 0.58 : 0.45 + 0.38 * Math.sin(time * 0.03 - i * 0.5);
-        } else {
-          // idle: static draw
-          alpha = 0.24;
-        }
-
-        const clampedAlpha = Math.max(0.08, Math.min(alpha, 0.86));
-
-        ctx.beginPath();
-        ctx.arc(x, y, dotRadius, 0, Math.PI * 2);
-        ctx.fillStyle = `hsl(42 100% 62% / ${clampedAlpha})`;
-        ctx.fill();
-      }
-
-      // Only continue rAF loop when spinning or won (for max 2.5s)
-      if (state === "spinning") {
-        rafId = requestAnimationFrame(draw);
-      } else if (state === "won" && wonStart && (performance.now() - wonStart < 2500)) {
-        rafId = requestAnimationFrame(draw);
-      }
-      // idle: no loop — drawn once
-    };
-
-    resize();
-    rafId = requestAnimationFrame(draw);
-    window.addEventListener("resize", resize);
-
-    return () => {
-      cancelAnimationFrame(rafId);
-      window.removeEventListener("resize", resize);
-    };
-  }, [state]);
-
-  return <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none z-10" />;
-};
 
 const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
   const [rotation, setRotation] = useState(0);
   const [spinning, setSpinning] = useState(false);
   const [phase, setPhase] = useState<"idle" | "spinning" | "bounce">("idle");
+  const [glowIntensity, setGlowIntensity] = useState(0);
   const [highlightIndex, setHighlightIndex] = useState<number>(-1);
   const [wheelState, setWheelState] = useState<WheelState>("idle");
   const [showWinConfetti, setShowWinConfetti] = useState(false);
   const wheelRef = useRef<SVGSVGElement>(null);
   const lastTickSegmentRef = useRef<number>(-1);
   const rafRef = useRef<number | null>(null);
-  const timeoutIdsRef = useRef<number[]>([]);
 
-  const clearTimers = useCallback(() => {
-    timeoutIdsRef.current.forEach((id) => window.clearTimeout(id));
-    timeoutIdsRef.current = [];
-  }, []);
-
+  // Idle breathing glow
   useEffect(() => {
-    return () => {
-      clearTimers();
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    if (spinning || disabled) return;
+    let frame: number;
+    let start: number | null = null;
+    const animate = (ts: number) => {
+      if (!start) start = ts;
+      const elapsed = (ts - start) / 1000;
+      setGlowIntensity(0.35 + 0.25 * Math.sin(elapsed * 1.2));
+      frame = requestAnimationFrame(animate);
     };
-  }, [clearTimers]);
+    frame = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(frame);
+  }, [spinning, disabled]);
 
+  // Tick sound tracker — reads computed transform, NO highlight updates during spin
   useEffect(() => {
     if (!spinning) {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       rafRef.current = null;
       return;
     }
-
     const checkTick = () => {
       const svg = wheelRef.current;
-      if (!svg) {
-        rafRef.current = requestAnimationFrame(checkTick);
-        return;
-      }
-
-      const transform = window.getComputedStyle(svg).transform;
+      if (!svg) { rafRef.current = requestAnimationFrame(checkTick); return; }
+      const style = window.getComputedStyle(svg);
+      const transform = style.transform;
       if (transform && transform !== "none") {
         const values = transform.match(/matrix\((.+)\)/);
         if (values) {
@@ -172,77 +125,59 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
           const angle = Math.atan2(b, a) * (180 / Math.PI);
           const normalizedAngle = ((angle % 360) + 360) % 360;
           const currentSegment = getSegmentUnderPointer(normalizedAngle);
-
           if (currentSegment !== lastTickSegmentRef.current) {
             lastTickSegmentRef.current = currentSegment;
-            playTick(0.95 + Math.random() * 0.1);
+            playTick(0.9 + Math.random() * 0.2);
           }
         }
       }
-
       rafRef.current = requestAnimationFrame(checkTick);
     };
-
     rafRef.current = requestAnimationFrame(checkTick);
-
-    return () => {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    };
+    return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
   }, [spinning]);
 
   const spin = useCallback(() => {
     if (spinning || disabled) return;
-
-    clearTimers();
     setSpinning(true);
     setPhase("spinning");
+    setGlowIntensity(0.9);
     setHighlightIndex(-1);
     setWheelState("spinning");
     setShowWinConfetti(false);
     lastTickSegmentRef.current = -1;
 
+    // Truly random landing — pick a random angle, no forced segment
     const randomAngle = Math.random() * 360;
-    const fullSpins = 7 + Math.floor(Math.random() * 2);
+    const fullSpins = 7 + Math.floor(Math.random() * 3);
     const totalRotation = fullSpins * 360 + randomAngle;
-    const finalRotation = rotation + totalRotation;
+    const newRotation = rotation + totalRotation;
 
-    setRotation(finalRotation);
+    setRotation(newRotation);
 
-    const spinDuration = 4200;
-
-    const stopSpinId = window.setTimeout(() => {
+    // CSS transition handles the easing. After it finishes, compute result.
+    const spinDuration = 4800; // matches CSS transition duration
+    setTimeout(() => {
+      // Bounce phase
       setPhase("bounce");
-      setRotation(finalRotation + 4);
+      setGlowIntensity(1);
 
-      const settleBackId = window.setTimeout(() => {
-        setRotation(finalRotation);
+      // Single source of truth: compute winner from final rotation
+      const winIdx = getSegmentUnderPointer(newRotation);
+      setHighlightIndex(winIdx);
+      setWheelState("won");
+      setShowWinConfetti(true);
+      playLandingClick();
 
-        const winIdx = getSegmentUnderPointer(finalRotation);
-        setHighlightIndex(winIdx);
-        setWheelState("won");
-        setShowWinConfetti(true);
-        playLandingClick();
-
-        const completeId = window.setTimeout(() => {
-          setSpinning(false);
-          setPhase("idle");
-          onSpinComplete(SEGMENTS[winIdx].label);
-
-          const hideConfettiId = window.setTimeout(() => {
-            setShowWinConfetti(false);
-          }, 900);
-
-          timeoutIdsRef.current.push(hideConfettiId);
-        }, 320);
-
-        timeoutIdsRef.current.push(completeId);
-      }, 140);
-
-      timeoutIdsRef.current.push(settleBackId);
+      setTimeout(() => {
+        setSpinning(false);
+        setPhase("idle");
+        const winIdx2 = getSegmentUnderPointer(newRotation);
+        onSpinComplete(SEGMENTS[winIdx2].label);
+        setTimeout(() => setShowWinConfetti(false), 4000);
+      }, 600);
     }, spinDuration);
-
-    timeoutIdsRef.current.push(stopSpinId);
-  }, [spinning, disabled, rotation, clearTimers, onSpinComplete]);
+  }, [spinning, disabled, onSpinComplete, rotation]);
 
   const size = 310;
   const center = size / 2;
@@ -257,14 +192,12 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
     const x2 = center + r * Math.cos(endAngle);
     const y2 = center + r * Math.sin(endAngle);
     const largeArc = SEGMENT_ANGLE > 180 ? 1 : 0;
-
     return `M ${center} ${center} L ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2} Z`;
   };
 
   const getTextPosition = (index: number) => {
     const midAngle = ((index * SEGMENT_ANGLE + SEGMENT_ANGLE / 2) * Math.PI) / 180;
     const textRadius = innerRadius * 0.62;
-
     return {
       x: center + textRadius * Math.cos(midAngle),
       y: center + textRadius * Math.sin(midAngle),
@@ -273,64 +206,73 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
   };
 
   const getTransition = () => {
-    if (phase === "spinning") return "transform 4.2s cubic-bezier(0.12, 0.78, 0.12, 1)";
-    if (phase === "bounce") return "transform 0.16s cubic-bezier(0.22, 1.25, 0.36, 1)";
+    if (phase === "spinning") return "transform 4.8s cubic-bezier(0.10, 0.58, 0.06, 0.98)";
+    if (phase === "bounce") return "transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)";
     return "none";
   };
 
-  const rimNotches = Array.from({ length: SEGMENTS.length }, (_, i) => {
-    const angle = (i * SEGMENT_ANGLE * Math.PI) / 180;
-    const r = outerRadius - 3;
-
-    return {
-      cx: center + r * Math.cos(angle),
-      cy: center + r * Math.sin(angle),
-    };
-  });
+  const rimNotches = useMemo(() => {
+    return Array.from({ length: SEGMENTS.length }, (_, i) => {
+      const angle = (i * SEGMENT_ANGLE * Math.PI) / 180;
+      const r = outerRadius - 3;
+      return { cx: center + r * Math.cos(angle), cy: center + r * Math.sin(angle) };
+    });
+  }, []);
 
   return (
-    <div className="relative flex flex-col items-center" style={{ width: "min(92vw, 420px)", contain: "layout paint" }}>
+    <div className="relative flex flex-col items-center" style={{ width: "min(92vw, 420px)" }}>
       {showWinConfetti && <Confetti />}
 
+      {/* Ambient glow */}
       <div
-        className="absolute inset-0 pointer-events-none rounded-full"
+        className="absolute pointer-events-none rounded-full"
         style={{
-          opacity: wheelState === "won" ? 0.55 : 0.34,
-          background:
-            "radial-gradient(circle, hsl(42 100% 55% / 0.28) 28%, hsl(42 100% 55% / 0.12) 55%, transparent 74%)",
-          transition: "opacity 220ms ease",
+          top: "-12%", left: "-4%", right: "-4%",
+          aspectRatio: "1/1",
+          background: `radial-gradient(circle, hsl(42 100% 55% / ${glowIntensity * 0.18}) 30%, hsl(350 60% 30% / ${glowIntensity * 0.06}) 55%, transparent 70%)`,
+          transition: "background 0.8s ease",
         }}
       />
 
-      <div className="relative w-full overflow-visible" style={{ aspectRatio: "1/1", padding: "10%" }}>
-        <LedRingCanvas state={wheelState} />
+      {/* Wheel container — perfect square, never clips */}
+      <div className="relative w-full overflow-visible" style={{ aspectRatio: "1/1", padding: "8%" }}>
+        {/* LED Ring */}
+        <LedRing state={wheelState} />
 
+        {/* Soft shadow under wheel */}
         <div
           className="absolute pointer-events-none"
           style={{
-            bottom: "3%",
-            left: "14%",
-            right: "14%",
-            height: "7%",
-            borderRadius: "9999px",
-            background: "radial-gradient(ellipse, hsl(0 0% 0% / 0.38) 0%, transparent 72%)",
+            bottom: "2%", left: "10%", right: "10%", height: "8%",
+            borderRadius: "50%",
+            background: "radial-gradient(ellipse, hsl(0 0% 0% / 0.55) 0%, transparent 70%)",
+            filter: "blur(12px)",
           }}
         />
 
+        {/* Metallic gold outer rim */}
         <div
-          className="absolute inset-[9%] rounded-full"
+          className="absolute inset-[8%] rounded-full wheel-rim-sheen"
           style={{
             padding: 4,
-            background:
-              "conic-gradient(from 0deg, hsl(42 100% 70%), hsl(38 80% 44%), hsl(42 100% 65%), hsl(38 85% 35%), hsl(42 100% 72%), hsl(38 80% 42%), hsl(42 100% 68%))",
-            boxShadow: "0 10px 24px hsl(0 0% 0% / 0.34)",
+            background: `conic-gradient(from 0deg, hsl(42 100% 70%), hsl(38 80% 40%), hsl(42 100% 65%), hsl(38 85% 30%), hsl(42 100% 72%), hsl(38 80% 38%), hsl(42 100% 68%))`,
+            boxShadow: `
+              0 0 ${16 + glowIntensity * 30}px hsl(42 100% 55% / ${glowIntensity * 0.4}),
+              0 0 ${50 + glowIntensity * 50}px hsl(42 100% 55% / ${glowIntensity * 0.12}),
+              inset 0 2px 6px hsl(42 100% 80% / 0.35),
+              inset 0 -2px 6px hsl(0 0% 0% / 0.3),
+              0 10px 30px hsl(0 0% 0% / 0.5)
+            `,
+            transition: "box-shadow 0.6s ease",
           }}
         >
+          {/* Inner ring bevel */}
           <div
             className="rounded-full w-full h-full"
             style={{
               padding: 5,
-              background: "linear-gradient(160deg, hsl(42 100% 62%), hsl(38 80% 32%), hsl(42 100% 48%))",
+              background: `linear-gradient(160deg, hsl(42 100% 62%), hsl(38 80% 32%), hsl(42 100% 48%))`,
+              boxShadow: "inset 0 1px 4px hsl(42 100% 80% / 0.4), inset 0 -2px 4px hsl(0 0% 0% / 0.35)",
             }}
           >
             <svg
@@ -342,8 +284,8 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
               style={{
                 transform: `rotate(${rotation}deg)`,
                 transition: getTransition(),
-                willChange: "transform",
-                backfaceVisibility: "hidden",
+                filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.3))",
+                aspectRatio: "1/1",
               }}
             >
               <defs>
@@ -352,7 +294,6 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
                   const rad = (midAngle * Math.PI) / 180;
                   const gx1 = 0.5 + 0.3 * Math.cos(rad);
                   const gy1 = 0.5 + 0.3 * Math.sin(rad);
-
                   return (
                     <radialGradient key={`segGrad${i}`} id={`segGrad${i}`} cx={gx1} cy={gy1} r="0.7">
                       <stop offset="0%" stopColor={seg.color} />
@@ -366,6 +307,14 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
                   <stop offset="50%" stopColor="hsl(42, 100%, 48%)" />
                   <stop offset="100%" stopColor="hsl(38, 85%, 32%)" />
                 </radialGradient>
+                <radialGradient id="topLight" cx="0.5" cy="0.15" r="0.6">
+                  <stop offset="0%" stopColor="white" stopOpacity="0.12" />
+                  <stop offset="100%" stopColor="white" stopOpacity="0" />
+                </radialGradient>
+                <radialGradient id="bottomShadow" cx="0.5" cy="0.85" r="0.6">
+                  <stop offset="0%" stopColor="black" stopOpacity="0.15" />
+                  <stop offset="100%" stopColor="black" stopOpacity="0" />
+                </radialGradient>
                 <radialGradient id="hubGrad" cx="0.4" cy="0.35" r="0.7">
                   <stop offset="0%" stopColor="hsl(42, 100%, 70%)" />
                   <stop offset="50%" stopColor="hsl(42, 100%, 50%)" />
@@ -375,6 +324,17 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
                   <stop offset="0%" stopColor="hsl(0, 60%, 22%)" />
                   <stop offset="100%" stopColor="hsl(0, 60%, 10%)" />
                 </radialGradient>
+                <filter id="winGlow">
+                  <feGaussianBlur stdDeviation="6" result="blur" />
+                  <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+                </filter>
+                <filter id="segGlow">
+                  <feGaussianBlur stdDeviation="1" result="blur" />
+                  <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+                </filter>
+                <filter id="textShadow">
+                  <feDropShadow dx="0" dy="1" stdDeviation="1" floodColor="rgba(0,0,0,0.5)" />
+                </filter>
               </defs>
 
               <circle cx={center} cy={center} r={innerRadius} fill="hsl(0, 60%, 12%)" />
@@ -382,8 +342,6 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
               {SEGMENTS.map((seg, i) => {
                 const isHighlighted = i === highlightIndex;
                 const isGoldSeg = seg.label === "200%";
-                const textPos = getTextPosition(i);
-
                 return (
                   <g key={i}>
                     <path
@@ -392,16 +350,16 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
                       stroke="hsl(42, 100%, 55%)"
                       strokeWidth="1.2"
                     />
-
+                    {/* Highlight overlay — only for the segment under the pointer */}
                     {isHighlighted && wheelState === "won" && (
                       <path
                         d={createSegmentPath(i, innerRadius)}
-                        fill="hsl(45, 100%, 62%)"
-                        opacity="0.34"
+                        fill="hsl(45, 100%, 60%)"
+                        opacity="0.3"
                         className="animate-pulse"
+                        filter="url(#winGlow)"
                       />
                     )}
-
                     <path
                       d={createSegmentPath(i, innerRadius)}
                       fill="none"
@@ -409,59 +367,37 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
                       strokeWidth="0.6"
                       opacity={isGoldSeg ? 0.5 : 0.06}
                     />
-
                     <text
-                      x={textPos.x}
-                      y={textPos.y}
+                      x={getTextPosition(i).x} y={getTextPosition(i).y}
                       fill={isGoldSeg ? "hsl(0, 0%, 5%)" : "hsl(0, 0%, 95%)"}
-                      fontWeight="900"
-                      fontSize="14"
-                      fontFamily="'Space Grotesk', sans-serif"
-                      textAnchor="middle"
-                      dominantBaseline="central"
-                      transform={`rotate(${textPos.angle}, ${textPos.x}, ${textPos.y})`}
-                      style={{ letterSpacing: "0.45px" }}
-                    >
-                      {seg.label}
-                    </text>
+                      fontWeight="900" fontSize="15" fontFamily="'Space Grotesk', sans-serif"
+                      textAnchor="middle" dominantBaseline="central"
+                      transform={`rotate(${getTextPosition(i).angle}, ${getTextPosition(i).x}, ${getTextPosition(i).y})`}
+                      filter="url(#textShadow)" style={{ letterSpacing: "0.5px" }}
+                    >{seg.label}</text>
                   </g>
                 );
               })}
 
               {rimNotches.map((notch, i) => (
-                <circle
-                  key={`notch-${i}`}
-                  cx={notch.cx}
-                  cy={notch.cy}
-                  r="3.2"
-                  fill="url(#hubGrad)"
-                  stroke="hsl(38, 85%, 30%)"
-                  strokeWidth="0.4"
-                />
+                <circle key={`notch-${i}`} cx={notch.cx} cy={notch.cy} r="3.5" fill="url(#hubGrad)" stroke="hsl(38, 85%, 30%)" strokeWidth="0.5" />
               ))}
 
-              <circle cx={center} cy={center} r={innerRadius} fill="none" stroke="hsl(42, 100%, 55%)" strokeWidth="1.6" opacity="0.25" />
-              <circle cx={center} cy={center} r="30" fill="url(#hubGrad)" stroke="hsl(38, 85%, 25%)" strokeWidth="1.6" />
-              <circle cx={center} cy={center} r="24" fill="url(#hubInner)" stroke="hsl(42, 100%, 50%)" strokeWidth="1" />
-              <text
-                x={center}
-                y={center}
-                fill="hsl(42, 100%, 60%)"
-                fontWeight="900"
-                fontSize="10"
-                fontFamily="'Space Grotesk', sans-serif"
-                textAnchor="middle"
-                dominantBaseline="central"
-                style={{ letterSpacing: "1.4px" }}
-              >
-                BONUS
-              </text>
+              <circle cx={center} cy={center} r={innerRadius} fill="url(#topLight)" />
+              <circle cx={center} cy={center} r={innerRadius} fill="url(#bottomShadow)" />
+              <circle cx={center} cy={center} r={innerRadius} fill="none" stroke="hsl(42, 100%, 55%)" strokeWidth="2" opacity="0.3" />
+
+              <circle cx={center} cy={center} r="30" fill="url(#hubGrad)" stroke="hsl(38, 85%, 25%)" strokeWidth="2" filter="url(#segGlow)" />
+              <circle cx={center} cy={center} r="24" fill="url(#hubInner)" stroke="hsl(42, 100%, 50%)" strokeWidth="1.2" />
+              <ellipse cx={center - 4} cy={center - 6} rx="10" ry="7" fill="white" opacity="0.08" />
+              <text x={center} y={center} fill="hsl(42, 100%, 60%)" fontWeight="900" fontSize="10" fontFamily="'Space Grotesk', sans-serif" textAnchor="middle" dominantBaseline="central" style={{ letterSpacing: "1.5px" }}>BONUS</text>
             </svg>
           </div>
         </div>
 
+        {/* 3D Pointer — fixed at top center */}
         <div
-          className={`absolute z-20 ${phase === "bounce" ? "pointer-bounce" : ""}`}
+          className={`absolute z-20 ${!spinning && !disabled ? "wiggle-idle" : ""} ${phase === "bounce" ? "pointer-bounce" : ""}`}
           style={{ top: "3%", left: "50%", transform: "translateX(-50%)" }}
         >
           <svg width="36" height="44" viewBox="0 0 36 44">
@@ -471,8 +407,12 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
                 <stop offset="40%" stopColor="hsl(42, 100%, 51%)" />
                 <stop offset="100%" stopColor="hsl(38, 85%, 35%)" />
               </linearGradient>
+              <filter id="pointerShadow">
+                <feDropShadow dx="0" dy="3" stdDeviation="3" floodColor="rgba(0,0,0,0.6)" />
+                <feDropShadow dx="0" dy="0" stdDeviation="4" floodColor="hsl(42, 100%, 51%)" floodOpacity="0.4" />
+              </filter>
             </defs>
-            <polygon points="18,40 6,4 18,10 30,4" fill="url(#pointerGrad)" stroke="hsl(38, 85%, 30%)" strokeWidth="1" />
+            <polygon points="18,40 6,4 18,10 30,4" fill="url(#pointerGrad)" stroke="hsl(38, 85%, 30%)" strokeWidth="1" filter="url(#pointerShadow)" />
             <polygon points="18,38 14,8 18,12" fill="hsl(42, 100%, 75%)" opacity="0.3" />
             <circle cx="18" cy="6" r="4" fill="url(#pointerGrad)" stroke="hsl(38,85%,30%)" strokeWidth="0.8" />
             <circle cx="17" cy="5" r="1.5" fill="hsl(42,100%,80%)" opacity="0.6" />
@@ -480,16 +420,23 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
         </div>
       </div>
 
+      {/* Urgency */}
       <div className="mt-3 flex items-center gap-2 glass-card rounded-full px-4 py-2 text-xs">
         <span>🔥</span>
         <span className="text-muted-foreground">Bonos disponibles hoy:</span>
         <span className="font-bold text-casino-gold">12 restantes</span>
       </div>
 
+      {/* Spin button */}
       <button
         onClick={spin}
         disabled={spinning || disabled}
-        className="mt-4 px-12 py-4 rounded-full font-black text-lg tracking-wide gold-gradient text-primary-foreground disabled:opacity-50 transition-transform active:scale-[0.98] uppercase"
+        className={`mt-4 px-12 py-4 rounded-full font-black text-lg tracking-wide gold-gradient text-primary-foreground pulse-glow disabled:opacity-50 disabled:animate-none transition-all spin-btn-hover uppercase ${!spinning && !disabled ? "bounce-cta" : ""}`}
+        style={{
+          boxShadow: spinning
+            ? "0 4px 16px hsl(42 100% 55% / 0.3)"
+            : "0 4px 24px hsl(42 100% 55% / 0.4), 0 0 40px hsl(42 100% 55% / 0.15), 0 8px 16px hsl(0 0% 0% / 0.3)",
+        }}
       >
         {spinning ? "Girando..." : disabled ? "Ya giraste" : "🎰 Girar ahora"}
       </button>

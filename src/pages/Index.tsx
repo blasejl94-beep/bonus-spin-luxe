@@ -3,7 +3,7 @@ import { Shield, Zap, Headphones, Lock, Star } from "lucide-react";
 import logo from "@/assets/logo.png";
 import SpinWheel from "@/components/SpinWheel";
 import Confetti from "@/components/Confetti";
-
+import AmbientParticles from "@/components/AmbientParticles";
 import SocialProofTicker from "@/components/SocialProofTicker";
 import LiveCounter from "@/components/LiveCounter";
 import ScarcityBar from "@/components/ScarcityBar";
@@ -125,7 +125,7 @@ const Index = () => {
 
   return (
     <div className={`min-h-screen casino-gradient relative overflow-x-hidden ${showShake ? 'screen-shake' : ''}`}>
-      
+      <AmbientParticles />
       {showConfetti && <Confetti />}
       {showSuspense && <SuspenseOverlay onComplete={handleSuspenseComplete} />}
       {showFlash && (
@@ -140,7 +140,7 @@ const Index = () => {
       <section className="relative z-10 flex flex-col items-center px-5 pt-10 pb-8 text-center max-w-lg mx-auto">
         {/* Logo / Brand */}
         <div className="flex items-center justify-center mb-6">
-          <img src={logo} alt="Smart Play" className="w-28 h-28 object-contain" />
+          <img src={logo} alt="Smart Play" className="w-28 h-28 object-contain drop-shadow-[0_0_20px_hsl(var(--casino-gold)/0.4)]" />
         </div>
 
         <h1 className="text-3xl sm:text-4xl font-black leading-[1.1] mb-3 gold-text max-w-md tracking-tight">
@@ -235,7 +235,7 @@ const Index = () => {
 
             <Button
               onClick={handleClaim}
-              className="mt-2 w-full max-w-xs py-8 text-2xl font-black rounded-2xl gold-gradient text-primary-foreground uppercase tracking-wide bounce-cta stagger-4 relative overflow-hidden gold-glow hover:scale-[1.03] active:scale-95 transition-transform duration-300 border-2 border-casino-gold/60"
+              className="mt-2 w-full max-w-xs py-8 text-2xl font-black rounded-2xl gold-gradient text-primary-foreground uppercase tracking-wide bounce-cta stagger-4 relative overflow-hidden shadow-[0_0_40px_hsl(42,100%,50%,0.5),0_0_80px_hsl(42,100%,50%,0.2)] hover:shadow-[0_0_60px_hsl(42,100%,50%,0.7),0_0_100px_hsl(42,100%,50%,0.3)] hover:scale-[1.03] active:scale-95 transition-all duration-300 border-2 border-casino-gold/60"
             >
               <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
               🎁 RECLAMAR MI BONO
@@ -284,7 +284,7 @@ const Index = () => {
                 <Button
                   type="submit"
                   disabled={!phone}
-                  className="w-full py-5 text-lg font-black rounded-xl gold-gradient text-primary-foreground uppercase tracking-wide disabled:opacity-40 relative overflow-hidden gold-glow hover:scale-[1.02] active:scale-95 transition-transform duration-300 border border-casino-gold/50"
+                  className="w-full py-5 text-lg font-black rounded-xl gold-gradient text-primary-foreground uppercase tracking-wide disabled:opacity-40 relative overflow-hidden shadow-[0_0_30px_hsl(42,100%,50%,0.4)] hover:shadow-[0_0_50px_hsl(42,100%,50%,0.6)] hover:scale-[1.02] active:scale-95 transition-all duration-300 border border-casino-gold/50"
                 >
                   <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
                   🎁 ¡Reclamar!
@@ -325,7 +325,7 @@ const Index = () => {
       <div className="h-px w-4/5 mx-auto bg-gradient-to-r from-transparent via-border to-transparent" />
 
       {/* Social Proof */}
-      <section className="relative z-10 px-5 py-8 max-w-lg mx-auto" style={{ contentVisibility: 'auto', containIntrinsicSize: '0 500px' }}>
+      <section className="relative z-10 px-5 py-8 max-w-lg mx-auto">
         <h3 className="text-center text-xs font-bold text-muted-foreground uppercase tracking-[0.25em] mb-4">
           Ganadores recientes
         </h3>
@@ -348,7 +348,7 @@ const Index = () => {
       <div className="h-px w-4/5 mx-auto bg-gradient-to-r from-transparent via-border to-transparent" />
 
       {/* Footer */}
-      <footer className="relative z-10 px-5 py-10 max-w-lg mx-auto text-center" style={{ contentVisibility: 'auto', containIntrinsicSize: '0 400px' }}>
+      <footer className="relative z-10 px-5 py-10 max-w-lg mx-auto text-center">
         {/* Payment methods */}
         <div className="mb-6">
           <p className="text-[10px] text-muted-foreground/50 uppercase tracking-[0.2em] mb-3">Métodos de pago aceptados</p>
@@ -397,7 +397,7 @@ const Index = () => {
           href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`}
           target="_blank"
           rel="noopener noreferrer"
-          className={`fixed bottom-4 left-4 right-4 z-40 flex items-center justify-center gap-2 py-4 rounded-2xl bg-[hsl(142,70%,38%)] text-white font-bold text-base shadow-md active:scale-95 transition-transform duration-200 max-w-lg mx-auto ${step === "result" ? "bounce-cta" : ""}`}
+          className={`fixed bottom-4 left-4 right-4 z-40 flex items-center justify-center gap-2 py-4 rounded-2xl bg-[hsl(142,70%,38%)] text-white font-bold text-base shadow-[0_4px_24px_hsl(142_70%_38%/0.4)] active:scale-95 transition-all duration-200 max-w-lg mx-auto ${step === "result" ? "bounce-cta" : ""}`}
         >
           <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current">
             <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />

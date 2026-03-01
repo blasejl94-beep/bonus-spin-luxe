@@ -1,5 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
-import { usePageVisible } from "@/hooks/use-page-visible";
+import React, { useEffect, useState } from "react";
 
 const NAMES = ["Valentina", "Gonzalo", "Felipe", "Camila", "Martín", "Lucía", "Santiago", "Florencia", "Mateo", "Sofía"];
 const CITIES = ["Montevideo", "Punta del Este", "Salto", "Colonia", "Maldonado", "Rivera", "Paysandú"];
@@ -8,22 +7,8 @@ const AMOUNTS = [15000, 22000, 8500, 45000, 31000, 12000, 67000, 19500, 28000, 5
 const WinnerToast: React.FC = () => {
   const [visible, setVisible] = useState(false);
   const [winner, setWinner] = useState({ name: "", city: "", amount: 0, time: "" });
-  const pageVisible = usePageVisible();
-  const intervalRef = useRef<number | null>(null);
-  const timeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
-    const clearAll = () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    };
-
-    if (!pageVisible) {
-      clearAll();
-      setVisible(false);
-      return;
-    }
-
     const show = () => {
       const times = ["hace 1 min", "hace 2 min", "hace 30 seg", "ahora mismo", "hace 5 min"];
       setWinner({
@@ -33,19 +18,19 @@ const WinnerToast: React.FC = () => {
         time: times[Math.floor(Math.random() * times.length)],
       });
       setVisible(true);
-      timeoutRef.current = window.setTimeout(() => setVisible(false), 4000);
+      setTimeout(() => setVisible(false), 4000);
     };
 
-    const initial = window.setTimeout(show, 5000);
-    intervalRef.current = window.setInterval(show, 8000 + Math.random() * 4000);
-    return () => { clearTimeout(initial); clearAll(); };
-  }, [pageVisible]);
+    const initial = setTimeout(show, 5000);
+    const interval = setInterval(show, 8000 + Math.random() * 4000);
+    return () => { clearTimeout(initial); clearInterval(interval); };
+  }, []);
 
   if (!visible) return null;
 
   return (
     <div className="fixed bottom-20 left-4 z-50 max-w-[280px] animate-in slide-in-from-left-5 fade-in-0 duration-300">
-      <div className="bg-card border border-border rounded-xl p-3 shadow-lg">
+      <div className="bg-card/95 backdrop-blur border border-border rounded-xl p-3 shadow-lg">
         <div className="flex items-start gap-2">
           <span className="text-lg mt-0.5">🏆</span>
           <div className="text-xs">

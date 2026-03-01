@@ -1,28 +1,50 @@
 
-1) Bloqueo inmediato de causas de crash en zona de rueda (hero)
-- `src/pages/Index.tsx`: quitar `drop-shadow-[...]` del logo principal y reducir sombras/glows pesados en elementos visibles al cargar.
-- `src/index.css`: recortar intensidad de `.gold-glow`, `.premium-shadow`, `.glass-card-strong`, `.victory-card-glow` para que queden estáticos y de bajo costo (sin filtros/sombras grandes).
 
-2) Evitar trabajo continuo fuera de viewport
-- `src/components/SocialProofTicker.tsx`: animar ticker solo cuando la sección está visible (IntersectionObserver); cuando no está visible, pausar animación (`animation-play-state: paused` o clase sin animación).
-- Reducir nodos del ticker (lista base menor) y mantener duplicado mínimo para loop visual.
-- `src/pages/Index.tsx`: aplicar `content-visibility: auto` + `contain-intrinsic-size` en secciones debajo del fold (social proof/footer) para aliviar scroll sobre hero.
+## Casino Promotion Landing Page - Implementation Plan
 
-3) Wheel 100% estable y liviana en idle
-- `src/components/SpinWheel.tsx`: mantener giro solo con `transform: rotate()` + `will-change: transform` en el SVG rotante.
-- Añadir `contain: layout paint size` al contenedor de rueda y asegurar `overflow-visible` con padding fijo para no recortes ni relayout.
-- `LedRingCanvas`: en `idle` dibujar una sola vez y detener loop; en `spinning/won` usar rAF con tope de FPS (p. ej. 30) y cortar celebración a ~1.8–2.2s.
+### Page Structure (Single-page, mobile-first)
 
-4) Eliminar re-renders/intervalos no críticos en navegación
-- `src/components/WinnerToast.tsx`: pausar intervalos cuando pestaña no visible (`visibilitychange`) y desactivar en modo bajo rendimiento.
-- `src/components/LiveCounter.tsx` y `src/components/ScarcityBar.tsx`: mantener intervalos lentos, sin animaciones extra; no actualizar si documento está oculto.
-- Confirmar que no existan listeners globales de scroll con trabajo pesado (actualmente no hay; mantener así).
+**1. Hero Section (Above the fold)**
+- Deep red gradient background with gold accents
+- Headline: "Girá la ruleta y desbloqueá tu bono de bienvenida"
+- Subheadline with player count social proof
+- Three trust badges (verified, fast payments, 24/7 support)
+- Large interactive spin wheel with 7 segments (50%-350% bonuses)
+- "Tenés 1 giro disponible" text + "Girar ahora" CTA button
 
-5) Modo “low-performance” automático
-- Nuevo hook/util (ej. `src/hooks/use-performance-mode.ts`): activar degradación si `prefers-reduced-motion`, `deviceMemory` baja o `hardwareConcurrency` baja.
-- En modo low-performance: desactivar ticker animado, bajar LEDs efectivos, desactivar efectos decorativos no esenciales del hero, mantener layout intacto.
+**2. Spin Wheel Interaction**
+- CSS-animated wheel with realistic spin physics and suspense delay
+- Result always lands on a high bonus (e.g., 350%)
+- Confetti animation on result reveal
+- Prize modal: "🎉 ¡Felicitaciones! Ganaste 350% de bono"
+- "Reclamar mi bono" CTA button
+- Store spin in localStorage to prevent re-spins
 
-6) Validación final enfocada en crash de scroll
-- Probar end-to-end en móvil real: scroll repetido arriba/abajo sobre la rueda por 2–3 minutos.
-- Verificar: sin cierres del navegador, scroll fluido, rueda centrada/grande/responsive, giro correcto, highlight correcto al detener.
-- Verificar en modo reducido: animaciones minimizadas y sin regresiones visuales críticas.
+**3. Bonus Claim Form**
+- Slides in after clicking "Reclamar mi bono"
+- "Activá tu bono en 10 segundos" header
+- Countdown timer (5 minutes) for urgency
+- Phone number (required) + Name (optional) fields
+- "Activar bono ahora" CTA button
+- On submit → redirects to WhatsApp with prefilled message
+
+**4. Social Proof Section**
+- Auto-scrolling ticker of recent winners with randomized names/amounts
+- Small casino game thumbnails (slots, roulette, blackjack) using icons/emojis
+
+**5. Sticky WhatsApp CTA**
+- Fixed bottom floating button: "Hablar con un asesor por WhatsApp"
+- Opens WhatsApp with prefilled message
+
+### Design System
+- Background: deep red-to-dark gradient
+- Accents: gold/amber tones
+- Text: white, high contrast
+- Large touch targets, smooth transitions
+- Confetti effect using CSS animations
+
+### Technical Notes
+- All frontend, no backend needed
+- Single Index page with state management for the funnel steps
+- localStorage for one-spin-per-session logic
+
