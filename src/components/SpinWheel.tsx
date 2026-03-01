@@ -12,7 +12,6 @@ const SEGMENTS = [
   { label: "200%", color: "hsl(45, 100%, 51%)", colorDark: "hsl(38, 85%, 38%)" },
 ];
 
-const WINNING_INDEX = 6;
 const SEGMENT_ANGLE = 360 / SEGMENTS.length;
 const NUM_SEGMENTS = SEGMENTS.length;
 const NUM_LEDS = 32;
@@ -28,9 +27,8 @@ type WheelState = "idle" | "spinning" | "won";
 const LedRing: React.FC<{ state: WheelState }> = ({ state }) => {
   const leds = useMemo(() =>
     Array.from({ length: NUM_LEDS }, (_, i) => {
-      const angle = (i / NUM_LEDS) * 360 - 90; // start from top
+      const angle = (i / NUM_LEDS) * 360 - 90;
       const rad = (angle * Math.PI) / 180;
-      // Position as percentage for responsiveness
       const x = 50 + 50 * Math.cos(rad);
       const y = 50 + 50 * Math.sin(rad);
       return { x, y, idx: i };
@@ -72,8 +70,9 @@ const LedRing: React.FC<{ state: WheelState }> = ({ state }) => {
 
 /* ── Helpers ── */
 function getSegmentUnderPointer(rotationDeg: number): number {
-  // Pointer is at top (270°). Segment 0 starts at 0° (3 o'clock).
-  // After rotating by `rotationDeg`, the angle under the pointer is (270 - rotation) mod 360.
+  // Pointer is at top (270° in standard math coords).
+  // Segment 0 spans from 0° to SEGMENT_ANGLE (starting at 3 o'clock).
+  // After rotating clockwise by `rotationDeg`, the angle under the pointer is:
   const angleUnderPointer = ((270 - (rotationDeg % 360)) % 360 + 360) % 360;
   return Math.floor(angleUnderPointer / SEGMENT_ANGLE) % NUM_SEGMENTS;
 }
@@ -81,15 +80,14 @@ function getSegmentUnderPointer(rotationDeg: number): number {
 const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
   const [rotation, setRotation] = useState(0);
   const [spinning, setSpinning] = useState(false);
-  const [phase, setPhase] = useState<"idle" | "fast" | "slow" | "bounce">("idle");
+  const [phase, setPhase] = useState<"idle" | "spinning" | "bounce">("idle");
   const [glowIntensity, setGlowIntensity] = useState(0);
   const [highlightIndex, setHighlightIndex] = useState<number>(-1);
   const [wheelState, setWheelState] = useState<WheelState>("idle");
   const [showWinConfetti, setShowWinConfetti] = useState(false);
   const wheelRef = useRef<SVGSVGElement>(null);
-  const tickIntervalRef = useRef<number | null>(null);
   const lastTickSegmentRef = useRef<number>(-1);
-  const finalRotationRef = useRef<number>(0);
+  const rafRef = useRef<number | null>(null);
 
   // Idle breathing glow
   useEffect(() => {
@@ -106,18 +104,16 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
     return () => cancelAnimationFrame(frame);
   }, [spinning, disabled]);
 
-  // Tick sound + highlight tracker during spin
+  // Tick sound tracker — reads computed transform, NO highlight updates during spin
   useEffect(() => {
     if (!spinning) {
-      if (tickIntervalRef.current) {
-        clearInterval(tickIntervalRef.current);
-        tickIntervalRef.current = null;
-      }
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
       return;
     }
     const checkTick = () => {
       const svg = wheelRef.current;
-      if (!svg) return;
+      if (!svg) { rafRef.current = requestAnimationFrame(checkTick); return; }
       const style = window.getComputedStyle(svg);
       const transform = style.transform;
       if (transform && transform !== "none") {
@@ -128,58 +124,59 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
           const b = parseFloat(parts[1]);
           const angle = Math.atan2(b, a) * (180 / Math.PI);
           const normalizedAngle = ((angle % 360) + 360) % 360;
-          // Compute which segment is under pointer from actual rendered angle
           const currentSegment = getSegmentUnderPointer(normalizedAngle);
           if (currentSegment !== lastTickSegmentRef.current) {
             lastTickSegmentRef.current = currentSegment;
-            setHighlightIndex(currentSegment);
             playTick(0.9 + Math.random() * 0.2);
           }
         }
       }
+      rafRef.current = requestAnimationFrame(checkTick);
     };
-    tickIntervalRef.current = window.setInterval(checkTick, 30);
-    return () => { if (tickIntervalRef.current) clearInterval(tickIntervalRef.current); };
+    rafRef.current = requestAnimationFrame(checkTick);
+    return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
   }, [spinning]);
 
   const spin = useCallback(() => {
     if (spinning || disabled) return;
     setSpinning(true);
-    setPhase("fast");
+    setPhase("spinning");
     setGlowIntensity(0.9);
     setHighlightIndex(-1);
     setWheelState("spinning");
     setShowWinConfetti(false);
     lastTickSegmentRef.current = -1;
 
-    // Calculate target: winning segment center aligned under pointer (270°)
-    const segmentCenter = WINNING_INDEX * SEGMENT_ANGLE + SEGMENT_ANGLE / 2;
-    const targetAngle = 270 - segmentCenter;
+    // Truly random landing — pick a random angle, no forced segment
+    const randomAngle = Math.random() * 360;
     const fullSpins = 7 + Math.floor(Math.random() * 3);
-    const totalRotation = fullSpins * 360 + targetAngle + (Math.random() * 10 - 5);
+    const totalRotation = fullSpins * 360 + randomAngle;
     const newRotation = rotation + totalRotation;
 
-    finalRotationRef.current = newRotation;
     setRotation(newRotation);
 
-    setTimeout(() => setPhase("slow"), 2200);
+    // CSS transition handles the easing. After it finishes, compute result.
+    const spinDuration = 4800; // matches CSS transition duration
     setTimeout(() => {
+      // Bounce phase
       setPhase("bounce");
       setGlowIntensity(1);
-      // Compute final highlight from actual final rotation
+
+      // Single source of truth: compute winner from final rotation
       const winIdx = getSegmentUnderPointer(newRotation);
       setHighlightIndex(winIdx);
       setWheelState("won");
       setShowWinConfetti(true);
       playLandingClick();
-    }, 4400);
 
-    setTimeout(() => {
-      setSpinning(false);
-      setPhase("idle");
-      onSpinComplete(SEGMENTS[WINNING_INDEX].label);
-      setTimeout(() => setShowWinConfetti(false), 4000);
-    }, 5000);
+      setTimeout(() => {
+        setSpinning(false);
+        setPhase("idle");
+        const winIdx2 = getSegmentUnderPointer(newRotation);
+        onSpinComplete(SEGMENTS[winIdx2].label);
+        setTimeout(() => setShowWinConfetti(false), 4000);
+      }, 600);
+    }, spinDuration);
   }, [spinning, disabled, onSpinComplete, rotation]);
 
   const size = 310;
@@ -209,7 +206,7 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
   };
 
   const getTransition = () => {
-    if (phase === "fast") return "transform 4.8s cubic-bezier(0.10, 0.58, 0.06, 0.98)";
+    if (phase === "spinning") return "transform 4.8s cubic-bezier(0.10, 0.58, 0.06, 0.98)";
     if (phase === "bounce") return "transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)";
     return "none";
   };
@@ -344,12 +341,12 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
 
               {SEGMENTS.map((seg, i) => {
                 const isHighlighted = i === highlightIndex;
-                const isWinSeg = i === WINNING_INDEX;
+                const isGoldSeg = seg.label === "200%";
                 return (
                   <g key={i}>
                     <path
                       d={createSegmentPath(i, innerRadius)}
-                      fill={isWinSeg ? "url(#winSegGrad)" : `url(#segGrad${i})`}
+                      fill={isGoldSeg ? "url(#winSegGrad)" : `url(#segGrad${i})`}
                       stroke="hsl(42, 100%, 55%)"
                       strokeWidth="1.2"
                     />
@@ -363,23 +360,16 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
                         filter="url(#winGlow)"
                       />
                     )}
-                    {isHighlighted && spinning && (
-                      <path
-                        d={createSegmentPath(i, innerRadius)}
-                        fill="hsl(42, 100%, 70%)"
-                        opacity="0.12"
-                      />
-                    )}
                     <path
                       d={createSegmentPath(i, innerRadius)}
                       fill="none"
-                      stroke={isWinSeg ? "hsl(45, 100%, 80%)" : "hsl(0, 0%, 100%)"}
+                      stroke={isGoldSeg ? "hsl(45, 100%, 80%)" : "hsl(0, 0%, 100%)"}
                       strokeWidth="0.6"
-                      opacity={isWinSeg ? 0.5 : 0.06}
+                      opacity={isGoldSeg ? 0.5 : 0.06}
                     />
                     <text
                       x={getTextPosition(i).x} y={getTextPosition(i).y}
-                      fill={isWinSeg ? "hsl(0, 0%, 5%)" : "hsl(0, 0%, 95%)"}
+                      fill={isGoldSeg ? "hsl(0, 0%, 5%)" : "hsl(0, 0%, 95%)"}
                       fontWeight="900" fontSize="15" fontFamily="'Space Grotesk', sans-serif"
                       textAnchor="middle" dominantBaseline="central"
                       transform={`rotate(${getTextPosition(i).angle}, ${getTextPosition(i).x}, ${getTextPosition(i).y})`}
