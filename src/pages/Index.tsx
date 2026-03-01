@@ -139,9 +139,8 @@ const Index = () => {
       {/* Hero Section */}
       <section className="relative z-10 flex flex-col items-center px-5 pt-10 pb-8 text-center max-w-lg mx-auto">
         {/* Logo / Brand */}
-        <div className="flex items-center gap-2.5 mb-6">
-          <img src={logo} alt="Smart Play" className="w-10 h-10 rounded-xl shadow-lg object-cover" />
-          <span className="text-xl font-black tracking-tight gold-text">{BRAND_NAME}</span>
+        <div className="flex items-center justify-center mb-6">
+          <img src={logo} alt="Smart Play" className="w-28 h-28 object-contain drop-shadow-[0_0_20px_hsl(var(--casino-gold)/0.4)]" />
         </div>
 
         <h1 className="text-3xl sm:text-4xl font-black leading-[1.1] mb-3 gold-text max-w-md tracking-tight">
@@ -377,9 +376,8 @@ const Index = () => {
         </div>
 
         {/* Brand */}
-        <div className="flex items-center justify-center gap-2 mb-2">
-          <img src={logo} alt="Smart Play" className="w-6 h-6 rounded-md object-cover" />
-          <span className="text-sm font-bold gold-text">{BRAND_NAME}</span>
+        <div className="flex items-center justify-center mb-2">
+          <img src={logo} alt="Smart Play" className="w-20 h-20 object-contain" />
         </div>
         <p className="text-[10px] text-muted-foreground/30">
           © {new Date().getFullYear()} {BRAND_NAME}. Todos los derechos reservados.
