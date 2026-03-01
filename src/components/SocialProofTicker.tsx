@@ -30,7 +30,7 @@ const SocialProofTicker: React.FC = () => {
             key={i}
             className="flex items-center gap-3 py-2.5 px-4 hover:bg-muted/20 transition-colors rounded-lg"
           >
-            <div className="w-8 h-8 rounded-full glass-card flex items-center justify-center text-base flex-shrink-0">
+            <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-base flex-shrink-0">
               {w.avatar}
             </div>
             <span className="text-foreground/90 text-sm flex-1 leading-snug">

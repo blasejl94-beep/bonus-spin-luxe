@@ -14,7 +14,7 @@ const SEGMENTS = [
 
 const SEGMENT_ANGLE = 360 / SEGMENTS.length;
 const NUM_SEGMENTS = SEGMENTS.length;
-const NUM_LEDS = 18;
+const NUM_LEDS = 16;
 
 interface SpinWheelProps {
   onSpinComplete: (result: string) => void;
@@ -58,6 +58,8 @@ const LedRingCanvas: React.FC<{ state: WheelState }> = ({ state }) => {
       }
     };
 
+    let wonStart = 0;
+
     const draw = () => {
       frame += 1;
       if (frame % 12 === 0) resize();
@@ -85,9 +87,11 @@ const LedRingCanvas: React.FC<{ state: WheelState }> = ({ state }) => {
           const distance = (i - chaseHead + NUM_LEDS) % NUM_LEDS;
           alpha = distance < 4 ? 0.2 + (4 - distance) * 0.16 : 0.1;
         } else if (state === "won") {
+          if (!wonStart) wonStart = time;
           alpha = reducedMotion ? 0.58 : 0.45 + 0.38 * Math.sin(time * 0.03 - i * 0.5);
         } else {
-          alpha = reducedMotion ? 0.28 : 0.24 + 0.12 * Math.sin(time * 0.002 + i * 0.4);
+          // idle: static draw
+          alpha = 0.24;
         }
 
         const clampedAlpha = Math.max(0.08, Math.min(alpha, 0.86));
@@ -98,7 +102,13 @@ const LedRingCanvas: React.FC<{ state: WheelState }> = ({ state }) => {
         ctx.fill();
       }
 
-      rafId = requestAnimationFrame(draw);
+      // Only continue rAF loop when spinning or won (for max 2.5s)
+      if (state === "spinning") {
+        rafId = requestAnimationFrame(draw);
+      } else if (state === "won" && wonStart && (performance.now() - wonStart < 2500)) {
+        rafId = requestAnimationFrame(draw);
+      }
+      // idle: no loop — drawn once
     };
 
     resize();
