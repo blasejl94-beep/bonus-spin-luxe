@@ -23,6 +23,7 @@ const Confetti: React.FC = () => {
   }, []);
 
   return (
+    <>
     <div className="fixed inset-0 pointer-events-none z-50">
       {pieces.map((p) => (
         <div
@@ -39,6 +40,7 @@ const Confetti: React.FC = () => {
         />
       ))}
     </div>
+    </>
   );
 };
 

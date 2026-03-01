@@ -73,7 +73,7 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
   return (
     <div className="relative flex flex-col items-center">
       {/* Pointer */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1 z-10">
+      <div className={`absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1 z-10 ${!spinning && !disabled ? 'wiggle-idle' : ''}`}>
         <div
           className="w-0 h-0"
           style={{
@@ -129,7 +129,7 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
       <button
         onClick={spin}
         disabled={spinning || disabled}
-        className="mt-6 px-10 py-4 rounded-full font-extrabold text-lg tracking-wide gold-gradient text-primary-foreground pulse-glow disabled:opacity-50 disabled:animate-none transition-all active:scale-95 uppercase"
+        className={`mt-6 px-10 py-4 rounded-full font-extrabold text-lg tracking-wide gold-gradient text-primary-foreground pulse-glow disabled:opacity-50 disabled:animate-none transition-all active:scale-95 uppercase ${!spinning && !disabled ? 'bounce-cta' : ''}`}
       >
         {spinning ? "Girando..." : disabled ? "Ya giraste" : "🎰 Girar ahora"}
       </button>
