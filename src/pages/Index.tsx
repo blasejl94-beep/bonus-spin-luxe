@@ -7,6 +7,8 @@ import SocialProofTicker from "@/components/SocialProofTicker";
 import LiveCounter from "@/components/LiveCounter";
 import ScarcityBar from "@/components/ScarcityBar";
 import WinnerToast from "@/components/WinnerToast";
+import SuspenseOverlay from "@/components/SuspenseOverlay";
+import { playWinSound, playDrumroll } from "@/lib/sounds";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
@@ -27,6 +29,8 @@ const Index = () => {
   const [showConfetti, setShowConfetti] = useState(false);
   const [showFlash, setShowFlash] = useState(false);
   const [showShake, setShowShake] = useState(false);
+  const [showSuspense, setShowSuspense] = useState(false);
+  const [pendingPrize, setPendingPrize] = useState<string | null>(null);
   const [phone, setPhone] = useState("");
   const [name, setName] = useState("");
   const [countdown, setCountdown] = useState(BONUS_TIMER);
@@ -36,17 +40,28 @@ const Index = () => {
   const hasSpun = !!localStorage.getItem("casino_spun");
 
   const handleSpinComplete = useCallback((prize: string) => {
+    // Store prize and show suspense overlay first
+    setPendingPrize(prize);
+    playDrumroll();
+    setShowSuspense(true);
+  }, []);
+
+  const handleSuspenseComplete = useCallback(() => {
+    if (!pendingPrize) return;
+    setShowSuspense(false);
     localStorage.setItem("casino_spun", "true");
-    localStorage.setItem("casino_result", prize);
-    setResult(prize);
+    localStorage.setItem("casino_result", pendingPrize);
+    setResult(pendingPrize);
+    playWinSound();
     setShowConfetti(true);
     setShowFlash(true);
     setShowShake(true);
-    setTimeout(() => setShowFlash(false), 500);
-    setTimeout(() => setShowShake(false), 500);
-    setTimeout(() => setStep("result"), 800);
-    setTimeout(() => setShowConfetti(false), 5000);
-  }, []);
+    setTimeout(() => setShowFlash(false), 600);
+    setTimeout(() => setShowShake(false), 700);
+    setTimeout(() => setStep("result"), 300);
+    setTimeout(() => setShowConfetti(false), 6000);
+    setPendingPrize(null);
+  }, [pendingPrize]);
 
   const handleClaim = () => {
     setStep("claim");
@@ -98,6 +113,7 @@ const Index = () => {
     <div className={`min-h-screen casino-gradient relative overflow-x-hidden ${showShake ? 'screen-shake' : ''}`}>
       <AmbientParticles />
       {showConfetti && <Confetti />}
+      {showSuspense && <SuspenseOverlay onComplete={handleSuspenseComplete} />}
       {showFlash && (
         <div className="fixed inset-0 bg-casino-gold/30 z-50 pointer-events-none screen-flash" />
       )}
