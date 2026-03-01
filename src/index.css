@@ -198,12 +198,26 @@
 /* Wiggle animation for wheel pointer */
 @keyframes wiggle {
   0%, 100% { transform: translateX(-50%) rotate(0deg); }
-  25% { transform: translateX(-50%) rotate(-6deg); }
-  75% { transform: translateX(-50%) rotate(6deg); }
+  25% { transform: translateX(-50%) rotate(-8deg); }
+  75% { transform: translateX(-50%) rotate(8deg); }
 }
 
 .wiggle-idle {
   animation: wiggle 1.5s ease-in-out infinite;
+}
+
+/* Pointer bounce on landing */
+@keyframes pointer-bounce {
+  0% { transform: translateX(-50%) rotate(0deg); }
+  20% { transform: translateX(-50%) rotate(-12deg); }
+  40% { transform: translateX(-50%) rotate(8deg); }
+  60% { transform: translateX(-50%) rotate(-4deg); }
+  80% { transform: translateX(-50%) rotate(2deg); }
+  100% { transform: translateX(-50%) rotate(0deg); }
+}
+
+.pointer-bounce {
+  animation: pointer-bounce 0.6s ease-out;
 }
 
 /* Bounce animation for CTA */
