@@ -319,22 +319,33 @@
   100% { transform: translateX(100%); }
 }
 
-/* LED idle twinkle — opacity only for perf */
-@keyframes led-twinkle {
-  0%, 100% { opacity: 0.25; }
-  50% { opacity: 1; }
+/* LED idle breathing — opacity only for perf */
+@keyframes led-breathe {
+  0%, 100% { opacity: 0.2; transform: scale(0.85); }
+  50% { opacity: 0.7; transform: scale(1); }
 }
 .led-idle {
-  animation: led-twinkle 3s ease-in-out infinite;
+  animation: led-breathe 3s ease-in-out infinite;
 }
 
 /* LED chase while spinning — opacity only */
 @keyframes led-chase {
-  0%, 60% { opacity: 0.15; }
-  30% { opacity: 1; }
+  0%, 70% { opacity: 0.1; transform: scale(0.8); }
+  25% { opacity: 1; transform: scale(1.15); }
 }
 .led-chase {
   animation: led-chase 0.8s ease-in-out infinite;
+}
+
+/* LED celebrate on win — quick pulses */
+@keyframes led-celebrate {
+  0%, 100% { opacity: 0.4; transform: scale(0.9); }
+  25% { opacity: 1; transform: scale(1.3); }
+  50% { opacity: 0.6; transform: scale(1); }
+  75% { opacity: 1; transform: scale(1.2); }
+}
+.led-celebrate {
+  animation: led-celebrate 0.5s ease-in-out infinite;
 }
 
 /* Metallic sheen sweep on rim — transform only */
