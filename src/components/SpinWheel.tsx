@@ -1,4 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect, useMemo } from "react";
+import { playTick, playLandingClick } from "@/lib/sounds";
 
 const SEGMENTS = [
   { label: "50%", color: "hsl(0, 72%, 30%)", colorDark: "hsl(0, 72%, 22%)" },
@@ -12,6 +13,7 @@ const SEGMENTS = [
 
 const WINNING_INDEX = 6;
 const SEGMENT_ANGLE = 360 / SEGMENTS.length;
+const NUM_SEGMENTS = SEGMENTS.length;
 
 interface SpinWheelProps {
   onSpinComplete: (result: string) => void;
@@ -65,6 +67,8 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
   const [glowIntensity, setGlowIntensity] = useState(0);
   const [winHighlight, setWinHighlight] = useState(false);
   const wheelRef = useRef<SVGSVGElement>(null);
+  const tickIntervalRef = useRef<number | null>(null);
+  const lastTickSegmentRef = useRef<number>(-1);
 
   // Idle breathing glow
   useEffect(() => {
@@ -81,12 +85,55 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
     return () => cancelAnimationFrame(frame);
   }, [spinning, disabled]);
 
+  // Tick sound tracker during spin
+  useEffect(() => {
+    if (!spinning) {
+      if (tickIntervalRef.current) {
+        clearInterval(tickIntervalRef.current);
+        tickIntervalRef.current = null;
+      }
+      return;
+    }
+
+    const checkTick = () => {
+      const svg = wheelRef.current;
+      if (!svg) return;
+      const style = window.getComputedStyle(svg);
+      const transform = style.transform;
+      if (transform && transform !== "none") {
+        // Extract rotation from matrix
+        const values = transform.match(/matrix\((.+)\)/);
+        if (values) {
+          const parts = values[1].split(", ");
+          const a = parseFloat(parts[0]);
+          const b = parseFloat(parts[1]);
+          const angle = Math.atan2(b, a) * (180 / Math.PI);
+          const normalizedAngle = ((angle % 360) + 360) % 360;
+          const currentSegment = Math.floor(normalizedAngle / SEGMENT_ANGLE) % NUM_SEGMENTS;
+          
+          if (currentSegment !== lastTickSegmentRef.current) {
+            lastTickSegmentRef.current = currentSegment;
+            // Vary pitch slightly for realism
+            const pitch = 0.9 + Math.random() * 0.2;
+            playTick(pitch);
+          }
+        }
+      }
+    };
+
+    tickIntervalRef.current = window.setInterval(checkTick, 30);
+    return () => {
+      if (tickIntervalRef.current) clearInterval(tickIntervalRef.current);
+    };
+  }, [spinning]);
+
   const spin = useCallback(() => {
     if (spinning || disabled) return;
     setSpinning(true);
     setPhase("fast");
     setGlowIntensity(0.9);
     setWinHighlight(false);
+    lastTickSegmentRef.current = -1;
 
     const segmentCenter = WINNING_INDEX * SEGMENT_ANGLE + SEGMENT_ANGLE / 2;
     const targetAngle = 270 - segmentCenter;
@@ -100,19 +147,7 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
       setPhase("bounce");
       setGlowIntensity(1);
       setWinHighlight(true);
-      // Landing click sound
-      try {
-        const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = "sine";
-        osc.frequency.value = 1200;
-        gain.gain.setValueAtTime(0.15, ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
-        osc.connect(gain).connect(ctx.destination);
-        osc.start();
-        osc.stop(ctx.currentTime + 0.15);
-      } catch {}
+      playLandingClick();
     }, 4400);
 
     setTimeout(() => {
@@ -154,7 +189,6 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
     return "none";
   };
 
-  // Rim notch positions (like real casino wheel pegs)
   const rimNotches = useMemo(() => {
     return Array.from({ length: SEGMENTS.length }, (_, i) => {
       const angle = (i * SEGMENT_ANGLE * Math.PI) / 180;
@@ -166,33 +200,16 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
     });
   }, []);
 
-  // Decorative dots on rim
-  const rimDots = useMemo(() => {
-    return Array.from({ length: 28 }, (_, i) => {
-      const angle = ((i / 28) * 360 * Math.PI) / 180;
-      const r = outerRadius + 4;
-      return {
-        cx: center + r * Math.cos(angle),
-        cy: center + r * Math.sin(angle),
-      };
-    });
-  }, []);
-
   return (
     <div className="relative flex flex-col items-center" style={{ minHeight: 420 }}>
-      {/* Floating sparkles */}
       <WheelSparkles spinning={spinning} />
 
-      {/* Drop shadow beneath wheel */}
+      {/* Drop shadow */}
       <div
         className="absolute pointer-events-none"
         style={{
-          bottom: 52,
-          left: "50%",
-          transform: "translateX(-50%)",
-          width: size + 40,
-          height: 30,
-          borderRadius: "50%",
+          bottom: 52, left: "50%", transform: "translateX(-50%)",
+          width: size + 40, height: 30, borderRadius: "50%",
           background: "radial-gradient(ellipse, hsl(0 0% 0% / 0.5) 0%, transparent 70%)",
           filter: "blur(8px)",
         }}
@@ -202,11 +219,8 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
       <div
         className="absolute pointer-events-none rounded-full"
         style={{
-          top: -20,
-          left: "50%",
-          transform: "translateX(-50%)",
-          width: size + 60,
-          height: size + 60,
+          top: -20, left: "50%", transform: "translateX(-50%)",
+          width: size + 60, height: size + 60,
           background: `radial-gradient(circle, hsl(42 100% 55% / ${glowIntensity * 0.2}) 40%, hsl(350 60% 30% / ${glowIntensity * 0.08}) 60%, transparent 70%)`,
           transition: "background 0.6s ease",
         }}
@@ -229,22 +243,14 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
               <feDropShadow dx="0" dy="0" stdDeviation="4" floodColor="hsl(42, 100%, 51%)" floodOpacity="0.4" />
             </filter>
           </defs>
-          <polygon
-            points="18,40 6,4 18,10 30,4"
-            fill="url(#pointerGrad)"
-            stroke="hsl(38, 85%, 30%)"
-            strokeWidth="1"
-            filter="url(#pointerShadow)"
-          />
-          {/* Highlight stripe */}
+          <polygon points="18,40 6,4 18,10 30,4" fill="url(#pointerGrad)" stroke="hsl(38, 85%, 30%)" strokeWidth="1" filter="url(#pointerShadow)" />
           <polygon points="18,38 14,8 18,12" fill="hsl(42, 100%, 75%)" opacity="0.3" />
-          {/* Top circle */}
           <circle cx="18" cy="6" r="4" fill="url(#pointerGrad)" stroke="hsl(38,85%,30%)" strokeWidth="0.8" />
           <circle cx="17" cy="5" r="1.5" fill="hsl(42,100%,80%)" opacity="0.6" />
         </svg>
       </div>
 
-      {/* Main wheel container */}
+      {/* Main wheel */}
       <div
         className={`rounded-full ${phase === "fast" ? "wheel-spin-pulse" : ""}`}
         style={{
@@ -259,7 +265,6 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
           transition: "box-shadow 0.6s ease",
         }}
       >
-        {/* Inner metallic rim */}
         <div
           className="rounded-full"
           style={{
@@ -281,7 +286,6 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
             }}
           >
             <defs>
-              {/* 3D segment gradient for red segments */}
               {SEGMENTS.map((seg, i) => {
                 const midAngle = i * SEGMENT_ANGLE + SEGMENT_ANGLE / 2;
                 const rad = (midAngle * Math.PI) / 180;
@@ -295,185 +299,78 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
                   </radialGradient>
                 );
               })}
-
-              {/* Winning segment animated glow */}
               <radialGradient id="winSegGrad" cx="0.5" cy="0.5" r="0.8">
                 <stop offset="0%" stopColor="hsl(45, 100%, 65%)" />
                 <stop offset="50%" stopColor="hsl(42, 100%, 48%)" />
                 <stop offset="100%" stopColor="hsl(38, 85%, 32%)" />
               </radialGradient>
-
-              {/* Top light reflection overlay */}
               <radialGradient id="topLight" cx="0.5" cy="0.15" r="0.6">
                 <stop offset="0%" stopColor="white" stopOpacity="0.12" />
                 <stop offset="100%" stopColor="white" stopOpacity="0" />
               </radialGradient>
-
-              {/* Bottom shadow */}
               <radialGradient id="bottomShadow" cx="0.5" cy="0.85" r="0.6">
                 <stop offset="0%" stopColor="black" stopOpacity="0.15" />
                 <stop offset="100%" stopColor="black" stopOpacity="0" />
               </radialGradient>
-
-              {/* Center hub gradient */}
               <radialGradient id="hubGrad" cx="0.4" cy="0.35" r="0.7">
                 <stop offset="0%" stopColor="hsl(42, 100%, 70%)" />
                 <stop offset="50%" stopColor="hsl(42, 100%, 50%)" />
                 <stop offset="100%" stopColor="hsl(38, 85%, 30%)" />
               </radialGradient>
-
               <radialGradient id="hubInner" cx="0.4" cy="0.35" r="0.6">
                 <stop offset="0%" stopColor="hsl(0, 60%, 22%)" />
                 <stop offset="100%" stopColor="hsl(0, 60%, 10%)" />
               </radialGradient>
-
-              {/* Glow filters */}
               <filter id="winGlow">
                 <feGaussianBlur stdDeviation="4" result="blur" />
-                <feMerge>
-                  <feMergeNode in="blur" />
-                  <feMergeNode in="SourceGraphic" />
-                </feMerge>
+                <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
               </filter>
-
               <filter id="segGlow">
                 <feGaussianBlur stdDeviation="1" result="blur" />
-                <feMerge>
-                  <feMergeNode in="blur" />
-                  <feMergeNode in="SourceGraphic" />
-                </feMerge>
+                <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
               </filter>
-
               <filter id="textShadow">
                 <feDropShadow dx="0" dy="1" stdDeviation="1" floodColor="rgba(0,0,0,0.5)" />
               </filter>
             </defs>
 
-            {/* Background circle */}
             <circle cx={center} cy={center} r={innerRadius} fill="hsl(0, 60%, 12%)" />
 
-            {/* Segments with 3D gradients */}
             {SEGMENTS.map((seg, i) => (
               <g key={i}>
-                {/* Main segment fill */}
-                <path
-                  d={createSegmentPath(i, innerRadius)}
-                  fill={i === WINNING_INDEX ? "url(#winSegGrad)" : `url(#segGrad${i})`}
-                  stroke="hsl(42, 100%, 55%)"
-                  strokeWidth="1.2"
-                />
-                {/* Bevel highlight (top edge of segment) */}
-                <path
-                  d={createSegmentPath(i, innerRadius)}
-                  fill="none"
-                  stroke={i === WINNING_INDEX ? "hsl(45, 100%, 80%)" : "hsl(0, 0%, 100%)"}
-                  strokeWidth="0.6"
-                  opacity={i === WINNING_INDEX ? 0.5 : 0.06}
-                />
-                {/* Win highlight pulse */}
+                <path d={createSegmentPath(i, innerRadius)} fill={i === WINNING_INDEX ? "url(#winSegGrad)" : `url(#segGrad${i})`} stroke="hsl(42, 100%, 55%)" strokeWidth="1.2" />
+                <path d={createSegmentPath(i, innerRadius)} fill="none" stroke={i === WINNING_INDEX ? "hsl(45, 100%, 80%)" : "hsl(0, 0%, 100%)"} strokeWidth="0.6" opacity={i === WINNING_INDEX ? 0.5 : 0.06} />
                 {i === WINNING_INDEX && winHighlight && (
-                  <path
-                    d={createSegmentPath(i, innerRadius)}
-                    fill="hsl(45, 100%, 60%)"
-                    opacity="0.25"
-                    className="animate-pulse"
-                  />
+                  <path d={createSegmentPath(i, innerRadius)} fill="hsl(45, 100%, 60%)" opacity="0.25" className="animate-pulse" />
                 )}
-                {/* Segment text */}
                 <text
-                  x={getTextPosition(i).x}
-                  y={getTextPosition(i).y}
+                  x={getTextPosition(i).x} y={getTextPosition(i).y}
                   fill={i === WINNING_INDEX ? "hsl(0, 0%, 5%)" : "hsl(0, 0%, 95%)"}
-                  fontWeight="900"
-                  fontSize="15"
-                  fontFamily="'Space Grotesk', sans-serif"
-                  textAnchor="middle"
-                  dominantBaseline="central"
+                  fontWeight="900" fontSize="15" fontFamily="'Space Grotesk', sans-serif"
+                  textAnchor="middle" dominantBaseline="central"
                   transform={`rotate(${getTextPosition(i).angle}, ${getTextPosition(i).x}, ${getTextPosition(i).y})`}
-                  filter="url(#textShadow)"
-                  style={{ letterSpacing: "0.5px" }}
-                >
-                  {seg.label}
-                </text>
+                  filter="url(#textShadow)" style={{ letterSpacing: "0.5px" }}
+                >{seg.label}</text>
               </g>
             ))}
 
-            {/* Divider lines between segments (gold pegs) */}
             {rimNotches.map((notch, i) => (
-              <circle
-                key={`notch-${i}`}
-                cx={notch.cx}
-                cy={notch.cy}
-                r="3.5"
-                fill="url(#hubGrad)"
-                stroke="hsl(38, 85%, 30%)"
-                strokeWidth="0.5"
-              />
+              <circle key={`notch-${i}`} cx={notch.cx} cy={notch.cy} r="3.5" fill="url(#hubGrad)" stroke="hsl(38, 85%, 30%)" strokeWidth="0.5" />
             ))}
 
-            {/* Top light reflection overlay */}
             <circle cx={center} cy={center} r={innerRadius} fill="url(#topLight)" />
-            {/* Bottom shadow overlay */}
             <circle cx={center} cy={center} r={innerRadius} fill="url(#bottomShadow)" />
+            <circle cx={center} cy={center} r={innerRadius} fill="none" stroke="hsl(42, 100%, 55%)" strokeWidth="2" opacity="0.3" />
 
-            {/* Outer ring inside the wheel */}
-            <circle
-              cx={center}
-              cy={center}
-              r={innerRadius}
-              fill="none"
-              stroke="hsl(42, 100%, 55%)"
-              strokeWidth="2"
-              opacity="0.3"
-            />
-
-            {/* Center hub - outer metallic ring */}
-            <circle
-              cx={center}
-              cy={center}
-              r="30"
-              fill="url(#hubGrad)"
-              stroke="hsl(38, 85%, 25%)"
-              strokeWidth="2"
-              filter="url(#segGlow)"
-            />
-            {/* Center hub - inner dark circle */}
-            <circle
-              cx={center}
-              cy={center}
-              r="24"
-              fill="url(#hubInner)"
-              stroke="hsl(42, 100%, 50%)"
-              strokeWidth="1.2"
-            />
-            {/* Hub highlight */}
-            <ellipse
-              cx={center - 4}
-              cy={center - 6}
-              rx="10"
-              ry="7"
-              fill="white"
-              opacity="0.08"
-            />
-            {/* BONUS text */}
-            <text
-              x={center}
-              y={center}
-              fill="hsl(42, 100%, 60%)"
-              fontWeight="900"
-              fontSize="10"
-              fontFamily="'Space Grotesk', sans-serif"
-              textAnchor="middle"
-              dominantBaseline="central"
-              style={{ letterSpacing: "1.5px" }}
-            >
-              BONUS
-            </text>
+            <circle cx={center} cy={center} r="30" fill="url(#hubGrad)" stroke="hsl(38, 85%, 25%)" strokeWidth="2" filter="url(#segGlow)" />
+            <circle cx={center} cy={center} r="24" fill="url(#hubInner)" stroke="hsl(42, 100%, 50%)" strokeWidth="1.2" />
+            <ellipse cx={center - 4} cy={center - 6} rx="10" ry="7" fill="white" opacity="0.08" />
+            <text x={center} y={center} fill="hsl(42, 100%, 60%)" fontWeight="900" fontSize="10" fontFamily="'Space Grotesk', sans-serif" textAnchor="middle" dominantBaseline="central" style={{ letterSpacing: "1.5px" }}>BONUS</text>
           </svg>
         </div>
       </div>
 
-      {/* Urgency indicator */}
+      {/* Urgency */}
       <div className="mt-5 flex items-center gap-2 glass-card rounded-full px-4 py-2 text-xs">
         <span>🔥</span>
         <span className="text-muted-foreground">Bonos disponibles hoy:</span>
