@@ -223,22 +223,22 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
   }, []);
 
   return (
-    <div className="relative flex flex-col items-center w-full" style={{ maxWidth: 420 }}>
+    <div className="relative flex flex-col items-center" style={{ width: "min(92vw, 420px)" }}>
       {showWinConfetti && <Confetti />}
 
       {/* Ambient glow */}
       <div
         className="absolute pointer-events-none rounded-full"
         style={{
-          top: "-12%", left: "5%", right: "5%",
+          top: "-12%", left: "-4%", right: "-4%",
           aspectRatio: "1/1",
           background: `radial-gradient(circle, hsl(42 100% 55% / ${glowIntensity * 0.18}) 30%, hsl(350 60% 30% / ${glowIntensity * 0.06}) 55%, transparent 70%)`,
           transition: "background 0.8s ease",
         }}
       />
 
-      {/* Wheel container — always square via aspect-ratio */}
-      <div className="relative w-full" style={{ maxWidth: 380, aspectRatio: "1/1", padding: "8%" }}>
+      {/* Wheel container — perfect square, never clips */}
+      <div className="relative w-full overflow-visible" style={{ aspectRatio: "1/1", padding: "8%" }}>
         {/* LED Ring */}
         <LedRing state={wheelState} />
 
