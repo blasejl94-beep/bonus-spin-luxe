@@ -1,6 +1,6 @@
 import React, { useState, useRef, useCallback, useEffect, useMemo } from "react";
-import { playTick, playLandingClick } from "@/lib/sounds";
-import Confetti from "@/components/Confetti";
+import { Volume2, VolumeX } from "lucide-react";
+import { playTick, playLandingClick, playSlotWin } from "@/lib/sounds";
 
 const SEGMENTS = [
   { label: "50%", color: "hsl(0, 72%, 30%)", colorDark: "hsl(0, 72%, 22%)" },
@@ -13,9 +13,7 @@ const SEGMENTS = [
   { label: "200%", color: "hsl(45, 100%, 51%)", colorDark: "hsl(38, 85%, 38%)" },
 ];
 
-// Indices that are allowed to win (100-200% only)
-const ALLOWED_INDICES = [1, 3, 5, 6, 7]; // 100%, 150%, 125%, 175%, 200%
-
+const ALLOWED_INDICES = [1, 3, 5, 6, 7];
 const SEGMENT_ANGLE = 360 / SEGMENTS.length;
 const NUM_SEGMENTS = SEGMENTS.length;
 const NUM_LEDS = 32;
@@ -25,7 +23,7 @@ interface SpinWheelProps {
   disabled?: boolean;
 }
 
-type WheelState = "idle" | "spinning" | "won";
+type WheelState = "idle" | "spinning" | "celebrating" | "won";
 
 /* ── LED Ring ── */
 const LedRing: React.FC<{ state: WheelState }> = ({ state }) => {
@@ -39,7 +37,11 @@ const LedRing: React.FC<{ state: WheelState }> = ({ state }) => {
     }), []
   );
 
-  const stateClass = state === "spinning" ? "led-chase" : state === "won" ? "led-celebrate" : "led-idle";
+  const stateClass =
+    state === "spinning" ? "led-chase" :
+    state === "celebrating" ? "led-celebrating" :
+    state === "won" ? "led-celebrate" :
+    "led-idle";
 
   return (
     <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 5 }}>
@@ -56,12 +58,14 @@ const LedRing: React.FC<{ state: WheelState }> = ({ state }) => {
             marginLeft: -3.5,
             marginTop: -3.5,
             borderRadius: "50%",
-            background: state === "won" ? "hsl(42, 100%, 75%)" : "hsl(42, 100%, 65%)",
-            boxShadow: state === "won"
+            background: (state === "won" || state === "celebrating") ? "hsl(42, 100%, 75%)" : "hsl(42, 100%, 65%)",
+            boxShadow: (state === "won" || state === "celebrating")
               ? "0 0 10px 3px hsl(42 100% 60% / 0.8)"
               : "0 0 6px 2px hsl(42 100% 55% / 0.6)",
             animationDelay: state === "spinning"
               ? `${(led.idx / NUM_LEDS) * 0.8}s`
+              : state === "celebrating"
+              ? `${(led.idx / NUM_LEDS) * 0.15}s`
               : state === "won"
               ? `${(led.idx / NUM_LEDS) * 0.3}s`
               : `${(led.idx / NUM_LEDS) * 3}s`,
@@ -79,25 +83,27 @@ function getSegmentUnderPointer(rotationDeg: number): number {
 }
 
 function getAngleForSegment(segIndex: number): number {
-  // Returns the rotation angle that places the middle of segIndex under the pointer (top/270°)
   const segMid = segIndex * SEGMENT_ANGLE + SEGMENT_ANGLE / 2;
-  // We need: (270 - rotation%360) = segMid → rotation = 270 - segMid
   return ((270 - segMid) % 360 + 360) % 360;
 }
 
 const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
   const [rotation, setRotation] = useState(0);
   const [spinning, setSpinning] = useState(false);
-  const [phase, setPhase] = useState<"idle" | "spinning" | "bounce">("idle");
+  const [phase, setPhase] = useState<"idle" | "spinning" | "bounce" | "celebrating">("idle");
   const [glowIntensity, setGlowIntensity] = useState(0);
   const [highlightIndex, setHighlightIndex] = useState<number>(-1);
   const [wheelState, setWheelState] = useState<WheelState>("idle");
-  const [showWinConfetti, setShowWinConfetti] = useState(false);
   const [pointerFlick, setPointerFlick] = useState(false);
+  const [muted, setMuted] = useState(false);
   const wheelRef = useRef<SVGSVGElement>(null);
   const lastTickSegmentRef = useRef<number>(-1);
   const rafRef = useRef<number | null>(null);
   const pointerRef = useRef<HTMLDivElement>(null);
+  const mutedRef = useRef(false);
+
+  // Keep ref in sync
+  useEffect(() => { mutedRef.current = muted; }, [muted]);
 
   // Idle breathing glow
   useEffect(() => {
@@ -137,8 +143,7 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
           const currentSegment = getSegmentUnderPointer(normalizedAngle);
           if (currentSegment !== lastTickSegmentRef.current) {
             lastTickSegmentRef.current = currentSegment;
-            playTick(0.9 + Math.random() * 0.2);
-            // Trigger pointer flick
+            if (!mutedRef.current) playTick(0.9 + Math.random() * 0.2);
             setPointerFlick(true);
             setTimeout(() => setPointerFlick(false), 100);
           }
@@ -157,14 +162,11 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
     setGlowIntensity(0.9);
     setHighlightIndex(-1);
     setWheelState("spinning");
-    setShowWinConfetti(false);
     setPointerFlick(false);
     lastTickSegmentRef.current = -1;
 
-    // Pick a random allowed segment and compute landing angle
     const targetIdx = ALLOWED_INDICES[Math.floor(Math.random() * ALLOWED_INDICES.length)];
     const targetBase = getAngleForSegment(targetIdx);
-    // Add jitter within the segment (avoid exact center)
     const jitter = (Math.random() - 0.5) * (SEGMENT_ANGLE * 0.7);
     const targetAngle = ((targetBase + jitter) % 360 + 360) % 360;
 
@@ -176,22 +178,28 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
 
     const spinDuration = 4800;
     setTimeout(() => {
+      // Phase 1: Bounce (500ms)
       setPhase("bounce");
       setGlowIntensity(1);
-
       const winIdx = getSegmentUnderPointer(newRotation);
       setHighlightIndex(winIdx);
-      setWheelState("won");
-      setShowWinConfetti(true);
-      playLandingClick();
+      if (!mutedRef.current) playLandingClick();
 
       setTimeout(() => {
-        setSpinning(false);
-        setPhase("idle");
-        const winIdx2 = getSegmentUnderPointer(newRotation);
-        onSpinComplete(SEGMENTS[winIdx2].label);
-        setTimeout(() => setShowWinConfetti(false), 4000);
-      }, 600);
+        // Phase 2: Celebrating (2000ms)
+        setPhase("celebrating");
+        setWheelState("celebrating");
+        if (!mutedRef.current) playSlotWin();
+
+        setTimeout(() => {
+          // Phase 3: Done — fire onSpinComplete
+          setWheelState("won");
+          setSpinning(false);
+          setPhase("idle");
+          const winIdx2 = getSegmentUnderPointer(newRotation);
+          onSpinComplete(SEGMENTS[winIdx2].label);
+        }, 2000);
+      }, 500);
     }, spinDuration);
   }, [spinning, disabled, onSpinComplete, rotation]);
 
@@ -236,10 +244,18 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
   }, []);
 
   const isGoldSeg = (label: string) => label === "200%" || label === "350%";
+  const isCelebrating = phase === "celebrating";
 
   return (
     <div className="relative flex flex-col items-center" style={{ width: "min(92vw, 420px)" }}>
-      {showWinConfetti && <Confetti />}
+      {/* Mute toggle */}
+      <button
+        onClick={() => setMuted(m => !m)}
+        className="absolute top-0 right-0 z-30 p-2 rounded-full glass-card text-muted-foreground hover:text-foreground transition-colors"
+        aria-label={muted ? "Activar sonido" : "Silenciar"}
+      >
+        {muted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+      </button>
 
       {/* Ambient glow */}
       <div
@@ -252,9 +268,8 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
         }}
       />
 
-      {/* Wheel container — perfect square */}
-      <div className="relative w-full overflow-visible" style={{ aspectRatio: "1/1", padding: "4%" }}>
-        {/* LED Ring */}
+      {/* Wheel container */}
+      <div className={`relative w-full overflow-visible ${isCelebrating ? "wheel-celebrate-bounce" : ""}`} style={{ aspectRatio: "1/1", padding: "4%" }}>
         <LedRing state={wheelState} />
 
         {/* Soft shadow under wheel */}
@@ -284,7 +299,6 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
             transition: "box-shadow 0.6s ease",
           }}
         >
-          {/* Inner ring bevel */}
           <div
             className="rounded-full w-full h-full"
             style={{
@@ -360,6 +374,7 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
               {SEGMENTS.map((seg, i) => {
                 const isHighlighted = i === highlightIndex;
                 const gold = isGoldSeg(seg.label);
+                const showHighlight = isHighlighted && (wheelState === "won" || wheelState === "celebrating");
                 return (
                   <g key={i}>
                     <path
@@ -368,12 +383,12 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
                       stroke="hsl(42, 100%, 55%)"
                       strokeWidth="1.2"
                     />
-                    {isHighlighted && wheelState === "won" && (
+                    {showHighlight && (
                       <path
                         d={createSegmentPath(i, innerRadius)}
                         fill="hsl(45, 100%, 60%)"
                         opacity="0.3"
-                        className="animate-pulse"
+                        className={isCelebrating ? "segment-celebrate-pulse" : "animate-pulse"}
                         filter="url(#winGlow)"
                       />
                     )}
@@ -412,7 +427,7 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
           </div>
         </div>
 
-        {/* 3D Pointer — fixed at top center, RED for contrast */}
+        {/* 3D Pointer */}
         <div
           ref={pointerRef}
           className={`absolute z-20 ${!spinning && !disabled ? "wiggle-idle" : ""} ${phase === "bounce" ? "pointer-bounce" : ""} ${pointerFlick ? "pointer-flick" : ""}`}

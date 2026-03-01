@@ -313,6 +313,38 @@
   animation: led-celebrate 0.5s ease-in-out infinite;
 }
 
+/* LED celebrating — fast chase with golden flashes */
+@keyframes led-celebrating {
+  0% { opacity: 0.15; transform: scale(0.7); }
+  15% { opacity: 1; transform: scale(1.4); }
+  30% { opacity: 0.2; transform: scale(0.8); }
+  45% { opacity: 1; transform: scale(1.3); }
+  60% { opacity: 0.15; transform: scale(0.7); }
+  75% { opacity: 1; transform: scale(1.35); }
+  100% { opacity: 0.15; transform: scale(0.7); }
+}
+.led-celebrating {
+  animation: led-celebrating 0.4s ease-in-out infinite;
+}
+
+/* Wheel celebrate bounce */
+@keyframes wheel-celebrate-bounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+.wheel-celebrate-bounce {
+  animation: wheel-celebrate-bounce 0.6s ease-in-out 2;
+}
+
+/* Winning segment pulse during celebration */
+@keyframes segment-celebrate-pulse {
+  0%, 100% { opacity: 0.15; }
+  50% { opacity: 0.5; }
+}
+.segment-celebrate-pulse {
+  animation: segment-celebrate-pulse 0.5s ease-in-out 4;
+}
+
 /* Metallic sheen sweep on rim — transform only */
 .wheel-rim-sheen {
   position: relative;
