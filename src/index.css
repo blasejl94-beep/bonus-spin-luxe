@@ -319,6 +319,46 @@
   100% { transform: translateX(100%); }
 }
 
+/* LED idle twinkle — opacity only for perf */
+@keyframes led-twinkle {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 1; }
+}
+.led-idle {
+  animation: led-twinkle 3s ease-in-out infinite;
+}
+
+/* LED chase while spinning — opacity only */
+@keyframes led-chase {
+  0%, 60% { opacity: 0.15; }
+  30% { opacity: 1; }
+}
+.led-chase {
+  animation: led-chase 0.8s ease-in-out infinite;
+}
+
+/* Metallic sheen sweep on rim — transform only */
+.wheel-rim-sheen {
+  position: relative;
+  overflow: hidden;
+}
+.wheel-rim-sheen::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -60%;
+  width: 40%;
+  height: 200%;
+  background: linear-gradient(105deg, transparent 40%, hsl(42 100% 90% / 0.18) 45%, hsl(42 100% 95% / 0.25) 50%, transparent 55%);
+  animation: rim-sheen 4s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes rim-sheen {
+  0% { transform: translateX(0%); }
+  50% { transform: translateX(350%); }
+  100% { transform: translateX(350%); }
+}
+
 .sparkle {
   position: absolute;
   width: 8px;

@@ -284,10 +284,10 @@ const Index = () => {
                 <Button
                   type="submit"
                   disabled={!phone}
-                  className="w-full py-7 text-xl font-black rounded-2xl gold-gradient text-primary-foreground uppercase tracking-wide disabled:opacity-40 relative overflow-hidden shadow-[0_0_40px_hsl(42,100%,50%,0.5),0_0_80px_hsl(42,100%,50%,0.2)] hover:shadow-[0_0_60px_hsl(42,100%,50%,0.7)] hover:scale-[1.03] active:scale-95 transition-all duration-300 border-2 border-casino-gold/60"
+                  className="w-full py-5 text-lg font-black rounded-xl gold-gradient text-primary-foreground uppercase tracking-wide disabled:opacity-40 relative overflow-hidden shadow-[0_0_30px_hsl(42,100%,50%,0.4)] hover:shadow-[0_0_50px_hsl(42,100%,50%,0.6)] hover:scale-[1.02] active:scale-95 transition-all duration-300 border border-casino-gold/50"
                 >
                   <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
-                  🎁 RECLAMAR MI BONO AHORA
+                  🎁 ¡Reclamar!
                 </Button>
               </form>
 
