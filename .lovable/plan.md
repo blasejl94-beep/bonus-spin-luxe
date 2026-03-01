@@ -1,50 +1,61 @@
 
 
-## Casino Promotion Landing Page - Implementation Plan
+# Performance-First Refactor Plan
 
-### Page Structure (Single-page, mobile-first)
+## Problem Summary
+The page crashes mobile browsers due to: 40 continuously animated DOM particles, backdrop-filter blur on multiple elements, animated box-shadows, a canvas LED ring running rAF forever even when idle, and heavy CSS animations (filter: blur in keyframes, text-shadow pulses).
 
-**1. Hero Section (Above the fold)**
-- Deep red gradient background with gold accents
-- Headline: "Girá la ruleta y desbloqueá tu bono de bienvenida"
-- Subheadline with player count social proof
-- Three trust badges (verified, fast payments, 24/7 support)
-- Large interactive spin wheel with 7 segments (50%-350% bonuses)
-- "Tenés 1 giro disponible" text + "Girar ahora" CTA button
+## Changes
 
-**2. Spin Wheel Interaction**
-- CSS-animated wheel with realistic spin physics and suspense delay
-- Result always lands on a high bonus (e.g., 350%)
-- Confetti animation on result reveal
-- Prize modal: "🎉 ¡Felicitaciones! Ganaste 350% de bono"
-- "Reclamar mi bono" CTA button
-- Store spin in localStorage to prevent re-spins
+### 1. Remove AmbientParticles entirely
+**File:** `src/pages/Index.tsx` — remove `<AmbientParticles />` import and usage.
+**Why:** 40 fixed-position DOM nodes each running a CSS animation with `radial-gradient` backgrounds. Major compositor overhead on mobile.
 
-**3. Bonus Claim Form**
-- Slides in after clicking "Reclamar mi bono"
-- "Activá tu bono en 10 segundos" header
-- Countdown timer (5 minutes) for urgency
-- Phone number (required) + Name (optional) fields
-- "Activar bono ahora" CTA button
-- On submit → redirects to WhatsApp with prefilled message
+### 2. Replace `backdrop-filter: blur()` with solid backgrounds
+**File:** `src/index.css` — change `.glass-card` and `.glass-card-strong` to use opaque `background` colors instead of `backdrop-filter: blur()`. Remove `-webkit-backdrop-filter` too.
+**Why:** `backdrop-filter` is one of the most expensive CSS properties on mobile, forces re-rendering of layers behind the element.
 
-**4. Social Proof Section**
-- Auto-scrolling ticker of recent winners with randomized names/amounts
-- Small casino game thumbnails (slots, roulette, blackjack) using icons/emojis
+### 3. Remove animated box-shadows
+**File:** `src/index.css`:
+- `.victory-card-glow` — remove animated box-shadow keyframes, use a static subtle border glow.
+- `.pulse-glow` — remove animated box-shadow, use static shadow or remove.
+- `.glow-text` — replace `text-shadow` + `filter: brightness()` animation with static `color` + simple opacity pulse.
+- `.bonus-number-scale` keyframes — remove `filter: blur(12px)` from animation, use opacity-only reveal.
+- `.bonus-reveal` — remove `filter: blur(10px)`.
 
-**5. Sticky WhatsApp CTA**
-- Fixed bottom floating button: "Hablar con un asesor por WhatsApp"
-- Opens WhatsApp with prefilled message
+**File:** `src/pages/Index.tsx`:
+- Remove massive `shadow-[0_0_40px...]` and `hover:shadow-[0_0_60px...]` from claim buttons. Use a static, modest shadow.
 
-### Design System
-- Background: deep red-to-dark gradient
-- Accents: gold/amber tones
-- Text: white, high contrast
-- Large touch targets, smooth transitions
-- Confetti effect using CSS animations
+### 4. Fix LedRingCanvas to pause when idle
+**File:** `src/components/SpinWheel.tsx` — In the `LedRingCanvas` component, when `state === "idle"`, draw once and stop the rAF loop (or run at a very low rate like every 60th frame). Only run continuous rAF during `"spinning"` and `"won"` states. Stop the won animation after ~2 seconds.
 
-### Technical Notes
-- All frontend, no backend needed
-- Single Index page with state management for the funnel steps
-- localStorage for one-spin-per-session logic
+### 5. Reduce LED count
+**File:** `src/components/SpinWheel.tsx` — Change `NUM_LEDS` from 18 to 16. Minor but helps.
+
+### 6. Simplify WinnerToast backdrop
+**File:** `src/components/WinnerToast.tsx` — Remove `backdrop-blur` from the toast card. Use solid `bg-card` instead.
+
+### 7. Clean up unused/heavy CSS animations
+**File:** `src/index.css`:
+- Remove `.ambient-particle` and `@keyframes float-up` (no longer needed after removing AmbientParticles).
+- Remove `.confetti-piece`, `.confetti-burst`, `@keyframes confetti-fall/sway/burst` (confetti is canvas-based now, these are dead CSS).
+- Simplify `.led-idle`, `.led-chase`, `.led-celebrate` (these are dead CSS too since LEDs moved to canvas).
+
+### 8. Add `prefers-reduced-motion` global rule
+**File:** `src/index.css` — Add a media query that disables or simplifies all custom animations:
+```css
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+```
+
+### 9. Reduce SocialProofTicker weight
+**File:** `src/components/SocialProofTicker.tsx` — The ticker duplicates 20 items (40 DOM nodes) with `glass-card` (blur). Remove `glass-card` class from avatar circles; use simple solid background.
+
+### Summary of expected impact
+- **Biggest wins:** Removing AmbientParticles (40 animated nodes), removing all `backdrop-filter: blur()`, removing animated box-shadows/text-shadows, pausing idle rAF loop.
+- **Visual impact:** Minimal — backgrounds become slightly more opaque instead of frosted glass. All layout, colors, and core animations preserved.
 
