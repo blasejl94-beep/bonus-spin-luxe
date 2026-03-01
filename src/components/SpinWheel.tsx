@@ -3,12 +3,12 @@ import { playTick, playLandingClick } from "@/lib/sounds";
 
 const SEGMENTS = [
   { label: "50%", color: "hsl(0, 72%, 30%)", colorDark: "hsl(0, 72%, 22%)" },
-  { label: "100%", color: "hsl(0, 60%, 20%)", colorDark: "hsl(0, 60%, 14%)" },
+  { label: "75%", color: "hsl(0, 60%, 20%)", colorDark: "hsl(0, 60%, 14%)" },
+  { label: "100%", color: "hsl(0, 72%, 30%)", colorDark: "hsl(0, 72%, 22%)" },
+  { label: "125%", color: "hsl(0, 60%, 20%)", colorDark: "hsl(0, 60%, 14%)" },
   { label: "150%", color: "hsl(0, 72%, 30%)", colorDark: "hsl(0, 72%, 22%)" },
-  { label: "200%", color: "hsl(0, 60%, 20%)", colorDark: "hsl(0, 60%, 14%)" },
-  { label: "250%", color: "hsl(0, 72%, 30%)", colorDark: "hsl(0, 72%, 22%)" },
-  { label: "300%", color: "hsl(0, 60%, 20%)", colorDark: "hsl(0, 60%, 14%)" },
-  { label: "350%", color: "hsl(45, 100%, 51%)", colorDark: "hsl(38, 85%, 38%)" },
+  { label: "175%", color: "hsl(0, 60%, 20%)", colorDark: "hsl(0, 60%, 14%)" },
+  { label: "200%", color: "hsl(45, 100%, 51%)", colorDark: "hsl(38, 85%, 38%)" },
 ];
 
 const WINNING_INDEX = 6;
