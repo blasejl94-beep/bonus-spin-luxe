@@ -16,7 +16,8 @@ import { Button } from "@/components/ui/button";
 type FunnelStep = "hero" | "result" | "claim" | "expired";
 
 const WHATSAPP_NUMBER = "59894619935";
-const WHATSAPP_MESSAGE = "Hola, quiero activar mi bono de bienvenida.";
+const WHATSAPP_MSG_NO_SPIN = `Hola!\n\nQuiero activar mi bono de bienvenida para empezar a jugar.\n\n¿Me decís la carga mínima y los medios de pago disponibles?`;
+
 const BONUS_TIMER = 300;
 
 const TRUST_BADGES = [
@@ -26,10 +27,20 @@ const TRUST_BADGES = [
 ];
 
 const GAMES = [
-  { emoji: "🎰", label: "Slots" },
-  { emoji: "🎡", label: "Ruleta" },
-  { emoji: "🃏", label: "Blackjack" },
-  { emoji: "🎲", label: "Dados" },
+  { emoji: "🎰" },
+  { emoji: "🎡" },
+  { emoji: "🃏" },
+  { emoji: "🎲" },
+];
+
+const PAYMENT_METHODS = [
+  { name: "Abitab", icon: "🏪" },
+  { name: "Redpagos", icon: "🏬" },
+  { name: "MercadoPago", icon: "💳" },
+  { name: "Prex", icon: "📱" },
+  { name: "MiDinero", icon: "💰" },
+  { name: "Santander", icon: "🏦" },
+  { name: "eBrou", icon: "🏛️" },
 ];
 
 const BRAND_NAME = "Smart Play";
@@ -95,7 +106,7 @@ const Index = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const msg = encodeURIComponent(
-      `${WHATSAPP_MESSAGE} Mi bono: ${result}. Teléfono: ${phone}${name ? `. Nombre: ${name}` : ""}`
+      `Hola!\n\nQuiero activar mi bono de bienvenida para empezar a jugar.\n\nBono obtenido: ${result}\n\n¿Me decís la carga mínima y los medios de pago disponibles?`
     );
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`, "_blank");
   };
@@ -144,7 +155,7 @@ const Index = () => {
         </div>
 
         <h1 className="text-3xl sm:text-4xl font-black leading-[1.1] mb-3 gold-text max-w-md tracking-tight">
-          Girá la ruleta y desbloqueá tu bono exclusivo
+          Girá la rueda y desbloqueá tu bono exclusivo
         </h1>
         <p className="text-muted-foreground text-sm mb-4 max-w-xs">
           Más de <span className="font-semibold text-foreground">10.000+</span> jugadores activos ganando todos los días
@@ -333,12 +344,9 @@ const Index = () => {
 
         {/* Game thumbnails */}
         <div className="flex justify-center gap-4 mt-8">
-          {GAMES.map(({ emoji, label }) => (
-            <div key={label} className="flex flex-col items-center gap-2 group cursor-pointer">
-              <div className="w-16 h-16 rounded-2xl glass-card flex items-center justify-center text-3xl premium-shadow group-hover:scale-105 transition-transform duration-200">
-                {emoji}
-              </div>
-              <span className="text-[11px] text-muted-foreground font-medium">{label}</span>
+          {GAMES.map(({ emoji }, i) => (
+            <div key={i} className="w-14 h-14 rounded-2xl glass-card flex items-center justify-center text-3xl premium-shadow hover:scale-105 transition-transform duration-200 cursor-pointer">
+              {emoji}
             </div>
           ))}
         </div>
@@ -352,10 +360,11 @@ const Index = () => {
         {/* Payment methods */}
         <div className="mb-6">
           <p className="text-[10px] text-muted-foreground/50 uppercase tracking-[0.2em] mb-3">Métodos de pago aceptados</p>
-          <div className="flex justify-center gap-3 flex-wrap">
-            {["💳 Visa", "💳 Mastercard", "📱 MercadoPago", "🏦 Transferencia"].map((method) => (
-              <span key={method} className="text-[11px] text-muted-foreground/60 glass-card rounded-md px-2.5 py-1.5">
-                {method}
+          <div className="flex justify-center gap-2 flex-wrap">
+            {PAYMENT_METHODS.map(({ name, icon }) => (
+              <span key={name} className="text-[11px] text-muted-foreground/70 glass-card rounded-lg px-2.5 py-1.5 flex items-center gap-1.5">
+                <span className="text-sm">{icon}</span>
+                {name}
               </span>
             ))}
           </div>
@@ -394,7 +403,7 @@ const Index = () => {
       {/* Sticky WhatsApp CTA */}
       {step !== "claim" && step !== "expired" && (
         <a
-          href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`}
+          href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(result ? `Hola!\n\nQuiero activar mi bono de bienvenida para empezar a jugar.\n\nBono obtenido: ${result}\n\n¿Me decís la carga mínima y los medios de pago disponibles?` : WHATSAPP_MSG_NO_SPIN)}`}
           target="_blank"
           rel="noopener noreferrer"
           className={`fixed bottom-4 left-4 right-4 z-40 flex items-center justify-center gap-2 py-4 rounded-2xl bg-[hsl(142,70%,38%)] text-white font-bold text-base shadow-[0_4px_24px_hsl(142_70%_38%/0.4)] active:scale-95 transition-all duration-200 max-w-lg mx-auto ${step === "result" ? "bounce-cta" : ""}`}
