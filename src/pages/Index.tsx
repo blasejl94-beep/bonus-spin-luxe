@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Shield, Zap, Headphones, Lock, Star } from "lucide-react";
+import logo from "@/assets/logo.jpg";
 import SpinWheel from "@/components/SpinWheel";
 import Confetti from "@/components/Confetti";
 import AmbientParticles from "@/components/AmbientParticles";
@@ -139,9 +140,7 @@ const Index = () => {
       <section className="relative z-10 flex flex-col items-center px-5 pt-10 pb-8 text-center max-w-lg mx-auto">
         {/* Logo / Brand */}
         <div className="flex items-center gap-2.5 mb-6">
-          <div className="w-10 h-10 rounded-xl gold-gradient flex items-center justify-center shadow-lg">
-            <Star className="w-5 h-5 text-primary-foreground" fill="currentColor" />
-          </div>
+          <img src={logo} alt="Smart Play" className="w-10 h-10 rounded-xl shadow-lg object-cover" />
           <span className="text-xl font-black tracking-tight gold-text">{BRAND_NAME}</span>
         </div>
 
@@ -379,9 +378,7 @@ const Index = () => {
 
         {/* Brand */}
         <div className="flex items-center justify-center gap-2 mb-2">
-          <div className="w-6 h-6 rounded-md gold-gradient flex items-center justify-center">
-            <Star className="w-3 h-3 text-primary-foreground" fill="currentColor" />
-          </div>
+          <img src={logo} alt="Smart Play" className="w-6 h-6 rounded-md object-cover" />
           <span className="text-sm font-bold gold-text">{BRAND_NAME}</span>
         </div>
         <p className="text-[10px] text-muted-foreground/30">
