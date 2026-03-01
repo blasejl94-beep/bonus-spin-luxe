@@ -6,18 +6,20 @@ const COLORS = [
   "hsl(0, 72%, 50%)",
   "hsl(0, 0%, 100%)",
   "hsl(30, 100%, 50%)",
+  "hsl(320, 70%, 55%)",
+  "hsl(200, 80%, 55%)",
 ];
 
 const Confetti: React.FC = () => {
   const [pieces, setPieces] = useState<Array<{ id: number; left: number; color: string; delay: number; size: number }>>([]);
 
   useEffect(() => {
-    const items = Array.from({ length: 50 }, (_, i) => ({
+    const items = Array.from({ length: 80 }, (_, i) => ({
       id: i,
       left: Math.random() * 100,
       color: COLORS[Math.floor(Math.random() * COLORS.length)],
-      delay: Math.random() * 2,
-      size: Math.random() * 8 + 4,
+      delay: Math.random() * 1.5,
+      size: Math.random() * 10 + 4,
     }));
     setPieces(items);
   }, []);

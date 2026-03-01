@@ -146,41 +146,61 @@ const Index = () => {
 
         {/* === RESULT: Victory Section === */}
         {step === "result" && (
-          <div className="flex flex-col items-center gap-3 w-full max-w-sm">
-            <div className="text-6xl victory-pop">🎉</div>
-            <h2 className="text-xl sm:text-2xl font-extrabold text-foreground uppercase tracking-wide victory-pop">
+          <div className="flex flex-col items-center gap-3 w-full max-w-sm relative">
+            {/* Radial burst behind bonus */}
+            <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 radial-burst" />
+
+            {/* Sparkles */}
+            {[...Array(8)].map((_, i) => (
+              <div
+                key={i}
+                className="sparkle"
+                style={{
+                  top: `${15 + Math.random() * 50}%`,
+                  left: `${10 + Math.random() * 80}%`,
+                  animation: `sparkle ${1 + Math.random()}s ease-in-out ${0.5 + i * 0.3}s infinite`,
+                  width: 6 + Math.random() * 8,
+                  height: 6 + Math.random() * 8,
+                }}
+              />
+            ))}
+
+            <div className="text-7xl emoji-celebrate">🎉</div>
+            <h2 className="text-xl sm:text-2xl font-extrabold text-foreground uppercase tracking-wide stagger-1">
               ¡Felicitaciones!
             </h2>
-            <p className="text-sm text-foreground/70 victory-pop">Ganaste un bono de bienvenida de</p>
-            <div className="bonus-reveal">
-              <span className="block text-6xl sm:text-7xl font-black glow-text tracking-tight leading-none">
+            <p className="text-sm text-foreground/70 stagger-2">Ganaste un bono de bienvenida de</p>
+            
+            <div className="relative stagger-3">
+              <span className="block text-7xl sm:text-8xl font-black glow-text tracking-tight leading-none">
                 {result}
               </span>
-              <span className="block text-lg font-bold text-foreground/80 mt-1">BONO DE BIENVENIDA</span>
+              <span className="block text-lg font-bold text-foreground/80 mt-2 uppercase tracking-widest">
+                Bono de Bienvenida
+              </span>
             </div>
 
-            <div className="bg-muted/30 rounded-lg px-4 py-2 mt-2 gold-border">
+            <div className="bg-muted/30 rounded-lg px-4 py-2 mt-2 gold-border stagger-4">
               <p className="text-xs text-foreground/60">
                 ⭐ Solo <span className="font-bold text-casino-gold">3 de cada 100</span> jugadores reciben este bono
               </p>
             </div>
 
-            {/* Countdown in result */}
-            <div className="flex flex-col items-center gap-1 mt-2">
+            <div className="flex flex-col items-center gap-1 mt-2 stagger-4">
               <span className="text-xs text-foreground/60">Tu bono está reservado durante:</span>
               <span className={`font-mono font-bold text-2xl px-4 py-1 rounded-lg ${isUrgent ? 'countdown-urgent bg-destructive/20' : 'text-casino-gold bg-muted/60'}`}>
                 {formatTime(countdown)}
               </span>
             </div>
 
-            <div className="flex items-center gap-2 text-xs text-destructive font-semibold animate-pulse mt-1">
+            <div className="flex items-center gap-2 text-xs text-destructive font-semibold animate-pulse mt-1 stagger-4">
               <span>⚠️</span>
               <span>Oferta válida por tiempo limitado</span>
             </div>
 
             <Button
               onClick={handleClaim}
-              className="mt-3 w-full max-w-xs py-7 text-xl font-black rounded-full gold-gradient text-primary-foreground pulse-glow uppercase tracking-wide bounce-cta"
+              className="mt-3 w-full max-w-xs py-7 text-xl font-black rounded-full gold-gradient text-primary-foreground pulse-glow uppercase tracking-wide bounce-cta stagger-5"
             >
               🎁 Reclamar mi bono ahora
             </Button>
