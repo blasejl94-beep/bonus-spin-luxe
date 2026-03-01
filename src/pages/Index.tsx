@@ -3,6 +3,7 @@ import { Shield, Zap, Headphones, Lock, Star } from "lucide-react";
 import logo from "@/assets/logo.png";
 import SpinWheel from "@/components/SpinWheel";
 import Confetti from "@/components/Confetti";
+import PrizeTicket from "@/components/PrizeTicket";
 import AmbientParticles from "@/components/AmbientParticles";
 import SocialProofTicker from "@/components/SocialProofTicker";
 import LiveCounter from "@/components/LiveCounter";
@@ -172,42 +173,10 @@ const Index = () => {
         )}
 
         {step === "result" && (
-          <div className="flex flex-col items-center gap-4 w-full max-w-sm relative victory-entrance">
-            <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 radial-burst" />
+          <div className="flex flex-col items-center gap-4 w-full max-w-sm relative prize-entrance">
+            <PrizeTicket result={result || "200%"} />
 
-            {[...Array(10)].map((_, i) => (
-              <div
-                key={i}
-                className="sparkle"
-                style={{
-                  top: `${10 + Math.random() * 60}%`,
-                  left: `${5 + Math.random() * 90}%`,
-                  animation: `sparkle ${1 + Math.random()}s ease-in-out ${0.3 + i * 0.2}s infinite`,
-                  width: 5 + Math.random() * 10,
-                  height: 5 + Math.random() * 10,
-                }}
-              />
-            ))}
-
-            <div className="text-7xl emoji-celebrate">🎉</div>
-            
-            <div className="glass-card-strong rounded-2xl p-6 w-full stagger-1 victory-card-glow">
-              <h2 className="text-xl sm:text-2xl font-black text-foreground uppercase tracking-wide mb-1">
-                ¡Felicitaciones!
-              </h2>
-              <p className="text-sm text-muted-foreground mb-4">Ganaste un bono de bienvenida de</p>
-              
-              <div className="relative">
-                <span className="block text-7xl sm:text-8xl font-black glow-text tracking-tight leading-none bonus-number-reveal">
-                  {result}
-                </span>
-                <span className="block text-base font-bold text-muted-foreground mt-3 uppercase tracking-[0.2em]">
-                  Bono de Bienvenida
-                </span>
-              </div>
-            </div>
-
-            <div className="glass-card rounded-xl px-4 py-2.5 stagger-2">
+            <div className="glass-card rounded-xl px-4 py-2.5 stagger-3">
               <p className="text-xs text-muted-foreground">
                 ⭐ Solo <span className="font-bold text-casino-gold">3 de cada 100</span> jugadores reciben este bono
               </p>
