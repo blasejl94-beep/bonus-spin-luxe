@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
+import { usePageVisible } from "@/hooks/use-page-visible";
 
 const NAMES = ["Valentina", "Gonzalo", "Felipe", "Camila", "Martín", "Lucía", "Santiago", "Florencia", "Mateo", "Sofía"];
 const CITIES = ["Montevideo", "Punta del Este", "Salto", "Colonia", "Maldonado", "Rivera", "Paysandú"];
@@ -7,8 +8,22 @@ const AMOUNTS = [15000, 22000, 8500, 45000, 31000, 12000, 67000, 19500, 28000, 5
 const WinnerToast: React.FC = () => {
   const [visible, setVisible] = useState(false);
   const [winner, setWinner] = useState({ name: "", city: "", amount: 0, time: "" });
+  const pageVisible = usePageVisible();
+  const intervalRef = useRef<number | null>(null);
+  const timeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
+    const clearAll = () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+
+    if (!pageVisible) {
+      clearAll();
+      setVisible(false);
+      return;
+    }
+
     const show = () => {
       const times = ["hace 1 min", "hace 2 min", "hace 30 seg", "ahora mismo", "hace 5 min"];
       setWinner({
@@ -18,13 +33,13 @@ const WinnerToast: React.FC = () => {
         time: times[Math.floor(Math.random() * times.length)],
       });
       setVisible(true);
-      setTimeout(() => setVisible(false), 4000);
+      timeoutRef.current = window.setTimeout(() => setVisible(false), 4000);
     };
 
-    const initial = setTimeout(show, 5000);
-    const interval = setInterval(show, 8000 + Math.random() * 4000);
-    return () => { clearTimeout(initial); clearInterval(interval); };
-  }, []);
+    const initial = window.setTimeout(show, 5000);
+    intervalRef.current = window.setInterval(show, 8000 + Math.random() * 4000);
+    return () => { clearTimeout(initial); clearAll(); };
+  }, [pageVisible]);
 
   if (!visible) return null;
 

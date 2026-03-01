@@ -140,7 +140,7 @@ const Index = () => {
       <section className="relative z-10 flex flex-col items-center px-5 pt-10 pb-8 text-center max-w-lg mx-auto">
         {/* Logo / Brand */}
         <div className="flex items-center justify-center mb-6">
-          <img src={logo} alt="Smart Play" className="w-28 h-28 object-contain drop-shadow-[0_0_20px_hsl(var(--casino-gold)/0.4)]" />
+          <img src={logo} alt="Smart Play" className="w-28 h-28 object-contain" />
         </div>
 
         <h1 className="text-3xl sm:text-4xl font-black leading-[1.1] mb-3 gold-text max-w-md tracking-tight">
@@ -325,7 +325,7 @@ const Index = () => {
       <div className="h-px w-4/5 mx-auto bg-gradient-to-r from-transparent via-border to-transparent" />
 
       {/* Social Proof */}
-      <section className="relative z-10 px-5 py-8 max-w-lg mx-auto">
+      <section className="relative z-10 px-5 py-8 max-w-lg mx-auto" style={{ contentVisibility: 'auto', containIntrinsicSize: '0 500px' }}>
         <h3 className="text-center text-xs font-bold text-muted-foreground uppercase tracking-[0.25em] mb-4">
           Ganadores recientes
         </h3>
@@ -348,7 +348,7 @@ const Index = () => {
       <div className="h-px w-4/5 mx-auto bg-gradient-to-r from-transparent via-border to-transparent" />
 
       {/* Footer */}
-      <footer className="relative z-10 px-5 py-10 max-w-lg mx-auto text-center">
+      <footer className="relative z-10 px-5 py-10 max-w-lg mx-auto text-center" style={{ contentVisibility: 'auto', containIntrinsicSize: '0 400px' }}>
         {/* Payment methods */}
         <div className="mb-6">
           <p className="text-[10px] text-muted-foreground/50 uppercase tracking-[0.2em] mb-3">Métodos de pago aceptados</p>

@@ -101,7 +101,7 @@
   }
 
   .gold-glow {
-    box-shadow: 0 0 24px hsl(42 100% 55% / 0.35), 0 0 80px hsl(42 100% 55% / 0.1);
+    box-shadow: 0 0 12px hsl(42 100% 55% / 0.18);
   }
 
   .gold-border {
@@ -121,7 +121,7 @@
   }
 
   .premium-shadow {
-    box-shadow: 0 4px 24px hsl(0 0% 0% / 0.5), 0 0 0 1px hsl(42 100% 55% / 0.08);
+    box-shadow: 0 2px 8px hsl(0 0% 0% / 0.3);
   }
 }
 
@@ -275,27 +275,7 @@
   100% { transform: translateX(100%); }
 }
 
-/* Metallic sheen sweep on rim — transform only */
-.wheel-rim-sheen {
-  position: relative;
-  overflow: hidden;
-}
-.wheel-rim-sheen::after {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -60%;
-  width: 40%;
-  height: 200%;
-  background: linear-gradient(105deg, transparent 40%, hsl(42 100% 90% / 0.18) 45%, hsl(42 100% 95% / 0.25) 50%, transparent 55%);
-  animation: rim-sheen 4s ease-in-out infinite;
-  pointer-events: none;
-}
-@keyframes rim-sheen {
-  0% { transform: translateX(0%); }
-  50% { transform: translateX(350%); }
-  100% { transform: translateX(350%); }
-}
+/* Metallic sheen sweep removed for perf */
 
 .sparkle {
   position: absolute;
@@ -378,7 +358,7 @@
 
 /* Victory card golden glow — static, no animation */
 .victory-card-glow {
-  box-shadow: 0 0 24px hsl(42 100% 55% / 0.2), 0 8px 32px hsl(0 0% 0% / 0.4), inset 0 1px 0 hsl(42 100% 55% / 0.1);
+  box-shadow: 0 0 10px hsl(42 100% 55% / 0.12), 0 4px 16px hsl(0 0% 0% / 0.3);
 }
 
 /* Bonus number dramatic reveal — no filter: blur */
