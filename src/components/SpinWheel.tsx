@@ -31,8 +31,8 @@ const LedRing: React.FC<{ state: WheelState }> = ({ state }) => {
     Array.from({ length: NUM_LEDS }, (_, i) => {
       const angle = (i / NUM_LEDS) * 360 - 90;
       const rad = (angle * Math.PI) / 180;
-      const x = 50 + 43.5 * Math.cos(rad);
-      const y = 50 + 43.5 * Math.sin(rad);
+      const x = 50 + 44.5 * Math.cos(rad);
+      const y = 50 + 44.5 * Math.sin(rad);
       return { x, y, idx: i };
     }), []
   );
