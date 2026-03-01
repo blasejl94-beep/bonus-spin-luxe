@@ -88,6 +88,37 @@ export function playDrumroll() {
   } catch {}
 }
 
+export function playSlotWin() {
+  try {
+    const ctx = audioCtx();
+    // Rapid ascending chimes
+    const notes = [880, 1108.73, 1318.51, 1567.98, 2093];
+    notes.forEach((freq, i) => {
+      const t = ctx.currentTime + i * 0.12;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "triangle";
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.12, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.25);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(t);
+      osc.stop(t + 0.25);
+    });
+    // Final ding
+    const ding = ctx.createOscillator();
+    const dingGain = ctx.createGain();
+    ding.type = "sine";
+    ding.frequency.value = 2637;
+    const dingStart = ctx.currentTime + notes.length * 0.12;
+    dingGain.gain.setValueAtTime(0.18, dingStart);
+    dingGain.gain.exponentialRampToValueAtTime(0.001, dingStart + 0.5);
+    ding.connect(dingGain).connect(ctx.destination);
+    ding.start(dingStart);
+    ding.stop(dingStart + 0.5);
+  } catch {}
+}
+
 export function playLandingClick() {
   try {
     const ctx = audioCtx();

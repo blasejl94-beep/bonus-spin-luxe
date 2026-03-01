@@ -8,8 +8,7 @@ import SocialProofTicker from "@/components/SocialProofTicker";
 import LiveCounter from "@/components/LiveCounter";
 import ScarcityBar from "@/components/ScarcityBar";
 import WinnerToast from "@/components/WinnerToast";
-import SuspenseOverlay from "@/components/SuspenseOverlay";
-import { playWinSound, playDrumroll } from "@/lib/sounds";
+import { playWinSound } from "@/lib/sounds";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
@@ -56,8 +55,6 @@ const Index = () => {
   const [showConfetti, setShowConfetti] = useState(false);
   const [showFlash, setShowFlash] = useState(false);
   const [showShake, setShowShake] = useState(false);
-  const [showSuspense, setShowSuspense] = useState(false);
-  const [pendingPrize, setPendingPrize] = useState<string | null>(null);
   const [phone, setPhone] = useState("");
   const [name, setName] = useState("");
   const [countdown, setCountdown] = useState(BONUS_TIMER);
@@ -67,27 +64,21 @@ const Index = () => {
   const hasSpun = !!localStorage.getItem("casino_spun");
 
   const handleSpinComplete = useCallback((prize: string) => {
-    setPendingPrize(prize);
-    playDrumroll();
-    setShowSuspense(true);
-  }, []);
-
-  const handleSuspenseComplete = useCallback(() => {
-    if (!pendingPrize) return;
-    setShowSuspense(false);
     localStorage.setItem("casino_spun", "true");
-    localStorage.setItem("casino_result", pendingPrize);
-    setResult(pendingPrize);
+    localStorage.setItem("casino_result", prize);
+    setResult(prize);
     playWinSound();
-    setShowConfetti(true);
     setShowFlash(true);
     setShowShake(true);
     setTimeout(() => setShowFlash(false), 600);
     setTimeout(() => setShowShake(false), 700);
     setTimeout(() => setStep("result"), 300);
-    setTimeout(() => setShowConfetti(false), 6000);
-    setPendingPrize(null);
-  }, [pendingPrize]);
+    // Confetti after bonus screen appears
+    setTimeout(() => {
+      setShowConfetti(true);
+      setTimeout(() => setShowConfetti(false), 6000);
+    }, 600);
+  }, []);
 
   const handleClaim = () => {
     setStep("claim");
@@ -138,18 +129,14 @@ const Index = () => {
     <div className={`min-h-screen casino-gradient relative overflow-x-hidden ${showShake ? 'screen-shake' : ''}`}>
       <AmbientParticles />
       {showConfetti && <Confetti />}
-      {showSuspense && <SuspenseOverlay onComplete={handleSuspenseComplete} />}
       {showFlash && (
         <div className="fixed inset-0 bg-casino-gold/30 z-50 pointer-events-none screen-flash" />
       )}
       <WinnerToast />
 
-      {/* Top decorative line */}
       <div className="h-px w-full bg-gradient-to-r from-transparent via-casino-gold/40 to-transparent" />
 
-      {/* Hero Section */}
       <section className="relative z-10 flex flex-col items-center px-5 pt-10 pb-8 text-center max-w-lg mx-auto">
-        {/* Logo / Brand */}
         <div className="flex items-center justify-center mb-6">
           <img src={logo} alt="Smart Play" className="w-28 h-28 object-contain drop-shadow-[0_0_20px_hsl(var(--casino-gold)/0.4)]" />
         </div>
@@ -163,20 +150,15 @@ const Index = () => {
 
         <LiveCounter />
 
-        {/* Trust Badges */}
         <div className="flex gap-2.5 mb-8 flex-wrap justify-center">
           {TRUST_BADGES.map(({ icon: Icon, label }) => (
-            <div
-              key={label}
-              className="flex items-center gap-1.5 glass-card rounded-full px-3.5 py-2 text-xs text-foreground/80 premium-shadow"
-            >
+            <div key={label} className="flex items-center gap-1.5 glass-card rounded-full px-3.5 py-2 text-xs text-foreground/80 premium-shadow">
               <Icon className="w-3.5 h-3.5 text-casino-gold" />
               {label}
             </div>
           ))}
         </div>
 
-        {/* === HERO: Spin Wheel === */}
         {step === "hero" && (
           <div className="flex flex-col items-center">
             <SpinWheel onSpinComplete={handleSpinComplete} disabled={hasSpun} />
@@ -189,7 +171,6 @@ const Index = () => {
           </div>
         )}
 
-        {/* === RESULT: Victory Section === */}
         {step === "result" && (
           <div className="flex flex-col items-center gap-4 w-full max-w-sm relative victory-entrance">
             <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 radial-burst" />
@@ -254,7 +235,6 @@ const Index = () => {
           </div>
         )}
 
-        {/* === CLAIM: Form === */}
         {step === "claim" && (
           <div className="w-full max-w-sm animate-in slide-in-from-bottom-4 duration-500">
             <div className="glass-card-strong rounded-2xl p-6">
@@ -313,7 +293,6 @@ const Index = () => {
           </div>
         )}
 
-        {/* === EXPIRED === */}
         {step === "expired" && (
           <div className="flex flex-col items-center gap-4 animate-in fade-in-0 duration-500">
             <div className="text-6xl">⏰</div>
@@ -332,17 +311,13 @@ const Index = () => {
         )}
       </section>
 
-      {/* Divider */}
       <div className="h-px w-4/5 mx-auto bg-gradient-to-r from-transparent via-border to-transparent" />
 
-      {/* Social Proof */}
       <section className="relative z-10 px-5 py-8 max-w-lg mx-auto">
         <h3 className="text-center text-xs font-bold text-muted-foreground uppercase tracking-[0.25em] mb-4">
           Ganadores recientes
         </h3>
         <SocialProofTicker />
-
-        {/* Game thumbnails */}
         <div className="flex justify-center gap-4 mt-8">
           {GAMES.map(({ emoji }, i) => (
             <div key={i} className="w-14 h-14 rounded-2xl glass-card flex items-center justify-center text-3xl premium-shadow hover:scale-105 transition-transform duration-200 cursor-pointer">
@@ -352,12 +327,9 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Divider */}
       <div className="h-px w-4/5 mx-auto bg-gradient-to-r from-transparent via-border to-transparent" />
 
-      {/* Footer */}
       <footer className="relative z-10 px-5 py-10 max-w-lg mx-auto text-center">
-        {/* Payment methods */}
         <div className="mb-6">
           <p className="text-[10px] text-muted-foreground/50 uppercase tracking-[0.2em] mb-3">Métodos de pago aceptados</p>
           <div className="flex justify-center gap-2 flex-wrap">
@@ -370,14 +342,12 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Responsible gaming */}
         <div className="glass-card rounded-xl px-4 py-3 mb-6 inline-block">
           <p className="text-[11px] text-muted-foreground/60 flex items-center gap-1.5">
             🔞 Jugá con responsabilidad — Solo para mayores de 18 años
           </p>
         </div>
 
-        {/* Legal links */}
         <div className="flex justify-center gap-4 mb-4 flex-wrap">
           {["Términos y condiciones", "Política de privacidad", "Juego responsable", "Contacto"].map((link) => (
             <a key={link} href="#" className="text-[10px] text-muted-foreground/40 hover:text-muted-foreground/70 transition-colors underline-offset-2 hover:underline">
@@ -386,7 +356,6 @@ const Index = () => {
           ))}
         </div>
 
-        {/* Brand */}
         <div className="flex items-center justify-center mb-2">
           <img src={logo} alt="Smart Play" className="w-20 h-20 object-contain" />
         </div>
@@ -400,7 +369,6 @@ const Index = () => {
 
       <div className="h-24" />
 
-      {/* Sticky WhatsApp CTA */}
       {step !== "claim" && step !== "expired" && (
         <a
           href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(result ? `Hola!\n\nQuiero activar mi bono de bienvenida para empezar a jugar.\n\nBono obtenido: ${result}\n\n¿Me decís la carga mínima y los medios de pago disponibles?` : WHATSAPP_MSG_NO_SPIN)}`}
