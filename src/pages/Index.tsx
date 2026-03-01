@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Shield, Zap, Headphones, Lock } from "lucide-react";
 import SpinWheel from "@/components/SpinWheel";
 import Confetti from "@/components/Confetti";
+import AmbientParticles from "@/components/AmbientParticles";
 import SocialProofTicker from "@/components/SocialProofTicker";
 import LiveCounter from "@/components/LiveCounter";
 import ScarcityBar from "@/components/ScarcityBar";
@@ -9,13 +10,15 @@ import WinnerToast from "@/components/WinnerToast";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
-type FunnelStep = "hero" | "result" | "claim";
+type FunnelStep = "hero" | "result" | "claim" | "expired";
 
 const WHATSAPP_NUMBER = "59899999999";
 const WHATSAPP_MESSAGE = "Hola, quiero activar mi bono de bienvenida.";
+const BONUS_TIMER = 300; // 5 minutes
 
 const Index = () => {
   const [step, setStep] = useState<FunnelStep>(() => {
+    if (localStorage.getItem("casino_expired")) return "expired";
     return localStorage.getItem("casino_spun") ? "result" : "hero";
   });
   const [result, setResult] = useState<string>(
@@ -23,9 +26,10 @@ const Index = () => {
   );
   const [showConfetti, setShowConfetti] = useState(false);
   const [showFlash, setShowFlash] = useState(false);
+  const [showShake, setShowShake] = useState(false);
   const [phone, setPhone] = useState("");
   const [name, setName] = useState("");
-  const [countdown, setCountdown] = useState(300);
+  const [countdown, setCountdown] = useState(BONUS_TIMER);
   const [recentClaims] = useState(() => Math.floor(Math.random() * 8) + 12);
   const phoneRef = useRef<HTMLInputElement>(null);
 
@@ -37,14 +41,25 @@ const Index = () => {
     setResult(prize);
     setShowConfetti(true);
     setShowFlash(true);
+    setShowShake(true);
     setTimeout(() => setShowFlash(false), 500);
-    setTimeout(() => setStep("result"), 500);
-    setTimeout(() => setShowConfetti(false), 4000);
+    setTimeout(() => setShowShake(false), 500);
+    setTimeout(() => setStep("result"), 800);
+    setTimeout(() => setShowConfetti(false), 5000);
   }, []);
 
   const handleClaim = () => {
     setStep("claim");
     setTimeout(() => phoneRef.current?.focus(), 400);
+  };
+
+  const handleRetry = () => {
+    localStorage.removeItem("casino_spun");
+    localStorage.removeItem("casino_result");
+    localStorage.removeItem("casino_expired");
+    setStep("hero");
+    setResult("");
+    setCountdown(BONUS_TIMER);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -55,11 +70,18 @@ const Index = () => {
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`, "_blank");
   };
 
-  // Countdown timer
+  // Countdown timer - active in both result and claim steps
   useEffect(() => {
-    if (step !== "claim") return;
+    if (step !== "result" && step !== "claim") return;
     const interval = setInterval(() => {
-      setCountdown((c) => (c <= 0 ? 0 : c - 1));
+      setCountdown((c) => {
+        if (c <= 1) {
+          localStorage.setItem("casino_expired", "true");
+          setStep("expired");
+          return 0;
+        }
+        return c - 1;
+      });
     }, 1000);
     return () => clearInterval(interval);
   }, [step]);
@@ -72,14 +94,9 @@ const Index = () => {
 
   const isUrgent = countdown < 60;
 
-  // Context-aware WhatsApp CTA
-  const getCtaText = () => {
-    if (step === "result") return "⚡ Activar mi bono por WhatsApp";
-    return "Hablar con un asesor por WhatsApp";
-  };
-
   return (
-    <div className="min-h-screen casino-gradient relative overflow-x-hidden">
+    <div className={`min-h-screen casino-gradient relative overflow-x-hidden ${showShake ? 'screen-shake' : ''}`}>
+      <AmbientParticles />
       {showConfetti && <Confetti />}
       {showFlash && (
         <div className="fixed inset-0 bg-casino-gold/30 z-50 pointer-events-none screen-flash" />
@@ -87,7 +104,7 @@ const Index = () => {
       <WinnerToast />
 
       {/* Hero Section */}
-      <section className="flex flex-col items-center px-4 pt-8 pb-6 text-center">
+      <section className="relative z-10 flex flex-col items-center px-4 pt-8 pb-6 text-center">
         <h1 className="text-2xl sm:text-3xl font-extrabold leading-tight mb-2 gold-text max-w-md">
           Girá la ruleta y desbloqueá tu bono de bienvenida
         </h1>
@@ -114,7 +131,7 @@ const Index = () => {
           ))}
         </div>
 
-        {/* Main interaction area */}
+        {/* === HERO: Spin Wheel === */}
         {step === "hero" && (
           <div className="flex flex-col items-center">
             <SpinWheel onSpinComplete={handleSpinComplete} disabled={hasSpun} />
@@ -127,33 +144,50 @@ const Index = () => {
           </div>
         )}
 
+        {/* === RESULT: Victory Section === */}
         {step === "result" && (
-          <div className="flex flex-col items-center gap-4 animate-in fade-in-0 zoom-in-95 duration-500">
-            <div className="text-6xl mb-2">🎉</div>
-            <h2 className="text-2xl font-extrabold text-foreground">¡Felicitaciones!</h2>
-            <p className="text-lg text-foreground/80">
-              Ganaste{" "}
-              <span className="font-black text-3xl gold-text">{result}</span>{" "}
-              de bono de bienvenida
-            </p>
-            <div className="bg-muted/30 rounded-lg px-4 py-2 mt-1">
+          <div className="flex flex-col items-center gap-3 w-full max-w-sm">
+            <div className="text-6xl victory-pop">🎉</div>
+            <h2 className="text-xl sm:text-2xl font-extrabold text-foreground uppercase tracking-wide victory-pop">
+              ¡Felicitaciones!
+            </h2>
+            <p className="text-sm text-foreground/70 victory-pop">Ganaste un bono de bienvenida de</p>
+            <div className="bonus-reveal">
+              <span className="block text-6xl sm:text-7xl font-black glow-text tracking-tight leading-none">
+                {result}
+              </span>
+              <span className="block text-lg font-bold text-foreground/80 mt-1">BONO DE BIENVENIDA</span>
+            </div>
+
+            <div className="bg-muted/30 rounded-lg px-4 py-2 mt-2 gold-border">
               <p className="text-xs text-foreground/60">
                 ⭐ Solo <span className="font-bold text-casino-gold">3 de cada 100</span> jugadores reciben este bono
               </p>
             </div>
-            <div className="flex items-center gap-2 text-xs text-destructive font-semibold animate-pulse">
+
+            {/* Countdown in result */}
+            <div className="flex flex-col items-center gap-1 mt-2">
+              <span className="text-xs text-foreground/60">Tu bono está reservado durante:</span>
+              <span className={`font-mono font-bold text-2xl px-4 py-1 rounded-lg ${isUrgent ? 'countdown-urgent bg-destructive/20' : 'text-casino-gold bg-muted/60'}`}>
+                {formatTime(countdown)}
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2 text-xs text-destructive font-semibold animate-pulse mt-1">
               <span>⚠️</span>
               <span>Oferta válida por tiempo limitado</span>
             </div>
+
             <Button
               onClick={handleClaim}
-              className="mt-2 px-8 py-6 text-lg font-extrabold rounded-full gold-gradient text-primary-foreground pulse-glow uppercase tracking-wide"
+              className="mt-3 w-full max-w-xs py-7 text-xl font-black rounded-full gold-gradient text-primary-foreground pulse-glow uppercase tracking-wide bounce-cta"
             >
-              🎁 Reclamar mi bono
+              🎁 Reclamar mi bono ahora
             </Button>
           </div>
         )}
 
+        {/* === CLAIM: Form === */}
         {step === "claim" && (
           <div className="w-full max-w-sm animate-in slide-in-from-bottom-4 duration-500">
             <div className="bg-card/80 backdrop-blur rounded-2xl p-6 gold-border">
@@ -166,10 +200,10 @@ const Index = () => {
               <p className="text-xs text-foreground/50 mb-3">Paso 2 de 2 — Solo falta tu número</p>
 
               <h2 className="text-xl font-extrabold text-foreground mb-1">
-                Activá tu bono en 10 segundos
+                Activá tu bono de <span className="text-casino-gold">{result}</span>
               </h2>
               <div className="flex items-center justify-center gap-2 mb-3">
-                <span className="text-xs text-foreground/60">Tu bono está reservado por</span>
+                <span className="text-xs text-foreground/60">Tu bono expira en</span>
                 <span className={`font-mono font-bold text-sm px-2 py-0.5 rounded ${isUrgent ? 'countdown-urgent bg-destructive/20' : 'text-casino-gold bg-muted/60'}`}>
                   {formatTime(countdown)}
                 </span>
@@ -197,7 +231,7 @@ const Index = () => {
                   disabled={!phone}
                   className="w-full py-6 text-lg font-extrabold rounded-full gold-gradient text-primary-foreground pulse-glow uppercase tracking-wide disabled:opacity-40"
                 >
-                  Activar bono ahora
+                  Reclamar mi bono ahora
                 </Button>
               </form>
 
@@ -211,10 +245,28 @@ const Index = () => {
             </div>
           </div>
         )}
+
+        {/* === EXPIRED === */}
+        {step === "expired" && (
+          <div className="flex flex-col items-center gap-4 animate-in fade-in-0 duration-500">
+            <div className="text-5xl">⏰</div>
+            <h2 className="text-xl font-extrabold text-foreground">El bono expiró</h2>
+            <p className="text-sm text-foreground/60 max-w-xs">
+              Tu bono de <span className="font-bold text-casino-gold">{result}</span> ya no está disponible.
+              Girá nuevamente para intentar obtener otro.
+            </p>
+            <Button
+              onClick={handleRetry}
+              className="mt-2 px-8 py-5 text-lg font-extrabold rounded-full gold-gradient text-primary-foreground pulse-glow uppercase"
+            >
+              🎰 Girar nuevamente
+            </Button>
+          </div>
+        )}
       </section>
 
       {/* Social Proof */}
-      <section className="px-4 py-6">
+      <section className="relative z-10 px-4 py-6">
         <h3 className="text-center text-sm font-bold text-foreground/50 uppercase tracking-widest mb-3">
           Ganadores recientes
         </h3>
@@ -240,8 +292,8 @@ const Index = () => {
       {/* Spacer for sticky button */}
       <div className="h-20" />
 
-      {/* Sticky WhatsApp CTA - hidden during claim step */}
-      {step !== "claim" && (
+      {/* Sticky WhatsApp CTA - hidden during claim/expired steps */}
+      {step !== "claim" && step !== "expired" && (
         <a
           href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`}
           target="_blank"
@@ -252,7 +304,7 @@ const Index = () => {
             <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
             <path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.034L.789 23.492a.75.75 0 00.917.918l4.458-1.495A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-2.395 0-4.612-.756-6.432-2.039l-.448-.334-2.648.888.888-2.648-.334-.448A9.96 9.96 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z" />
           </svg>
-          {getCtaText()}
+          {step === "result" ? "⚡ Reclamar mi bono ahora" : "Hablar con un asesor por WhatsApp"}
         </a>
       )}
     </div>
