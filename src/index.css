@@ -186,6 +186,29 @@
   animation: bounce-subtle 2s ease-in-out infinite;
 }
 
+/* Wheel spin pulse */
+@keyframes wheel-spin-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+.wheel-spin-pulse {
+  animation: wheel-spin-pulse 0.3s ease-in-out 3;
+}
+
+/* Spin button hover glow */
+.spin-btn-hover {
+  transition: box-shadow 0.3s ease, transform 0.15s ease;
+}
+
+.spin-btn-hover:hover:not(:disabled) {
+  box-shadow: 0 0 30px hsl(45 100% 51% / 0.7), 0 0 60px hsl(45 100% 51% / 0.3);
+}
+
+.spin-btn-hover:active:not(:disabled) {
+  transform: scale(0.92);
+}
+
 /* Flash screen on win */
 @keyframes screen-flash {
   0% { opacity: 0.7; }
