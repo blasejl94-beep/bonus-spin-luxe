@@ -12,12 +12,12 @@ const ScarcityBar: React.FC = () => {
   }, []);
 
   return (
-    <div className="w-full max-w-xs mx-auto mt-4">
-      <div className="flex items-center justify-between text-xs mb-1.5">
-        <span className="text-foreground/70">🔥 Bonos disponibles hoy</span>
+    <div className="w-full max-w-xs mx-auto mt-5 glass-card rounded-xl px-4 py-3 premium-shadow">
+      <div className="flex items-center justify-between text-xs mb-2">
+        <span className="text-muted-foreground">🔥 Bonos disponibles hoy</span>
         <span className="font-bold text-casino-gold">{bonos} restantes</span>
       </div>
-      <Progress value={(bonos / 50) * 100} className="h-2 bg-muted/50" />
+      <Progress value={(bonos / 50) * 100} className="h-1.5 bg-muted/40" />
     </div>
   );
 };
