@@ -289,7 +289,7 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
   });
 
   return (
-    <div className="relative flex flex-col items-center" style={{ width: "min(92vw, 420px)" }}>
+    <div className="relative flex flex-col items-center" style={{ width: "min(92vw, 420px)", contain: "layout paint" }}>
       {showWinConfetti && <Confetti />}
 
       <div
