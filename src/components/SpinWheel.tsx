@@ -31,8 +31,8 @@ const LedRing: React.FC<{ state: WheelState }> = ({ state }) => {
     Array.from({ length: NUM_LEDS }, (_, i) => {
       const angle = (i / NUM_LEDS) * 360 - 90;
       const rad = (angle * Math.PI) / 180;
-      const x = 50 + 46 * Math.cos(rad);
-      const y = 50 + 46 * Math.sin(rad);
+      const x = 50 + 43.5 * Math.cos(rad);
+      const y = 50 + 43.5 * Math.sin(rad);
       return { x, y, idx: i };
     }), []
   );
@@ -431,7 +431,7 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
         <div
           ref={pointerRef}
           className={`absolute z-20 ${!spinning && !disabled ? "wiggle-idle" : ""} ${phase === "bounce" ? "pointer-bounce" : ""} ${pointerFlick ? "pointer-flick" : ""}`}
-          style={{ top: "1%", left: "50%", transform: "translateX(-50%)" }}
+          style={{ top: "3.5%", left: "50%", transform: "translateX(-50%)" }}
         >
           <svg width="36" height="44" viewBox="0 0 36 44">
             <defs>
