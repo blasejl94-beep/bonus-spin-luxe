@@ -1,50 +1,34 @@
 
 
-## Casino Promotion Landing Page - Implementation Plan
+## Plan: Multiple UI/UX Improvements
 
-### Page Structure (Single-page, mobile-first)
+### 1. Game Icons — Remove text labels (Index.tsx)
+Remove the `<span>` text labels from the GAMES section, keeping only emoji icons. Also rename "Ruleta" to "Rueda" in the GAMES array.
 
-**1. Hero Section (Above the fold)**
-- Deep red gradient background with gold accents
-- Headline: "Girá la ruleta y desbloqueá tu bono de bienvenida"
-- Subheadline with player count social proof
-- Three trust badges (verified, fast payments, 24/7 support)
-- Large interactive spin wheel with 7 segments (50%-350% bonuses)
-- "Tenés 1 giro disponible" text + "Girar ahora" CTA button
+### 2. Payment Methods — Replace with Uruguayan providers (Index.tsx)
+Replace `["💳 Visa", "💳 Mastercard", "📱 MercadoPago", "🏦 Transferencia"]` with: Abitab, Redpagos, MercadoPago, Prex, MiDinero, Santander Rio, eBrou. Since we cannot use real logos (no image files), we will use styled text badges with appropriate icons/emojis and a clean glass-card design that integrates well.
 
-**2. Spin Wheel Interaction**
-- CSS-animated wheel with realistic spin physics and suspense delay
-- Result always lands on a high bonus (e.g., 350%)
-- Confetti animation on result reveal
-- Prize modal: "🎉 ¡Felicitaciones! Ganaste 350% de bono"
-- "Reclamar mi bono" CTA button
-- Store spin in localStorage to prevent re-spins
+### 3. Wheel Pointer — Improved physics & contrast (SpinWheel.tsx + index.css)
+- Change pointer color from gold to a high-contrast **red/crimson** with white highlight so it stands out against the gold rim.
+- Add a reactive "flick" animation: the pointer tilts when a segment boundary passes underneath it (triggered by the same tick-detection logic), creating a realistic physical response. Use a CSS class toggle on each tick to trigger a brief rotation animation.
 
-**3. Bonus Claim Form**
-- Slides in after clicking "Reclamar mi bono"
-- "Activá tu bono en 10 segundos" header
-- Countdown timer (5 minutes) for urgency
-- Phone number (required) + Name (optional) fields
-- "Activar bono ahora" CTA button
-- On submit → redirects to WhatsApp with prefilled message
+### 4. Rename "Ruleta" → "Rueda" (Index.tsx)
+Update any references to "Ruleta" in the page text (headline, GAMES array).
 
-**4. Social Proof Section**
-- Auto-scrolling ticker of recent winners with randomized names/amounts
-- Small casino game thumbnails (slots, roulette, blackjack) using icons/emojis
+### 5. Fix Wheel Sizing — LEDs & pointer inside the wheel boundary (SpinWheel.tsx)
+The LED ring at `50 + 50 * Math.cos(rad)` places LEDs at the very edge (0%-100%), causing them to overflow. Fix by reducing the LED radius to ~46% so they sit inside the rim. Adjust pointer position from `top: 3%` to align with the inner wheel area. Reduce the outer padding from 8% to ~4% so the wheel itself is larger relative to its container.
 
-**5. Sticky WhatsApp CTA**
-- Fixed bottom floating button: "Hablar con un asesor por WhatsApp"
-- Opens WhatsApp with prefilled message
+### 6. Wheel Segments — Show 350% but limit actual wins to 100-200% (SpinWheel.tsx)
+- Add a "350%" gold segment to the wheel display (8 segments total).
+- Rig the spin so the random angle only lands on segments 100%, 125%, 150%, 175%, or 200%. The 50%, 75%, and 350% segments are visible but the landing angle is constrained to avoid them. This is done by picking a random target from the allowed segments and computing the corresponding angle range.
 
-### Design System
-- Background: deep red-to-dark gradient
-- Accents: gold/amber tones
-- Text: white, high contrast
-- Large touch targets, smooth transitions
-- Confetti effect using CSS animations
+### 7. WhatsApp Messages — Update both messages (Index.tsx)
+- **After spinning (claim form submit):** Multi-line message with bonus result interpolated.
+- **Sticky button (no spin):** Generic inquiry message without bonus.
+- Use different messages depending on whether the user has a result or not.
 
-### Technical Notes
-- All frontend, no backend needed
-- Single Index page with state management for the funnel steps
-- localStorage for one-spin-per-session logic
+### Files to modify
+- `src/pages/Index.tsx` — items 1, 2, 4, 7
+- `src/components/SpinWheel.tsx` — items 3, 5, 6
+- `src/index.css` — item 3 (pointer flick animation)
 
