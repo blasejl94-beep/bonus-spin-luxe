@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Shield, Zap, Headphones, Lock, Star } from "lucide-react";
-import logo from "@/assets/logo.jpg";
+import logo from "@/assets/logo.png";
 import SpinWheel from "@/components/SpinWheel";
 import Confetti from "@/components/Confetti";
 import AmbientParticles from "@/components/AmbientParticles";
