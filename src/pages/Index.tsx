@@ -68,10 +68,8 @@ const Index = () => {
   const handleRevealComplete = useCallback(() => {
     setShowFlash(true);
     setShowShake(true);
-    setShowConfetti(true);
     setTimeout(() => setShowFlash(false), 600);
     setTimeout(() => setShowShake(false), 700);
-    setTimeout(() => setShowConfetti(false), 6000);
   }, []);
 
   const handleSpinComplete = useCallback((prize: string) => {
