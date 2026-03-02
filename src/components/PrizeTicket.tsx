@@ -37,7 +37,9 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
       setCountValue(Math.round(eased * numericValue));
       updateCountUpSound(progress);
       onCountProgress?.(progress);
-      setGlowIntensity(progress);
+      // Front-load glow so it's visible early and peaks at the end
+      const glowEased = Math.pow(progress, 0.4);
+      setGlowIntensity(glowEased);
 
       if (progress < 1) {
         rafRef.current = requestAnimationFrame(tick);
