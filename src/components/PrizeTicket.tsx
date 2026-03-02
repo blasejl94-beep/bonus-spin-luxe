@@ -84,28 +84,28 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
     return () => clearTimeout(t);
   }, [countDone]);
 
-  // Stable sparkle positions — more sparkles, wider spread
+  // Sparkle positions — fewer, appear gradually after count
   const [sparkles] = useState(() =>
-    Array.from({ length: 12 }, (_, i) => ({
-      top: 5 + ((i * 31 + 11) % 85),
-      left: 3 + ((i * 47 + 5) % 90),
-      size: 3 + ((i * 13) % 5),
-      delay: i * 0.35,
-      dur: 2.0 + ((i * 7) % 12) / 10,
+    Array.from({ length: 6 }, (_, i) => ({
+      top: 8 + ((i * 37 + 11) % 80),
+      left: 5 + ((i * 53 + 5) % 85),
+      size: 3 + ((i * 13) % 4),
+      delay: 2.5 + i * 0.6, // start after count finishes
+      dur: 2.2 + ((i * 7) % 12) / 10,
     }))
   );
 
-  // Badge sparkle positions — more sparkles, wider radius
+  // Badge sparkle positions — fewer, staggered entrance after count
   const [badgeSparkles] = useState(() =>
-    Array.from({ length: 20 }, (_, i) => {
-      const angle = (i * (360 / 20)) * (Math.PI / 180);
-      const radius = 22 + (i % 4) * 10;
+    Array.from({ length: 10 }, (_, i) => {
+      const angle = (i * (360 / 10)) * (Math.PI / 180);
+      const radius = 26 + (i % 3) * 12;
       return {
         x: Math.cos(angle) * radius,
         y: Math.sin(angle) * radius,
-        size: 2.5 + (i % 5),
-        delay: i * 0.18,
-        dur: 1.2 + (i % 5) * 0.3,
+        size: 2.5 + (i % 4),
+        delay: 2.2 + i * 0.25, // appear after count
+        dur: 1.5 + (i % 4) * 0.3,
       };
     })
   );
@@ -173,9 +173,9 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
         </div>
       </div>
 
-      {/* Card body */}
+      {/* Card body — alive with subtle motion */}
       <div
-        className={`prize-card-v3 relative z-[5] overflow-hidden ${breathing ? 'glow-breathing' : ''}`}
+        className={`prize-card-v3 relative z-[5] overflow-hidden ${breathing ? 'glow-breathing card-alive' : ''}`}
         style={{
           boxShadow: glowIntensity > 0
             ? `inset 0 0 ${10 + glowIntensity * 25}px ${3 + glowIntensity * 8}px hsl(42 100% 55% / ${glowIntensity * 0.18}), inset 0 0 ${20 + glowIntensity * 35}px ${6 + glowIntensity * 12}px hsl(42 100% 50% / ${glowIntensity * 0.08})`
