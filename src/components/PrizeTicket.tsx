@@ -13,6 +13,7 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
   const [countValue, setCountValue] = useState(0);
   const [countDone, setCountDone] = useState(false);
   const [winPulse, setWinPulse] = useState(false);
+  const [showCountdown, setShowCountdown] = useState(false);
   const rafRef = useRef<number>(0);
 
   const numericValue = parseInt(result.replace(/[^0-9]/g, ""), 10) || 0;
@@ -51,13 +52,14 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
     };
   }, [numericValue]);
 
-  // Shine sweep after count finishes, then trigger confetti
+  // Shine sweep after count finishes, then trigger confetti, then show countdown
   useEffect(() => {
     if (!countDone) return;
     const t = setTimeout(() => {
       setShowShine(true);
-      // After shine completes, fire confetti
       setTimeout(() => onRevealComplete?.(), 900);
+      // Show countdown after all animations settle
+      setTimeout(() => setShowCountdown(true), 1800);
     }, 400);
     return () => clearTimeout(t);
   }, [countDone, onRevealComplete]);
@@ -201,11 +203,11 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
             BONO DE BIENVENIDA
           </p>
 
-          {/* Countdown inside card — bottom right */}
-          {countdownText && (
-            <div className="flex items-center justify-end gap-2 stagger-4">
-              <span className="text-[10px] text-muted-foreground/60">Tu bono expira en:</span>
-              <span className={`font-mono font-bold text-sm px-2.5 py-1 rounded-lg ${isUrgent ? 'countdown-urgent bg-destructive/15' : 'text-casino-gold glass-card'}`}>
+          {/* Countdown inside card — centered, delayed */}
+          {countdownText && showCountdown && (
+            <div className="flex flex-col items-center gap-1.5 mt-6 pt-4 border-t border-casino-gold/10 animate-in fade-in-0 slide-in-from-bottom-2 duration-500">
+              <span className="text-[10px] text-muted-foreground/60 uppercase tracking-widest">Tu bono expira en:</span>
+              <span className="font-mono font-bold text-lg px-3 py-1 rounded-lg text-destructive">
                 {countdownText}
               </span>
             </div>
