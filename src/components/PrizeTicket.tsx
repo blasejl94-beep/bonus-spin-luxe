@@ -210,7 +210,15 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
 
           {/* Hero number with count-up */}
           <div className="relative stagger-2">
-            <span className={`prize-hero-number-v2 ${glowIntensity > 0 ? 'prize-number-glow' : ''} ${winPulse ? 'win-number-pulse' : ''}`}>
+            <span
+              className={`prize-hero-number-v2 ${winPulse ? 'win-number-pulse' : ''}`}
+              style={{
+                filter: glowIntensity > 0
+                  ? `drop-shadow(0 0 ${glowIntensity * 20}px hsl(42 100% 60% / ${glowIntensity * 0.5})) drop-shadow(0 0 ${glowIntensity * 40}px hsl(42 100% 55% / ${glowIntensity * 0.2}))`
+                  : undefined,
+                transition: breathing ? 'filter 3s ease-in-out' : 'filter 0.15s ease-out',
+              }}
+            >
               {countValue}{suffix}
             </span>
           </div>
