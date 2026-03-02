@@ -28,7 +28,12 @@ const TRUST_BADGES = [
   { icon: Headphones, label: "Soporte 24/7" },
 ];
 
-const GAMES = [{ emoji: "🎰" }, { emoji: "🎡" }, { emoji: "🃏" }, { emoji: "🎲" }];
+const GAMES = [
+  { emoji: "🎰" },
+  { emoji: "🎡" },
+  { emoji: "🃏" },
+  { emoji: "🎲" },
+];
 
 const PAYMENT_METHODS = [
   { name: "Abitab", icon: "🏪" },
@@ -47,7 +52,9 @@ const Index = () => {
     if (localStorage.getItem("casino_expired")) return "expired";
     return localStorage.getItem("casino_spun") ? "result" : "hero";
   });
-  const [result, setResult] = useState<string>(localStorage.getItem("casino_result") || "");
+  const [result, setResult] = useState<string>(
+    localStorage.getItem("casino_result") || ""
+  );
   const [showConfetti, setShowConfetti] = useState(false);
   const [showFlash, setShowFlash] = useState(false);
   const [phone, setPhone] = useState("");
@@ -87,7 +94,7 @@ const Index = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const msg = encodeURIComponent(
-      `Hola!\n\nQuiero activar mi bono de bienvenida para empezar a jugar.\n\nBono obtenido: ${result}\n\n¿Me decís la carga mínima y los medios de pago disponibles?`,
+      `Hola!\n\nQuiero activar mi bono de bienvenida para empezar a jugar.\n\nBono obtenido: ${result}\n\n¿Me decís la carga mínima y los medios de pago disponibles?`
     );
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`, "_blank");
   };
@@ -121,7 +128,9 @@ const Index = () => {
     <div className="min-h-screen casino-gradient relative overflow-x-hidden">
       <AmbientParticles />
       {showConfetti && <Confetti />}
-      {showFlash && <div className="fixed inset-0 bg-casino-gold/30 z-50 pointer-events-none screen-flash" />}
+      {showFlash && (
+        <div className="fixed inset-0 bg-casino-gold/30 z-50 pointer-events-none screen-flash" />
+      )}
 
       <WinnerToast />
 
@@ -129,32 +138,17 @@ const Index = () => {
 
       <section className="relative z-10 flex flex-col items-center px-5 pt-6 pb-8 text-center max-w-lg mx-auto">
         <div className="flex items-center justify-center mb-3 hero-logo-entrance">
-          <img
-            src={logo}
-            alt="Smart Play"
-            className="w-24 h-24 object-contain drop-shadow-[0_0_20px_hsl(var(--casino-gold)/0.4)]"
-          />
+          <img src={logo} alt="Smart Play" className="w-24 h-24 object-contain drop-shadow-[0_0_20px_hsl(var(--casino-gold)/0.4)]" />
         </div>
 
         <h1 className="text-2xl sm:text-3xl font-black leading-[1.1] mb-2 max-w-md tracking-tight hero-text-entrance">
-          <span
-            className="inline-block"
-            style={{ WebkitBackgroundClip: "unset", backgroundClip: "unset", WebkitTextFillColor: "unset" }}
-          >
-            {step === "result" || step === "claim" ? "🎉" : "🎰"}
-          </span>{" "}
-          <span className="gold-text">
-            {step === "result" || step === "claim" ? "¡Felicidades!" : "Girá la rueda y desbloqueá tu bono exclusivo"}
-          </span>
+          <span className="inline-block" style={{ WebkitBackgroundClip: 'unset', backgroundClip: 'unset', WebkitTextFillColor: 'unset' }}>{step === "result" || step === "claim" ? "🎉" : "🎰"}</span>{' '}
+          <span className="gold-text">{step === "result" || step === "claim" ? "¡Premio desbloqueado!" : "Girá la rueda y desbloqueá tu bono exclusivo"}</span>
         </h1>
         <p className="text-muted-foreground text-xs mb-3 max-w-xs hero-subtitle-entrance">
-          {step === "result" || step === "claim" ? (
-            "Tu bono está reservado por tiempo limitado"
-          ) : (
-            <>
-              Más de <span className="font-semibold text-foreground">10.000</span> jugadores ya reclamaron su bono
-            </>
-          )}
+          {step === "result" || step === "claim"
+            ? "Tu bono está reservado por tiempo limitado"
+            : <>Más de <span className="font-semibold text-foreground">10.000</span> jugadores ya reclamaron su bono</>}
         </p>
 
         {step === "hero" && (
@@ -173,10 +167,7 @@ const Index = () => {
           <>
             <div className="flex gap-2 mt-5 mb-4 flex-wrap justify-center hero-badges-entrance">
               {TRUST_BADGES.map(({ icon: Icon, label }) => (
-                <div
-                  key={label}
-                  className="flex items-center gap-1 glass-card rounded-full px-2.5 py-1.5 text-[10px] text-foreground/60"
-                >
+                <div key={label} className="flex items-center gap-1 glass-card rounded-full px-2.5 py-1.5 text-[10px] text-foreground/60">
                   <Icon className="w-3 h-3 text-casino-gold/80" />
                   {label}
                 </div>
@@ -209,6 +200,7 @@ const Index = () => {
               </p>
             </div>
 
+
             <div className="flex items-center gap-2 text-xs text-destructive font-semibold animate-pulse stagger-3">
               <span>⚠️</span>
               <span>Oferta válida por tiempo limitado</span>
@@ -222,7 +214,9 @@ const Index = () => {
               🎁 RECLAMAR MI BONO
             </Button>
 
-            <p className="text-xs text-muted-foreground stagger-4 mt-3">💬 Activación en menos de 1 minuto</p>
+            <p className="text-xs text-muted-foreground stagger-4 mt-3">
+              💬 Activación en menos de 1 minuto
+            </p>
           </div>
         )}
 
@@ -230,13 +224,9 @@ const Index = () => {
           <div className="w-full max-w-sm animate-in slide-in-from-bottom-4 duration-500">
             <div className="glass-card-strong rounded-2xl p-6">
               <div className="flex items-center justify-center gap-2 mb-3">
-                <span className="w-7 h-7 rounded-full gold-gradient text-primary-foreground text-xs font-bold flex items-center justify-center shadow-md">
-                  ✓
-                </span>
+                <span className="w-7 h-7 rounded-full gold-gradient text-primary-foreground text-xs font-bold flex items-center justify-center shadow-md">✓</span>
                 <div className="w-8 h-0.5 bg-casino-gold/50" />
-                <span className="w-7 h-7 rounded-full gold-border text-casino-gold text-xs font-bold flex items-center justify-center">
-                  2
-                </span>
+                <span className="w-7 h-7 rounded-full gold-border text-casino-gold text-xs font-bold flex items-center justify-center">2</span>
               </div>
               <p className="text-xs text-muted-foreground mb-4">✔ Paso 1 completado — Activá tu bono</p>
 
@@ -245,9 +235,7 @@ const Index = () => {
               </h2>
               <div className="flex items-center justify-center gap-2 mb-4">
                 <span className="text-xs text-muted-foreground">Tu bono expira en</span>
-                <span
-                  className={`font-mono font-bold text-sm px-2.5 py-1 rounded-lg ${isUrgent ? "countdown-urgent bg-destructive/15" : "text-casino-gold glass-card"}`}
-                >
+                <span className={`font-mono font-bold text-sm px-2.5 py-1 rounded-lg ${isUrgent ? 'countdown-urgent bg-destructive/15' : 'text-casino-gold glass-card'}`}>
                   {formatTime(countdown)}
                 </span>
               </div>
@@ -274,8 +262,8 @@ const Index = () => {
                   disabled={!phone}
                   className="w-full py-5 text-lg font-black rounded-xl gold-gradient text-primary-foreground uppercase tracking-wide disabled:opacity-40 relative overflow-hidden shadow-[0_0_30px_hsl(42,100%,50%,0.4)] hover:shadow-[0_0_50px_hsl(42,100%,50%,0.6)] hover:scale-[1.02] active:scale-95 transition-all duration-300 border border-casino-gold/50"
                 >
-                  <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
-                  ACTIVAR BONO AHORA
+                   <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
+                   ACTIVAR BONO AHORA
                 </Button>
               </form>
 
@@ -297,7 +285,9 @@ const Index = () => {
             <p className="text-sm text-muted-foreground max-w-xs">
               Ese bono ya fue reclamado, pero todavía podés girar la rueda para desbloquear uno nuevo.
             </p>
-            <p className="text-xs font-semibold text-casino-gold">🔥 Nuevos bonos disponibles ahora</p>
+            <p className="text-xs font-semibold text-casino-gold">
+              🔥 Nuevos bonos disponibles ahora
+            </p>
             <Button
               onClick={handleRetry}
               className="mt-2 px-8 py-5 text-lg font-black rounded-full gold-gradient text-primary-foreground pulse-glow uppercase"
@@ -318,10 +308,7 @@ const Index = () => {
         <SocialProofTicker />
         <div className="flex justify-center gap-4 mt-8 section-games-entrance">
           {GAMES.map(({ emoji }, i) => (
-            <div
-              key={i}
-              className="w-14 h-14 rounded-2xl glass-card flex items-center justify-center text-3xl premium-shadow hover:scale-105 transition-transform duration-200 cursor-pointer"
-            >
+            <div key={i} className="w-14 h-14 rounded-2xl glass-card flex items-center justify-center text-3xl premium-shadow hover:scale-105 transition-transform duration-200 cursor-pointer">
               {emoji}
             </div>
           ))}
@@ -332,15 +319,10 @@ const Index = () => {
 
       <footer className="relative z-10 px-5 py-10 max-w-lg mx-auto text-center footer-entrance">
         <div className="mb-6">
-          <p className="text-[10px] text-muted-foreground/50 uppercase tracking-[0.2em] mb-3">
-            Métodos de pago aceptados
-          </p>
+          <p className="text-[10px] text-muted-foreground/50 uppercase tracking-[0.2em] mb-3">Métodos de pago aceptados</p>
           <div className="flex justify-center gap-2 flex-wrap">
             {PAYMENT_METHODS.map(({ name, icon }) => (
-              <span
-                key={name}
-                className="text-[11px] text-muted-foreground/70 glass-card rounded-lg px-2.5 py-1.5 flex items-center gap-1.5"
-              >
+              <span key={name} className="text-[11px] text-muted-foreground/70 glass-card rounded-lg px-2.5 py-1.5 flex items-center gap-1.5">
                 <span className="text-sm">{icon}</span>
                 {name}
               </span>
@@ -355,32 +337,10 @@ const Index = () => {
         </div>
 
         <div className="flex justify-center gap-4 mb-4 flex-wrap">
-          <Link
-            to="/terminos"
-            className="text-[10px] text-muted-foreground/40 hover:text-muted-foreground/70 transition-colors underline-offset-2 hover:underline"
-          >
-            Términos y condiciones
-          </Link>
-          <Link
-            to="/privacidad"
-            className="text-[10px] text-muted-foreground/40 hover:text-muted-foreground/70 transition-colors underline-offset-2 hover:underline"
-          >
-            Política de privacidad
-          </Link>
-          <Link
-            to="/juego-responsable"
-            className="text-[10px] text-muted-foreground/40 hover:text-muted-foreground/70 transition-colors underline-offset-2 hover:underline"
-          >
-            Juego responsable
-          </Link>
-          <a
-            href={`https://wa.me/${WHATSAPP_NUMBER}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[10px] text-muted-foreground/40 hover:text-muted-foreground/70 transition-colors underline-offset-2 hover:underline"
-          >
-            Contacto
-          </a>
+          <Link to="/terminos" className="text-[10px] text-muted-foreground/40 hover:text-muted-foreground/70 transition-colors underline-offset-2 hover:underline">Términos y condiciones</Link>
+          <Link to="/privacidad" className="text-[10px] text-muted-foreground/40 hover:text-muted-foreground/70 transition-colors underline-offset-2 hover:underline">Política de privacidad</Link>
+          <Link to="/juego-responsable" className="text-[10px] text-muted-foreground/40 hover:text-muted-foreground/70 transition-colors underline-offset-2 hover:underline">Juego responsable</Link>
+          <a href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" rel="noopener noreferrer" className="text-[10px] text-muted-foreground/40 hover:text-muted-foreground/70 transition-colors underline-offset-2 hover:underline">Contacto</a>
         </div>
 
         <div className="flex items-center justify-center mb-2">
@@ -396,23 +356,21 @@ const Index = () => {
 
       <div className="h-24" />
 
-      {step !== "claim" &&
-        step !== "expired" &&
-        createPortal(
-          <a
-            href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(result ? `Hola!\n\nQuiero activar mi bono de bienvenida para empezar a jugar.\n\nBono obtenido: ${result}\n\n¿Me decís la carga mínima y los medios de pago disponibles?` : WHATSAPP_MSG_NO_SPIN)}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`fixed bottom-4 left-4 right-4 z-40 flex items-center justify-center gap-2 py-4 rounded-2xl bg-[hsl(142,70%,38%)] text-white font-bold text-base shadow-[0_4px_24px_hsl(142_70%_38%/0.4)] active:scale-95 transition-all duration-200 max-w-lg mx-auto cta-entrance ${step === "result" ? "bounce-cta" : ""}`}
-          >
-            <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current">
-              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
-              <path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.034L.789 23.492a.75.75 0 00.917.918l4.458-1.495A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-2.395 0-4.612-.756-6.432-2.039l-.448-.334-2.648.888.888-2.648-.334-.448A9.96 9.96 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z" />
-            </svg>
-            {step === "result" ? "⚡ Activar mi bono ahora" : "Hablar con un asesor"}
-          </a>,
-          document.body,
-        )}
+      {step !== "claim" && step !== "expired" && createPortal(
+        <a
+          href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(result ? `Hola!\n\nQuiero activar mi bono de bienvenida para empezar a jugar.\n\nBono obtenido: ${result}\n\n¿Me decís la carga mínima y los medios de pago disponibles?` : WHATSAPP_MSG_NO_SPIN)}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={`fixed bottom-4 left-4 right-4 z-40 flex items-center justify-center gap-2 py-4 rounded-2xl bg-[hsl(142,70%,38%)] text-white font-bold text-base shadow-[0_4px_24px_hsl(142_70%_38%/0.4)] active:scale-95 transition-all duration-200 max-w-lg mx-auto cta-entrance ${step === "result" ? "bounce-cta" : ""}`}
+        >
+          <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
+            <path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.034L.789 23.492a.75.75 0 00.917.918l4.458-1.495A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-2.395 0-4.612-.756-6.432-2.039l-.448-.334-2.648.888.888-2.648-.334-.448A9.96 9.96 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z" />
+          </svg>
+          {step === "result" ? "⚡ Activar mi bono ahora" : "Hablar con un asesor"}
+        </a>,
+        document.body
+      )}
     </div>
   );
 };
