@@ -9,7 +9,7 @@ import SocialProofTicker from "@/components/SocialProofTicker";
 import LiveCounter from "@/components/LiveCounter";
 import ScarcityBar from "@/components/ScarcityBar";
 import WinnerToast from "@/components/WinnerToast";
-import { playWinSound } from "@/lib/sounds";
+
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
@@ -73,14 +73,11 @@ const Index = () => {
     localStorage.setItem("casino_spun", "true");
     localStorage.setItem("casino_result", prize);
     setResult(prize);
-    playWinSound();
     setShowFlash(true);
     setShowShake(true);
     setTimeout(() => setShowFlash(false), 600);
     setTimeout(() => setShowShake(false), 700);
-    // Show panel after celebration lights/bounce
     setTimeout(() => setStep("result"), 500);
-    // Confetti is now triggered by PrizeTicket.onRevealComplete
   }, []);
 
   const handleClaim = () => {

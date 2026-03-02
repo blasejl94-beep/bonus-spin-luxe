@@ -19,35 +19,102 @@ export function playTick(pitch: number = 1) {
   } catch {}
 }
 
+// Rising tone that follows the count-up progress (0 to 1)
+let countUpCtx: AudioContext | null = null;
+let countUpOsc: OscillatorNode | null = null;
+let countUpGain: GainNode | null = null;
+
+export function startCountUpSound() {
+  try {
+    countUpCtx = audioCtx();
+    countUpOsc = countUpCtx.createOscillator();
+    countUpGain = countUpCtx.createGain();
+    countUpOsc.type = "sine";
+    countUpOsc.frequency.value = 200;
+    countUpGain.gain.value = 0.06;
+    countUpOsc.connect(countUpGain).connect(countUpCtx.destination);
+    countUpOsc.start();
+  } catch {}
+}
+
+export function updateCountUpSound(progress: number) {
+  try {
+    if (!countUpOsc || !countUpGain || !countUpCtx) return;
+    // Frequency rises from 200Hz to 900Hz
+    const freq = 200 + progress * 700;
+    countUpOsc.frequency.setTargetAtTime(freq, countUpCtx.currentTime, 0.02);
+    // Volume rises slightly
+    const vol = 0.04 + progress * 0.08;
+    countUpGain.gain.setTargetAtTime(vol, countUpCtx.currentTime, 0.02);
+
+    // Add rapid ticks at higher progress for slot-machine feel
+    if (progress > 0.3 && Math.random() < 0.3) {
+      const tickOsc = countUpCtx.createOscillator();
+      const tickGain = countUpCtx.createGain();
+      tickOsc.type = "triangle";
+      tickOsc.frequency.value = freq * 1.5;
+      tickGain.gain.setValueAtTime(0.03, countUpCtx.currentTime);
+      tickGain.gain.exponentialRampToValueAtTime(0.001, countUpCtx.currentTime + 0.03);
+      tickOsc.connect(tickGain).connect(countUpCtx.destination);
+      tickOsc.start();
+      tickOsc.stop(countUpCtx.currentTime + 0.03);
+    }
+  } catch {}
+}
+
+export function stopCountUpSound() {
+  try {
+    if (countUpGain && countUpCtx) {
+      countUpGain.gain.setTargetAtTime(0, countUpCtx.currentTime, 0.05);
+    }
+    setTimeout(() => {
+      try { countUpOsc?.stop(); } catch {}
+      countUpOsc = null;
+      countUpGain = null;
+    }, 200);
+  } catch {}
+}
+
 export function playWinSound() {
   try {
     const ctx = audioCtx();
 
+    // Big impact hit
+    const impact = ctx.createOscillator();
+    const impactGain = ctx.createGain();
+    impact.type = "sine";
+    impact.frequency.value = 150;
+    impactGain.gain.setValueAtTime(0.2, ctx.currentTime);
+    impactGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+    impact.connect(impactGain).connect(ctx.destination);
+    impact.start();
+    impact.stop(ctx.currentTime + 0.3);
+
     // Fanfare arpeggio
-    const notes = [523.25, 659.25, 783.99, 1046.5];
+    const notes = [523.25, 659.25, 783.99, 1046.5, 1318.51];
     notes.forEach((freq, i) => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.type = "triangle";
       osc.frequency.value = freq;
-      gain.gain.setValueAtTime(0.15, ctx.currentTime + i * 0.12);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.12 + 0.6);
+      gain.gain.setValueAtTime(0.15, ctx.currentTime + i * 0.1);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.1 + 0.5);
       osc.connect(gain).connect(ctx.destination);
-      osc.start(ctx.currentTime + i * 0.12);
-      osc.stop(ctx.currentTime + i * 0.12 + 0.6);
+      osc.start(ctx.currentTime + i * 0.1);
+      osc.stop(ctx.currentTime + i * 0.1 + 0.5);
     });
 
-    // Shimmer sweep
+    // Final shimmer sweep
     const shimmer = ctx.createOscillator();
     const shimmerGain = ctx.createGain();
     shimmer.type = "sine";
-    shimmer.frequency.setValueAtTime(800, ctx.currentTime + 0.5);
-    shimmer.frequency.exponentialRampToValueAtTime(2400, ctx.currentTime + 1.2);
-    shimmerGain.gain.setValueAtTime(0.08, ctx.currentTime + 0.5);
-    shimmerGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.4);
+    shimmer.frequency.setValueAtTime(1200, ctx.currentTime + 0.5);
+    shimmer.frequency.exponentialRampToValueAtTime(3200, ctx.currentTime + 1.0);
+    shimmerGain.gain.setValueAtTime(0.06, ctx.currentTime + 0.5);
+    shimmerGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.2);
     shimmer.connect(shimmerGain).connect(ctx.destination);
     shimmer.start(ctx.currentTime + 0.5);
-    shimmer.stop(ctx.currentTime + 1.4);
+    shimmer.stop(ctx.currentTime + 1.2);
   } catch {}
 }
 
