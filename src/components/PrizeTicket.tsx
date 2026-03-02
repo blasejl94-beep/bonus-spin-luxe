@@ -203,12 +203,12 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
             BONO DE BIENVENIDA
           </p>
 
-          {/* Countdown inside card — centered, delayed */}
+          {/* Countdown inside card — centered pill, delayed */}
           {countdownText && showCountdown && (
-            <div className="flex flex-col items-center gap-1.5 mt-6 pt-4 border-t border-casino-gold/10 animate-in fade-in-0 slide-in-from-bottom-2 duration-500">
-              <span className="text-[10px] text-muted-foreground/60 uppercase tracking-widest">Tu bono expira en:</span>
-              <span className="font-mono font-bold text-lg px-3 py-1 rounded-lg text-destructive">
-                {countdownText}
+            <div className="flex items-center justify-center gap-2 mt-5 animate-in fade-in-0 slide-in-from-bottom-2 duration-500">
+              <span className="inline-flex items-center gap-1.5 glass-card rounded-full px-3.5 py-1.5 text-[10px] text-muted-foreground/70">
+                Tu bono expira en:
+                <span className="font-mono font-bold text-xs text-destructive">{countdownText}</span>
               </span>
             </div>
           )}
