@@ -149,7 +149,7 @@ const Index = () => {
           <span className="gold-text">Girá la rueda y desbloqueá tu bono exclusivo</span>
         </h1>
         <p className="text-muted-foreground text-xs mb-3 max-w-xs">
-          ¡Más de <span className="font-semibold text-foreground">10.000</span> jugadores activos todas las semanas!
+          Más de <span className="font-semibold text-foreground">10.000</span> jugadores ya reclamaron su bono
         </p>
 
         {step === "hero" && (
@@ -157,7 +157,7 @@ const Index = () => {
             <SpinWheel onSpinComplete={handleSpinComplete} disabled={hasSpun} />
             {!hasSpun && (
               <p className="mt-4 text-sm text-muted-foreground">
-                Tenés <span className="font-bold text-casino-gold">1 giro gratis</span> disponible
+                🎰 Tenés <span className="font-bold text-casino-gold">1 giro</span> para desbloquear tu bono
               </p>
             )}
             <ScarcityBar />
@@ -291,9 +291,10 @@ const Index = () => {
       <div className="h-px w-4/5 mx-auto bg-gradient-to-r from-transparent via-border to-transparent" />
 
       <section className="relative z-10 px-5 py-8 max-w-lg mx-auto">
-        <h3 className="text-center text-xs font-bold text-muted-foreground uppercase tracking-[0.25em] mb-4">
-          Ganadores recientes
+        <h3 className="text-center text-xs font-bold text-muted-foreground uppercase tracking-[0.25em] mb-1">
+          🎉 Ganadores recientes
         </h3>
+        <p className="text-center text-[10px] text-muted-foreground/50 mb-4">actualizado en tiempo real</p>
         <SocialProofTicker />
         <div className="flex justify-center gap-4 mt-8">
           {GAMES.map(({ emoji }, i) => (
