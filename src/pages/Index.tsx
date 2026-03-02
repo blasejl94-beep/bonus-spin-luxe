@@ -167,7 +167,7 @@ const Index = () => {
                 Tenés <span className="font-bold text-casino-gold">1 giro gratis</span> disponible
               </p>
             )}
-            
+            <ScarcityBar />
           </div>
         )}
 
