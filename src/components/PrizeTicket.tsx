@@ -21,6 +21,8 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
 
   const numericValue = parseInt(result.replace(/[^0-9]/g, ""), 10) || 0;
   const suffix = result.replace(/[0-9]/g, "");
+  // Higher bonuses glow more intensely (100%→0.7, 200%→1.0, 500%→1.0 capped)
+  const maxGlow = Math.min(0.5 + (numericValue / 400), 1.0);
 
   // Count-up animation with synchronized sound
   useEffect(() => {
@@ -37,8 +39,8 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
       setCountValue(Math.round(eased * numericValue));
       updateCountUpSound(progress);
       onCountProgress?.(progress);
-      // Front-load glow so it's visible early and peaks at the end
-      const glowEased = Math.pow(progress, 0.4);
+      // Glow starts immediately and scales with progress × maxGlow
+      const glowEased = (0.15 + 0.85 * Math.pow(progress, 0.5)) * maxGlow;
       setGlowIntensity(glowEased);
 
       if (progress < 1) {
@@ -51,7 +53,7 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
         setTimeout(() => setWinPulse(false), 600);
         // Fade glow down then start breathing
         setTimeout(() => {
-          setGlowIntensity(0.3);
+          setGlowIntensity(maxGlow * 0.3);
           setTimeout(() => setBreathing(true), 800);
         }, 600);
       }
@@ -166,7 +168,7 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
         className={`prize-card-v3 relative z-[5] overflow-hidden ${breathing ? 'glow-breathing' : ''}`}
         style={{
           boxShadow: glowIntensity > 0
-            ? `inset 0 0 ${10 + glowIntensity * 25}px ${3 + glowIntensity * 8}px hsl(42 100% 55% / ${glowIntensity * 0.18}), inset 0 0 ${20 + glowIntensity * 35}px ${6 + glowIntensity * 12}px hsl(42 100% 50% / ${glowIntensity * 0.08})`
+            ? `inset 0 0 ${15 + glowIntensity * 40}px ${5 + glowIntensity * 15}px hsl(42 100% 55% / ${0.08 + glowIntensity * 0.22}), inset 0 0 ${30 + glowIntensity * 50}px ${10 + glowIntensity * 20}px hsl(42 100% 50% / ${0.04 + glowIntensity * 0.12})`
             : undefined,
           transition: breathing ? undefined : 'box-shadow 0.2s ease-out',
         }}
@@ -209,7 +211,7 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
               className={`prize-hero-number-v2 ${winPulse ? 'win-number-pulse' : ''}`}
               style={{
                 filter: glowIntensity > 0
-                  ? `drop-shadow(0 0 ${glowIntensity * 20}px hsl(42 100% 60% / ${glowIntensity * 0.5})) drop-shadow(0 0 ${glowIntensity * 40}px hsl(42 100% 55% / ${glowIntensity * 0.2}))`
+                  ? `drop-shadow(0 0 ${8 + glowIntensity * 25}px hsl(42 100% 60% / ${0.15 + glowIntensity * 0.5})) drop-shadow(0 0 ${15 + glowIntensity * 45}px hsl(42 100% 55% / ${0.05 + glowIntensity * 0.25}))`
                   : undefined,
                 transition: breathing ? 'filter 3s ease-in-out' : 'filter 0.15s ease-out',
               }}
