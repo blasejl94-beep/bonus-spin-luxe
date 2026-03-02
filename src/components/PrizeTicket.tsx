@@ -84,12 +84,20 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
     }))
   );
 
-  // Stable coin positions
-  const [coins] = useState(() => [
-    { top: 10, left: -6, delay: 0.8, dur: 3 },
-    { top: 60, right: -8, delay: 1.2, dur: 3.5 },
-    { top: 35, left: -10, delay: 1.6, dur: 4 },
-  ]);
+  // Badge sparkle positions
+  const [badgeSparkles] = useState(() =>
+    Array.from({ length: 6 }, (_, i) => {
+      const angle = (i * 60) * (Math.PI / 180);
+      const radius = 36 + (i % 2) * 6;
+      return {
+        x: Math.cos(angle) * radius,
+        y: Math.sin(angle) * radius,
+        size: 4 + (i % 3),
+        delay: i * 0.4,
+        dur: 1.8 + (i % 3) * 0.3,
+      };
+    })
+  );
 
   return (
     <div className="relative w-full max-w-sm">
@@ -121,48 +129,33 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
         />
       ))}
 
-      {/* Floating gold coins */}
-      {coins.map((c, i) => (
-        <div
-          key={`coin-${i}`}
-          className="absolute pointer-events-none z-20"
-          style={{
-            top: `${c.top}%`,
-            left: c.left !== undefined ? `${c.left}%` : undefined,
-            right: c.right !== undefined ? `${c.right}%` : undefined,
-            animation: `coin-float ${c.dur}s ease-in-out ${c.delay}s both`,
-            animationIterationCount: "1",
-          }}
-        >
-          <div
-            className="rounded-full"
-            style={{
-              width: 22,
-              height: 22,
-              background: "linear-gradient(160deg, hsl(42 100% 78%), hsl(38 90% 50%), hsl(35 80% 38%))",
-              boxShadow: "0 2px 6px hsl(42 100% 50% / 0.4), inset 0 1px 2px hsl(42 100% 90% / 0.4)",
-              border: "1.5px solid hsl(42 100% 65% / 0.5)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: 10,
-              fontWeight: 900,
-              color: "hsl(35 80% 30%)",
-            }}
-          >
-            $
-          </div>
-        </div>
-      ))}
+      {/* Badge premium sparkles */}
 
       {/* Gold Badge / Medallion */}
       <div className="relative z-10 flex justify-center mb-[-32px]">
-        <div className="prize-badge-v2">
-          <div className="prize-badge-v2-rim" />
-          <div className="prize-badge-v2-inner">
-            <span className="text-xl leading-none">🏆</span>
+        <div className="relative">
+          {/* Permanent sparkles around badge */}
+          {badgeSparkles.map((s, i) => (
+            <div
+              key={`bs-${i}`}
+              className="absolute pointer-events-none z-30 badge-sparkle-permanent"
+              style={{
+                left: `calc(50% + ${s.x}px - ${s.size / 2}px)`,
+                top: `calc(50% + ${s.y}px - ${s.size / 2}px)`,
+                width: s.size,
+                height: s.size,
+                animationDelay: `${s.delay}s`,
+                animationDuration: `${s.dur}s`,
+              }}
+            />
+          ))}
+          <div className="prize-badge-v2">
+            <div className="prize-badge-v2-rim" />
+            <div className="prize-badge-v2-inner">
+              <span className="text-xl leading-none">🏆</span>
+            </div>
+            <div className="prize-badge-shine" />
           </div>
-          <div className="prize-badge-shine" />
         </div>
       </div>
 
