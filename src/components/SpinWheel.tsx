@@ -453,12 +453,6 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
         </div>
       </div>
 
-      {/* Urgency */}
-      <div className="mt-3 flex items-center gap-2 glass-card rounded-full px-4 py-2 text-xs">
-        <span>🔥</span>
-        <span className="text-muted-foreground">Bonos disponibles hoy:</span>
-        <span className="font-bold text-casino-gold">12 restantes</span>
-      </div>
 
       {/* Spin button */}
       <button
