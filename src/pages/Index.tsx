@@ -141,8 +141,9 @@ const Index = () => {
           <img src={logo} alt="Smart Play" className="w-28 h-28 object-contain drop-shadow-[0_0_20px_hsl(var(--casino-gold)/0.4)]" />
         </div>
 
-        <h1 className="text-3xl sm:text-4xl font-black leading-[1.1] mb-3 gold-text max-w-md tracking-tight">
-          🎰 Girá la rueda y ganá tu bono de hasta 200%
+        <h1 className="text-3xl sm:text-4xl font-black leading-[1.1] mb-3 max-w-md tracking-tight">
+          <span className="inline-block" style={{ WebkitBackgroundClip: 'unset', backgroundClip: 'unset', WebkitTextFillColor: 'unset' }}>🎰</span>{' '}
+          <span className="gold-text">Girá la rueda y ganá tu bono de hasta 200%</span>
         </h1>
         <p className="text-muted-foreground text-sm mb-4 max-w-xs">
           <span className="font-semibold text-foreground">10.000+</span> jugadores activos
