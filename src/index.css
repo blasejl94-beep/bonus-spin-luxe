@@ -692,3 +692,12 @@
     font-size: 6rem;
   }
 }
+
+@keyframes glow-breathe {
+  0%, 100% { box-shadow: 0 0 20px 5px hsl(42 100% 55% / 0.1), 0 0 40px 10px hsl(42 100% 50% / 0.05); }
+  50% { box-shadow: 0 0 35px 12px hsl(42 100% 55% / 0.25), 0 0 60px 20px hsl(42 100% 50% / 0.1); }
+}
+
+.glow-breathing {
+  animation: glow-breathe 3s ease-in-out infinite;
+}
