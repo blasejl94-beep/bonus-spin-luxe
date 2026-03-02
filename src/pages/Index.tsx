@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
+import { createPortal } from "react-dom";
 import { Shield, Zap, Headphones, Lock, Star } from "lucide-react";
 import logo from "@/assets/logo.png";
 import SpinWheel from "@/components/SpinWheel";
@@ -352,7 +353,7 @@ const Index = () => {
 
       <div className="h-24" />
 
-      {step !== "claim" && step !== "expired" && (
+      {step !== "claim" && step !== "expired" && createPortal(
         <a
           href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(result ? `Hola!\n\nQuiero activar mi bono de bienvenida para empezar a jugar.\n\nBono obtenido: ${result}\n\n¿Me decís la carga mínima y los medios de pago disponibles?` : WHATSAPP_MSG_NO_SPIN)}`}
           target="_blank"
@@ -364,7 +365,8 @@ const Index = () => {
             <path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.034L.789 23.492a.75.75 0 00.917.918l4.458-1.495A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-2.395 0-4.612-.756-6.432-2.039l-.448-.334-2.648.888.888-2.648-.334-.448A9.96 9.96 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z" />
           </svg>
           {step === "result" ? "⚡ Activar mi bono ahora" : "Hablar con un asesor"}
-        </a>
+        </a>,
+        document.body
       )}
     </div>
   );
