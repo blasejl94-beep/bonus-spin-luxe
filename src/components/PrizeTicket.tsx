@@ -47,34 +47,86 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result }) => {
     return () => clearTimeout(t);
   }, []);
 
+  // Stable sparkle positions
+  const [sparkles] = useState(() =>
+    Array.from({ length: 10 }, (_, i) => ({
+      top: 5 + ((i * 37 + 13) % 80),
+      left: 5 + ((i * 53 + 7) % 85),
+      size: 3 + ((i * 17) % 5),
+      delay: 0.4 + i * 0.2,
+      dur: 1.5 + ((i * 11) % 10) / 10,
+    }))
+  );
+
+  // Stable coin positions
+  const [coins] = useState(() => [
+    { top: 8, left: -6, delay: 0.6, dur: 3 },
+    { top: 65, right: -8, delay: 1.0, dur: 3.5 },
+    { top: 38, left: -10, delay: 1.4, dur: 4 },
+  ]);
+
   return (
     <div className="relative w-full max-w-sm">
-      {/* Background spotlight */}
+      {/* Background golden spotlight */}
       <div
-        className="absolute -inset-x-8 -inset-y-16 pointer-events-none"
+        className="absolute -inset-x-12 -inset-y-20 pointer-events-none"
         style={{
           background:
-            "radial-gradient(ellipse 80% 60% at 50% 50%, hsl(42 100% 55% / 0.1) 0%, hsl(42 100% 55% / 0.04) 40%, transparent 70%)",
+            "radial-gradient(ellipse 90% 70% at 50% 45%, hsl(42 100% 55% / 0.14) 0%, hsl(42 100% 55% / 0.06) 35%, hsl(42 100% 50% / 0.02) 55%, transparent 75%)",
         }}
       />
 
-      {/* Sparkles - finite animation */}
-      {[...Array(8)].map((_, i) => (
+      {/* Floating gold sparkles */}
+      {sparkles.map((s, i) => (
         <div
           key={i}
           className="absolute pointer-events-none"
           style={{
-            top: `${5 + Math.random() * 80}%`,
-            left: `${5 + Math.random() * 90}%`,
-            width: 3 + Math.random() * 5,
-            height: 3 + Math.random() * 5,
+            top: `${s.top}%`,
+            left: `${s.left}%`,
+            width: s.size,
+            height: s.size,
             background: "hsl(45 100% 70%)",
             clipPath:
               "polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)",
-            animation: `sparkle ${1.5 + Math.random()}s ease-in-out ${0.5 + i * 0.25}s both`,
+            animation: `sparkle ${s.dur}s ease-in-out ${s.delay}s both`,
             animationIterationCount: "3",
           }}
         />
+      ))}
+
+      {/* Floating gold coins */}
+      {coins.map((c, i) => (
+        <div
+          key={`coin-${i}`}
+          className="absolute pointer-events-none z-20"
+          style={{
+            top: `${c.top}%`,
+            left: c.left !== undefined ? `${c.left}%` : undefined,
+            right: c.right !== undefined ? `${c.right}%` : undefined,
+            animation: `coin-float ${c.dur}s ease-in-out ${c.delay}s both`,
+            animationIterationCount: "1",
+          }}
+        >
+          <div
+            className="rounded-full"
+            style={{
+              width: 22,
+              height: 22,
+              background: "linear-gradient(160deg, hsl(42 100% 78%), hsl(38 90% 50%), hsl(35 80% 38%))",
+              boxShadow: "0 2px 6px hsl(42 100% 50% / 0.4), inset 0 1px 2px hsl(42 100% 90% / 0.4)",
+              border: "1.5px solid hsl(42 100% 65% / 0.5)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: 10,
+              fontWeight: 900,
+              color: "hsl(35 80% 30%)",
+            }}
+          >
+            $
+          </div>
+        </div>
       ))}
 
       {/* Gold Badge / Medallion */}
