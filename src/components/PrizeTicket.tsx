@@ -171,7 +171,7 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
         className={`prize-card-v3 relative z-[5] overflow-hidden ${breathing ? 'glow-breathing' : ''}`}
         style={{
           boxShadow: glowIntensity > 0
-            ? `0 0 ${15 + glowIntensity * 40}px ${5 + glowIntensity * 15}px hsl(42 100% 55% / ${glowIntensity * 0.35}), 0 0 ${30 + glowIntensity * 60}px ${10 + glowIntensity * 25}px hsl(42 100% 50% / ${glowIntensity * 0.15})`
+            ? `inset 0 0 ${10 + glowIntensity * 25}px ${3 + glowIntensity * 8}px hsl(42 100% 55% / ${glowIntensity * 0.18}), inset 0 0 ${20 + glowIntensity * 35}px ${6 + glowIntensity * 12}px hsl(42 100% 50% / ${glowIntensity * 0.08})`
             : undefined,
           transition: breathing ? undefined : 'box-shadow 0.2s ease-out',
         }}
