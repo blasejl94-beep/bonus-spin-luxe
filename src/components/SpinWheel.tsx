@@ -3,19 +3,27 @@ import { Volume2, VolumeX } from "lucide-react";
 import { playTick, playLandingClick, playSlotWin } from "@/lib/sounds";
 
 const SEGMENTS = [
-  { label: "50%", color: "hsl(0, 72%, 30%)", colorDark: "hsl(0, 72%, 22%)" },
-  { label: "100%", color: "hsl(0, 60%, 20%)", colorDark: "hsl(0, 60%, 14%)" },
-  { label: "75%", color: "hsl(0, 72%, 30%)", colorDark: "hsl(0, 72%, 22%)" },
-  { label: "150%", color: "hsl(0, 60%, 20%)", colorDark: "hsl(0, 60%, 14%)" },
-  { label: "350%", color: "hsl(45, 100%, 51%)", colorDark: "hsl(38, 85%, 38%)" },
-  { label: "125%", color: "hsl(0, 72%, 30%)", colorDark: "hsl(0, 72%, 22%)" },
-  { label: "175%", color: "hsl(0, 60%, 20%)", colorDark: "hsl(0, 60%, 14%)" },
-  { label: "200%", color: "hsl(45, 100%, 51%)", colorDark: "hsl(38, 85%, 38%)" },
+  { label: "50%", color: "hsl(0, 72%, 30%)", colorDark: "hsl(0, 72%, 22%)", weight: 1 },
+  { label: "100%", color: "hsl(0, 60%, 20%)", colorDark: "hsl(0, 60%, 14%)", weight: 1 },
+  { label: "75%", color: "hsl(0, 72%, 30%)", colorDark: "hsl(0, 72%, 22%)", weight: 1 },
+  { label: "150%", color: "hsl(0, 60%, 20%)", colorDark: "hsl(0, 60%, 14%)", weight: 1 },
+  { label: "350%", color: "hsl(45, 100%, 51%)", colorDark: "hsl(38, 85%, 38%)", weight: 1 },
+  { label: "125%", color: "hsl(0, 72%, 30%)", colorDark: "hsl(0, 72%, 22%)", weight: 1 },
+  { label: "175%", color: "hsl(0, 60%, 20%)", colorDark: "hsl(0, 60%, 14%)", weight: 1 },
+  { label: "200%", color: "hsl(45, 100%, 51%)", colorDark: "hsl(38, 85%, 38%)", weight: 1.25 },
 ];
 
 const ALLOWED_INDICES = [1, 3, 5, 6, 7];
-const SEGMENT_ANGLE = 360 / SEGMENTS.length;
 const NUM_SEGMENTS = SEGMENTS.length;
+const TOTAL_WEIGHT = SEGMENTS.reduce((sum, s) => sum + s.weight, 0);
+// Precompute cumulative angles for variable-width segments
+const SEGMENT_ANGLES: { start: number; end: number; mid: number }[] = [];
+let _cumAngle = 0;
+for (const seg of SEGMENTS) {
+  const angle = (seg.weight / TOTAL_WEIGHT) * 360;
+  SEGMENT_ANGLES.push({ start: _cumAngle, end: _cumAngle + angle, mid: _cumAngle + angle / 2 });
+  _cumAngle += angle;
+}
 const NUM_LEDS = 32;
 
 interface SpinWheelProps {
@@ -79,12 +87,18 @@ const LedRing: React.FC<{ state: WheelState }> = ({ state }) => {
 /* ── Helpers ── */
 function getSegmentUnderPointer(rotationDeg: number): number {
   const angleUnderPointer = ((270 - (rotationDeg % 360)) % 360 + 360) % 360;
-  return Math.floor(angleUnderPointer / SEGMENT_ANGLE) % NUM_SEGMENTS;
+  for (let i = 0; i < NUM_SEGMENTS; i++) {
+    if (angleUnderPointer >= SEGMENT_ANGLES[i].start && angleUnderPointer < SEGMENT_ANGLES[i].end) return i;
+  }
+  return 0;
 }
 
 function getAngleForSegment(segIndex: number): number {
-  const segMid = segIndex * SEGMENT_ANGLE + SEGMENT_ANGLE / 2;
-  return ((270 - segMid) % 360 + 360) % 360;
+  return ((270 - SEGMENT_ANGLES[segIndex].mid) % 360 + 360) % 360;
+}
+
+function getSegmentAngleSize(index: number): number {
+  return SEGMENT_ANGLES[index].end - SEGMENT_ANGLES[index].start;
 }
 
 const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
@@ -167,7 +181,8 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
 
     const targetIdx = ALLOWED_INDICES[Math.floor(Math.random() * ALLOWED_INDICES.length)];
     const targetBase = getAngleForSegment(targetIdx);
-    const jitter = (Math.random() - 0.5) * (SEGMENT_ANGLE * 0.7);
+    const segAngleSize = getSegmentAngleSize(targetIdx);
+    const jitter = (Math.random() - 0.5) * (segAngleSize * 0.7);
     const targetAngle = ((targetBase + jitter) % 360 + 360) % 360;
 
     const fullSpins = 7 + Math.floor(Math.random() * 3);
@@ -209,23 +224,24 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
   const innerRadius = outerRadius - 8;
 
   const createSegmentPath = (index: number, r: number) => {
-    const startAngle = (index * SEGMENT_ANGLE * Math.PI) / 180;
-    const endAngle = ((index + 1) * SEGMENT_ANGLE * Math.PI) / 180;
+    const startAngle = (SEGMENT_ANGLES[index].start * Math.PI) / 180;
+    const endAngle = (SEGMENT_ANGLES[index].end * Math.PI) / 180;
     const x1 = center + r * Math.cos(startAngle);
     const y1 = center + r * Math.sin(startAngle);
     const x2 = center + r * Math.cos(endAngle);
     const y2 = center + r * Math.sin(endAngle);
-    const largeArc = SEGMENT_ANGLE > 180 ? 1 : 0;
+    const segSize = SEGMENT_ANGLES[index].end - SEGMENT_ANGLES[index].start;
+    const largeArc = segSize > 180 ? 1 : 0;
     return `M ${center} ${center} L ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2} Z`;
   };
 
   const getTextPosition = (index: number) => {
-    const midAngle = ((index * SEGMENT_ANGLE + SEGMENT_ANGLE / 2) * Math.PI) / 180;
+    const midAngle = (SEGMENT_ANGLES[index].mid * Math.PI) / 180;
     const textRadius = innerRadius * 0.62;
     return {
       x: center + textRadius * Math.cos(midAngle),
       y: center + textRadius * Math.sin(midAngle),
-      angle: index * SEGMENT_ANGLE + SEGMENT_ANGLE / 2,
+      angle: SEGMENT_ANGLES[index].mid,
     };
   };
 
@@ -237,7 +253,7 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
 
   const rimNotches = useMemo(() => {
     return Array.from({ length: SEGMENTS.length }, (_, i) => {
-      const angle = (i * SEGMENT_ANGLE * Math.PI) / 180;
+      const angle = (SEGMENT_ANGLES[i].start * Math.PI) / 180;
       const r = outerRadius - 3;
       return { cx: center + r * Math.cos(angle), cy: center + r * Math.sin(angle) };
     });
@@ -269,7 +285,7 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
       />
 
       {/* Wheel container */}
-      <div className={`relative w-full overflow-visible ${isCelebrating ? "wheel-celebrate-bounce" : ""}`} style={{ aspectRatio: "1/1", padding: "4%" }}>
+      <div className={`relative w-full overflow-visible ${isCelebrating ? "wheel-celebrate-bounce" : ""} ${!spinning && !disabled ? "wheel-idle-wobble" : ""}`} style={{ aspectRatio: "1/1", padding: "4%" }}>
         <LedRing state={wheelState} />
 
         {/* Soft shadow under wheel */}
@@ -322,7 +338,7 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
             >
               <defs>
                 {SEGMENTS.map((seg, i) => {
-                  const midAngle = i * SEGMENT_ANGLE + SEGMENT_ANGLE / 2;
+                  const midAngle = SEGMENT_ANGLES[i].mid;
                   const rad = (midAngle * Math.PI) / 180;
                   const gx1 = 0.5 + 0.3 * Math.cos(rad);
                   const gy1 = 0.5 + 0.3 * Math.sin(rad);

@@ -167,6 +167,17 @@
   animation: wiggle 1.5s ease-in-out infinite;
 }
 
+/* Subtle idle wobble for the wheel */
+@keyframes wheel-idle-wobble {
+  0%, 100% { transform: rotate(0deg); }
+  30% { transform: rotate(2.5deg); }
+  70% { transform: rotate(-2.5deg); }
+}
+
+.wheel-idle-wobble {
+  animation: wheel-idle-wobble 4s ease-in-out infinite;
+}
+
 /* Pointer bounce on landing */
 @keyframes pointer-bounce {
   0% { transform: translateX(-50%) rotate(0deg); }
