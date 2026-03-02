@@ -64,6 +64,11 @@ const Index = () => {
 
   const hasSpun = !!localStorage.getItem("casino_spun");
 
+  const handleRevealComplete = useCallback(() => {
+    setShowConfetti(true);
+    setTimeout(() => setShowConfetti(false), 6000);
+  }, []);
+
   const handleSpinComplete = useCallback((prize: string) => {
     localStorage.setItem("casino_spun", "true");
     localStorage.setItem("casino_result", prize);
@@ -73,12 +78,9 @@ const Index = () => {
     setShowShake(true);
     setTimeout(() => setShowFlash(false), 600);
     setTimeout(() => setShowShake(false), 700);
-    setTimeout(() => setStep("result"), 300);
-    // Confetti after bonus screen appears
-    setTimeout(() => {
-      setShowConfetti(true);
-      setTimeout(() => setShowConfetti(false), 6000);
-    }, 600);
+    // Show panel after celebration lights/bounce
+    setTimeout(() => setStep("result"), 500);
+    // Confetti is now triggered by PrizeTicket.onRevealComplete
   }, []);
 
   const handleClaim = () => {
@@ -174,7 +176,7 @@ const Index = () => {
 
         {step === "result" && (
           <div className="flex flex-col items-center gap-4 w-full max-w-sm relative prize-entrance">
-            <PrizeTicket result={result || "200%"} />
+            <PrizeTicket result={result || "200%"} onRevealComplete={handleRevealComplete} />
 
             <div className="glass-card rounded-xl px-4 py-2.5 stagger-3">
               <p className="text-xs text-muted-foreground">
