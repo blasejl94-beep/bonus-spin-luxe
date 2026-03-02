@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
+import { startCountUpSound, updateCountUpSound, stopCountUpSound, playWinSound } from "@/lib/sounds";
 
 interface PrizeTicketProps {
   result: string;
@@ -11,32 +12,43 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
   const [showShine, setShowShine] = useState(false);
   const [countValue, setCountValue] = useState(0);
   const [countDone, setCountDone] = useState(false);
+  const [winPulse, setWinPulse] = useState(false);
   const rafRef = useRef<number>(0);
 
   const numericValue = parseInt(result.replace(/[^0-9]/g, ""), 10) || 0;
   const suffix = result.replace(/[0-9]/g, "");
 
-  // Count-up animation
+  // Count-up animation with synchronized sound
   useEffect(() => {
     if (numericValue === 0) return;
     const duration = 1200;
     const startTime = performance.now();
+
+    startCountUpSound();
 
     const tick = (now: number) => {
       const elapsed = now - startTime;
       const progress = Math.min(elapsed / duration, 1);
       const eased = 1 - Math.pow(1 - progress, 3);
       setCountValue(Math.round(eased * numericValue));
+      updateCountUpSound(progress);
 
       if (progress < 1) {
         rafRef.current = requestAnimationFrame(tick);
       } else {
+        stopCountUpSound();
         setCountDone(true);
+        setWinPulse(true);
+        playWinSound();
+        setTimeout(() => setWinPulse(false), 600);
       }
     };
 
     rafRef.current = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(rafRef.current);
+    return () => {
+      cancelAnimationFrame(rafRef.current);
+      stopCountUpSound();
+    };
   }, [numericValue]);
 
   // Shine sweep after count finishes, then trigger confetti
@@ -179,7 +191,7 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
 
           {/* Hero number with count-up */}
           <div className="relative stagger-2">
-            <span className={`prize-hero-number-v2 ${countDone ? 'prize-number-glow' : ''}`}>
+            <span className={`prize-hero-number-v2 ${countDone ? 'prize-number-glow' : ''} ${winPulse ? 'win-number-pulse' : ''}`}>
               {countValue}{suffix}
             </span>
           </div>
