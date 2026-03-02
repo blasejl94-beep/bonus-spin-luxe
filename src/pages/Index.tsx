@@ -139,22 +139,32 @@ const Index = () => {
 
       <div className="h-px w-full bg-gradient-to-r from-transparent via-casino-gold/40 to-transparent" />
 
-      <section className="relative z-10 flex flex-col items-center px-5 pt-10 pb-8 text-center max-w-lg mx-auto">
-        <div className="flex items-center justify-center mb-6">
-          <img src={logo} alt="Smart Play" className="w-28 h-28 object-contain drop-shadow-[0_0_20px_hsl(var(--casino-gold)/0.4)]" />
+      <section className="relative z-10 flex flex-col items-center px-5 pt-6 pb-8 text-center max-w-lg mx-auto">
+        <div className="flex items-center justify-center mb-3">
+          <img src={logo} alt="Smart Play" className="w-24 h-24 object-contain drop-shadow-[0_0_20px_hsl(var(--casino-gold)/0.4)]" />
         </div>
 
-        <h1 className="text-3xl sm:text-4xl font-black leading-[1.1] mb-3 max-w-md tracking-tight">
+        <h1 className="text-2xl sm:text-3xl font-black leading-[1.1] mb-2 max-w-md tracking-tight">
           <span className="inline-block" style={{ WebkitBackgroundClip: 'unset', backgroundClip: 'unset', WebkitTextFillColor: 'unset' }}>🎰</span>{' '}
-          <span className="gold-text">Girá la rueda y ganá tu bono de hasta 200%</span>
+          <span className="gold-text">Girá la rueda y desbloqueá tu bono exclusivo</span>
         </h1>
-        <p className="text-muted-foreground text-sm mb-4 max-w-xs">
-          <span className="font-semibold text-foreground">10.000+</span> jugadores activos
+        <p className="text-muted-foreground text-xs mb-3 max-w-xs">
+          ¡Más de <span className="font-semibold text-foreground">10.000</span> jugadores activos todas las semanas!
         </p>
 
-        <LiveCounter />
+        {step === "hero" && (
+          <div className="flex flex-col items-center">
+            <SpinWheel onSpinComplete={handleSpinComplete} disabled={hasSpun} />
+            {!hasSpun && (
+              <p className="mt-4 text-sm text-muted-foreground">
+                Tenés <span className="font-bold text-casino-gold">1 giro gratis</span> disponible
+              </p>
+            )}
+            <ScarcityBar />
+          </div>
+        )}
 
-        <div className="flex gap-2 mb-7 flex-wrap justify-center">
+        <div className="flex gap-2 mt-5 mb-4 flex-wrap justify-center">
           {TRUST_BADGES.map(({ icon: Icon, label }) => (
             <div key={label} className="flex items-center gap-1 glass-card rounded-full px-2.5 py-1.5 text-[10px] text-foreground/60">
               <Icon className="w-3 h-3 text-casino-gold/80" />
@@ -163,17 +173,7 @@ const Index = () => {
           ))}
         </div>
 
-        {step === "hero" && (
-          <div className="flex flex-col items-center">
-            <SpinWheel onSpinComplete={handleSpinComplete} disabled={hasSpun} />
-            {!hasSpun && (
-              <p className="mt-5 text-sm text-muted-foreground">
-                Tenés <span className="font-bold text-casino-gold">1 giro gratis</span> disponible
-              </p>
-            )}
-            <ScarcityBar />
-          </div>
-        )}
+        <LiveCounter />
 
         {step === "result" && (
           <div className="flex flex-col items-center gap-4 w-full max-w-sm relative prize-entrance">
@@ -254,8 +254,8 @@ const Index = () => {
                   disabled={!phone}
                   className="w-full py-5 text-lg font-black rounded-xl gold-gradient text-primary-foreground uppercase tracking-wide disabled:opacity-40 relative overflow-hidden shadow-[0_0_30px_hsl(42,100%,50%,0.4)] hover:shadow-[0_0_50px_hsl(42,100%,50%,0.6)] hover:scale-[1.02] active:scale-95 transition-all duration-300 border border-casino-gold/50"
                 >
-                  <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
-                  🎁 ¡Reclamar!
+                   <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
+                   Activar bono por WhatsApp
                 </Button>
               </form>
 
@@ -282,7 +282,7 @@ const Index = () => {
               onClick={handleRetry}
               className="mt-2 px-8 py-5 text-lg font-black rounded-full gold-gradient text-primary-foreground pulse-glow uppercase"
             >
-              🎰 Girar nuevamente
+              🎰 GIRAR DE NUEVO
             </Button>
           </div>
         )}

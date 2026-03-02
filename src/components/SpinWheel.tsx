@@ -465,7 +465,7 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
             : "0 4px 24px hsl(42 100% 55% / 0.4), 0 0 40px hsl(42 100% 55% / 0.15), 0 8px 16px hsl(0 0% 0% / 0.3)",
         }}
       >
-        {spinning ? "Girando..." : disabled ? "Ya giraste" : "🎰 Girar ahora"}
+        {spinning ? "Girando..." : disabled ? "Ya giraste" : "🎰 GIRAR AHORA"}
       </button>
     </div>
   );
