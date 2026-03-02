@@ -6,9 +6,10 @@ interface PrizeTicketProps {
   onRevealComplete?: () => void;
   countdownText?: string;
   isUrgent?: boolean;
+  onCountProgress?: (progress: number) => void;
 }
 
-const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, countdownText, isUrgent }) => {
+const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, countdownText, isUrgent, onCountProgress }) => {
   const [showShine, setShowShine] = useState(false);
   const [countValue, setCountValue] = useState(0);
   const [countDone, setCountDone] = useState(false);
@@ -33,6 +34,7 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
       const eased = 1 - Math.pow(1 - progress, 3);
       setCountValue(Math.round(eased * numericValue));
       updateCountUpSound(progress);
+      onCountProgress?.(progress);
 
       if (progress < 1) {
         rafRef.current = requestAnimationFrame(tick);
