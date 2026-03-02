@@ -144,9 +144,7 @@ const Index = () => {
             {step === "result" || step === "claim" ? "🎉" : "🎰"}
           </span>{" "}
           <span className="gold-text">
-            {step === "result" || step === "claim"
-              ? "¡Premio desbloqueado!"
-              : "Girá la rueda y desbloqueá tu bono exclusivo"}
+            {step === "result" || step === "claim" ? "¡Felicidades!" : "Girá la rueda y desbloqueá tu bono exclusivo"}
           </span>
         </h1>
         <p className="text-muted-foreground text-xs mb-3 max-w-xs hero-subtitle-entrance">
