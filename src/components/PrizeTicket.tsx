@@ -3,9 +3,11 @@ import React, { useEffect, useState, useRef } from "react";
 interface PrizeTicketProps {
   result: string;
   onRevealComplete?: () => void;
+  countdownText?: string;
+  isUrgent?: boolean;
 }
 
-const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete }) => {
+const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, countdownText, isUrgent }) => {
   const [showShine, setShowShine] = useState(false);
   const [countValue, setCountValue] = useState(0);
   const [countDone, setCountDone] = useState(false);
@@ -183,9 +185,19 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete }) =
           </div>
 
           {/* Subtitle */}
-          <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-muted-foreground mt-3 mb-5 stagger-3">
+          <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-muted-foreground mt-3 mb-4 stagger-3">
             BONO DE BIENVENIDA
           </p>
+
+          {/* Countdown inside card — bottom right */}
+          {countdownText && (
+            <div className="flex items-center justify-end gap-2 stagger-4">
+              <span className="text-[10px] text-muted-foreground/60">Tu bono expira en:</span>
+              <span className={`font-mono font-bold text-sm px-2.5 py-1 rounded-lg ${isUrgent ? 'countdown-urgent bg-destructive/15' : 'text-casino-gold glass-card'}`}>
+                {countdownText}
+              </span>
+            </div>
+          )}
         </div>
       </div>
     </div>

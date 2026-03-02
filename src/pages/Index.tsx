@@ -176,7 +176,7 @@ const Index = () => {
 
         {step === "result" && (
           <div className="flex flex-col items-center gap-4 w-full max-w-sm relative prize-entrance">
-            <PrizeTicket result={result || "200%"} onRevealComplete={handleRevealComplete} />
+            <PrizeTicket result={result || "200%"} onRevealComplete={handleRevealComplete} countdownText={formatTime(countdown)} isUrgent={isUrgent} />
 
             <div className="glass-card rounded-xl px-4 py-2.5 stagger-3">
               <p className="text-xs text-muted-foreground">
@@ -184,12 +184,6 @@ const Index = () => {
               </p>
             </div>
 
-            <div className="flex flex-col items-center gap-1.5 stagger-3">
-              <span className="text-xs text-muted-foreground">Tu bono expira en:</span>
-              <span className={`font-mono font-bold text-2xl px-5 py-1.5 rounded-xl ${isUrgent ? 'countdown-urgent bg-destructive/15' : 'text-casino-gold glass-card'}`}>
-                {formatTime(countdown)}
-              </span>
-            </div>
 
             <div className="flex items-center gap-2 text-xs text-destructive font-semibold animate-pulse stagger-3">
               <span>⚠️</span>
