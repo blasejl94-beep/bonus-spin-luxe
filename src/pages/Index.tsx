@@ -142,11 +142,13 @@ const Index = () => {
         </div>
 
         <h1 className="text-2xl sm:text-3xl font-black leading-[1.1] mb-2 max-w-md tracking-tight hero-text-entrance">
-          <span className="inline-block" style={{ WebkitBackgroundClip: 'unset', backgroundClip: 'unset', WebkitTextFillColor: 'unset' }}>🎰</span>{' '}
-          <span className="gold-text">Girá la rueda y desbloqueá tu bono exclusivo</span>
+          <span className="inline-block" style={{ WebkitBackgroundClip: 'unset', backgroundClip: 'unset', WebkitTextFillColor: 'unset' }}>{step === "result" || step === "claim" ? "🎉" : "🎰"}</span>{' '}
+          <span className="gold-text">{step === "result" || step === "claim" ? "¡Premio desbloqueado!" : "Girá la rueda y desbloqueá tu bono exclusivo"}</span>
         </h1>
         <p className="text-muted-foreground text-xs mb-3 max-w-xs hero-subtitle-entrance">
-          Más de <span className="font-semibold text-foreground">10.000</span> jugadores ya reclamaron su bono
+          {step === "result" || step === "claim"
+            ? "Tu bono está reservado por tiempo limitado"
+            : <>Más de <span className="font-semibold text-foreground">10.000</span> jugadores ya reclamaron su bono</>}
         </p>
 
         {step === "hero" && (
@@ -278,11 +280,13 @@ const Index = () => {
 
         {step === "expired" && (
           <div className="flex flex-col items-center gap-4 animate-in fade-in-0 duration-500">
-            <div className="text-6xl">⏰</div>
-            <h2 className="text-xl font-black text-foreground">El bono expiró</h2>
+            <div className="text-6xl">🎰</div>
+            <h2 className="text-xl font-black text-foreground">Intentá otra vez</h2>
             <p className="text-sm text-muted-foreground max-w-xs">
-              Tu bono de <span className="font-bold text-casino-gold">{result}</span> ya no está disponible.
-              Girá nuevamente para intentar obtener otro.
+              Ese bono ya fue reclamado, pero todavía podés girar la rueda para desbloquear uno nuevo.
+            </p>
+            <p className="text-xs font-semibold text-casino-gold">
+              🔥 Nuevos bonos disponibles ahora
             </p>
             <Button
               onClick={handleRetry}
