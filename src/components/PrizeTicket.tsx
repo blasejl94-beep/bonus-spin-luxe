@@ -60,11 +60,11 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
           setWinPulse(true);
           playFinalDing();
 
-          // Badge bounce back
-          setBadgeScale(1.25);
-          setTimeout(() => setBadgeScale(0.92), 150);
-          setTimeout(() => setBadgeScale(1.05), 300);
-          setTimeout(() => setBadgeScale(1), 450);
+          // Smooth bounce: overshoot from 1.15 → 1.2, then settle
+          setBadgeScale(1.2);
+          setTimeout(() => setBadgeScale(0.97), 200);
+          setTimeout(() => setBadgeScale(1.04), 400);
+          setTimeout(() => setBadgeScale(1), 550);
 
           setTimeout(() => setWinPulse(false), 600);
           setTimeout(() => {
@@ -152,7 +152,7 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
           className={`relative ${countDone ? 'badge-alive' : ''}`}
           style={{
             transform: `scale(${badgeScale})`,
-            transition: countDone ? 'transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1)' : 'transform 0.1s ease-out',
+            transition: countDone ? 'transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)' : 'transform 0.05s linear',
           }}
         >
           {/* Permanent sparkles around badge — infinite */}
