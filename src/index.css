@@ -594,6 +594,20 @@
   100% { left: 120%; }
 }
 
+/* Permanent badge sparkles */
+.badge-sparkle-permanent {
+  background: hsl(45 100% 75%);
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  animation: badge-sparkle-loop 1.8s ease-in-out infinite;
+}
+
+@keyframes badge-sparkle-loop {
+  0%, 100% { opacity: 0; transform: scale(0.5) rotate(0deg); }
+  30% { opacity: 0.9; transform: scale(1.1) rotate(20deg); }
+  50% { opacity: 0.7; transform: scale(1) rotate(30deg); }
+  70% { opacity: 0.4; transform: scale(0.8) rotate(40deg); }
+}
+
 /* Card body v3 — clean premium, no ticket cutouts */
 .prize-card-v3 {
   background:
