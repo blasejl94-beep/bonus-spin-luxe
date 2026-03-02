@@ -150,10 +150,10 @@ const Index = () => {
         </p>
 
         {step === "hero" && (
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center hero-wheel-entrance">
             <SpinWheel onSpinComplete={handleSpinComplete} disabled={hasSpun} />
             {!hasSpun && (
-              <p className="mt-4 text-sm text-muted-foreground">
+              <p className="mt-4 text-sm text-muted-foreground hero-hint-entrance">
                 🎰 Tenés <span className="font-bold text-casino-gold">1 giro</span> para desbloquear tu bono
               </p>
             )}
@@ -163,7 +163,7 @@ const Index = () => {
 
         {step !== "result" && (
           <>
-            <div className="flex gap-2 mt-5 mb-4 flex-wrap justify-center">
+            <div className="flex gap-2 mt-5 mb-4 flex-wrap justify-center hero-badges-entrance">
               {TRUST_BADGES.map(({ icon: Icon, label }) => (
                 <div key={label} className="flex items-center gap-1 glass-card rounded-full px-2.5 py-1.5 text-[10px] text-foreground/60">
                   <Icon className="w-3 h-3 text-casino-gold/80" />
@@ -171,7 +171,9 @@ const Index = () => {
                 </div>
               ))}
             </div>
-            <LiveCounter />
+            <div className="hero-counter-entrance">
+              <LiveCounter />
+            </div>
           </>
         )}
 
@@ -294,13 +296,13 @@ const Index = () => {
 
       <div className="h-px w-4/5 mx-auto bg-gradient-to-r from-transparent via-border to-transparent" />
 
-      <section className="relative z-10 px-5 py-8 max-w-lg mx-auto">
+      <section className="relative z-10 px-5 py-8 max-w-lg mx-auto section-entrance">
         <h3 className="text-center text-xs font-bold text-muted-foreground uppercase tracking-[0.25em] mb-1">
           🎉 Ganadores recientes
         </h3>
         <div className="mb-4" />
         <SocialProofTicker />
-        <div className="flex justify-center gap-4 mt-8">
+        <div className="flex justify-center gap-4 mt-8 section-games-entrance">
           {GAMES.map(({ emoji }, i) => (
             <div key={i} className="w-14 h-14 rounded-2xl glass-card flex items-center justify-center text-3xl premium-shadow hover:scale-105 transition-transform duration-200 cursor-pointer">
               {emoji}
@@ -311,7 +313,7 @@ const Index = () => {
 
       <div className="h-px w-4/5 mx-auto bg-gradient-to-r from-transparent via-border to-transparent" />
 
-      <footer className="relative z-10 px-5 py-10 max-w-lg mx-auto text-center">
+      <footer className="relative z-10 px-5 py-10 max-w-lg mx-auto text-center footer-entrance">
         <div className="mb-6">
           <p className="text-[10px] text-muted-foreground/50 uppercase tracking-[0.2em] mb-3">Métodos de pago aceptados</p>
           <div className="flex justify-center gap-2 flex-wrap">
@@ -355,7 +357,7 @@ const Index = () => {
           href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(result ? `Hola!\n\nQuiero activar mi bono de bienvenida para empezar a jugar.\n\nBono obtenido: ${result}\n\n¿Me decís la carga mínima y los medios de pago disponibles?` : WHATSAPP_MSG_NO_SPIN)}`}
           target="_blank"
           rel="noopener noreferrer"
-          className={`fixed bottom-4 left-4 right-4 z-40 flex items-center justify-center gap-2 py-4 rounded-2xl bg-[hsl(142,70%,38%)] text-white font-bold text-base shadow-[0_4px_24px_hsl(142_70%_38%/0.4)] active:scale-95 transition-all duration-200 max-w-lg mx-auto ${step === "result" ? "bounce-cta" : ""}`}
+          className={`fixed bottom-4 left-4 right-4 z-40 flex items-center justify-center gap-2 py-4 rounded-2xl bg-[hsl(142,70%,38%)] text-white font-bold text-base shadow-[0_4px_24px_hsl(142_70%_38%/0.4)] active:scale-95 transition-all duration-200 max-w-lg mx-auto cta-entrance ${step === "result" ? "bounce-cta" : ""}`}
         >
           <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current">
             <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
