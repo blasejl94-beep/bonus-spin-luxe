@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { startCountUpSound, updateCountUpSound, stopCountUpSound, playWinSound } from "@/lib/sounds";
+import { startCountUpSound, updateCountUpSound, stopCountUpSound } from "@/lib/sounds";
 
 interface PrizeTicketProps {
   result: string;
@@ -40,7 +40,7 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
         stopCountUpSound();
         setCountDone(true);
         setWinPulse(true);
-        playWinSound();
+        
         setTimeout(() => setWinPulse(false), 600);
       }
     };
@@ -52,17 +52,16 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
     };
   }, [numericValue]);
 
-  // Shine sweep after count finishes, then trigger confetti, then show countdown
+  // Shine sweep after count finishes, then show countdown
   useEffect(() => {
     if (!countDone) return;
     const t = setTimeout(() => {
       setShowShine(true);
-      setTimeout(() => onRevealComplete?.(), 900);
-      // Show countdown after all animations settle
+      // Show countdown after animations settle
       setTimeout(() => setShowCountdown(true), 1800);
     }, 400);
     return () => clearTimeout(t);
-  }, [countDone, onRevealComplete]);
+  }, [countDone]);
 
   // Stable sparkle positions
   const [sparkles] = useState(() =>
