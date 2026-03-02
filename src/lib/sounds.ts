@@ -118,6 +118,33 @@ export function playWinSound() {
   } catch {}
 }
 
+export function playFinalDing() {
+  try {
+    const ctx = audioCtx();
+    // Soft chime
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "sine";
+    osc.frequency.value = 1568; // G6
+    gain.gain.setValueAtTime(0.12, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.8);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.8);
+
+    // Gentle harmonic
+    const osc2 = ctx.createOscillator();
+    const gain2 = ctx.createGain();
+    osc2.type = "sine";
+    osc2.frequency.value = 2349; // D7
+    gain2.gain.setValueAtTime(0.06, ctx.currentTime + 0.05);
+    gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6);
+    osc2.connect(gain2).connect(ctx.destination);
+    osc2.start(ctx.currentTime + 0.05);
+    osc2.stop(ctx.currentTime + 0.6);
+  } catch {}
+}
+
 export function playSuspenseTick() {
   try {
     const ctx = audioCtx();
