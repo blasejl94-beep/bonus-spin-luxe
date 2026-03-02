@@ -59,6 +59,7 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
           setCountDone(true);
           setWinPulse(true);
           playFinalDing();
+          onRevealComplete?.();
 
           // Smooth bounce: overshoot from 1.15 → 1.2, then settle
           setBadgeScale(1.2);
