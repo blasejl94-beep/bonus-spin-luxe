@@ -12,6 +12,7 @@ import WinnerToast from "@/components/WinnerToast";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 type FunnelStep = "hero" | "result" | "claim" | "expired";
 
@@ -334,11 +335,10 @@ const Index = () => {
         </div>
 
         <div className="flex justify-center gap-4 mb-4 flex-wrap">
-          {["Términos y condiciones", "Política de privacidad", "Juego responsable", "Contacto"].map((link) => (
-            <a key={link} href="#" className="text-[10px] text-muted-foreground/40 hover:text-muted-foreground/70 transition-colors underline-offset-2 hover:underline">
-              {link}
-            </a>
-          ))}
+          <Link to="/terminos" className="text-[10px] text-muted-foreground/40 hover:text-muted-foreground/70 transition-colors underline-offset-2 hover:underline">Términos y condiciones</Link>
+          <Link to="/privacidad" className="text-[10px] text-muted-foreground/40 hover:text-muted-foreground/70 transition-colors underline-offset-2 hover:underline">Política de privacidad</Link>
+          <Link to="/juego-responsable" className="text-[10px] text-muted-foreground/40 hover:text-muted-foreground/70 transition-colors underline-offset-2 hover:underline">Juego responsable</Link>
+          <a href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" rel="noopener noreferrer" className="text-[10px] text-muted-foreground/40 hover:text-muted-foreground/70 transition-colors underline-offset-2 hover:underline">Contacto</a>
         </div>
 
         <div className="flex items-center justify-center mb-2">
