@@ -66,7 +66,11 @@ const Index = () => {
   const hasSpun = !!localStorage.getItem("casino_spun");
 
   const handleRevealComplete = useCallback(() => {
+    setShowFlash(true);
+    setShowShake(true);
     setShowConfetti(true);
+    setTimeout(() => setShowFlash(false), 600);
+    setTimeout(() => setShowShake(false), 700);
     setTimeout(() => setShowConfetti(false), 6000);
   }, []);
 
@@ -74,10 +78,6 @@ const Index = () => {
     localStorage.setItem("casino_spun", "true");
     localStorage.setItem("casino_result", prize);
     setResult(prize);
-    setShowFlash(true);
-    setShowShake(true);
-    setTimeout(() => setShowFlash(false), 600);
-    setTimeout(() => setShowShake(false), 700);
     setTimeout(() => setStep("result"), 500);
   }, []);
 
