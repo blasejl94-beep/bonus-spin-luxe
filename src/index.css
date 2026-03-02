@@ -647,7 +647,19 @@
   100% { transform: scale(1); }
 }
 
-/* Border shine sweep — more visible */
+/* Subtle urgency glow on countdown number */
+.countdown-urgency-glow {
+  animation: urgency-glow 3s ease-in-out infinite;
+}
+@keyframes urgency-glow {
+  0%, 100% {
+    text-shadow: none;
+  }
+  50% {
+    text-shadow: 0 0 8px hsl(0 80% 50% / 0.5), 0 0 16px hsl(0 80% 50% / 0.2);
+  }
+}
+
 .prize-border-shine {
   overflow: hidden;
 }

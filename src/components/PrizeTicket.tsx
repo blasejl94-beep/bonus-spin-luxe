@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { startCountUpSound, updateCountUpSound, stopCountUpSound } from "@/lib/sounds";
+import { startCountUpSound, updateCountUpSound, stopCountUpSound, playFinalDing } from "@/lib/sounds";
 
 interface PrizeTicketProps {
   result: string;
@@ -40,7 +40,7 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
         stopCountUpSound();
         setCountDone(true);
         setWinPulse(true);
-        
+        playFinalDing();
         setTimeout(() => setWinPulse(false), 600);
       }
     };
@@ -204,10 +204,10 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
 
           {/* Countdown inside card — centered pill, delayed */}
           {countdownText && showCountdown && (
-            <div className="flex items-center justify-center gap-2 mt-5 animate-in fade-in-0 slide-in-from-bottom-2 duration-500">
+            <div className="flex items-center justify-center gap-2 mt-5 animate-in fade-in-0 duration-700" style={{ animationTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)' }}>
               <span className="inline-flex items-center gap-1.5 glass-card rounded-full px-3.5 py-1.5 text-[10px] text-muted-foreground/70">
                 Tu bono expira en:
-                <span className="font-mono font-bold text-xs text-destructive">{countdownText}</span>
+                <span className="font-mono font-bold text-xs text-destructive countdown-urgency-glow">{countdownText}</span>
               </span>
             </div>
           )}
