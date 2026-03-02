@@ -85,12 +85,7 @@
   }
 
   .gold-gradient {
-    background: linear-gradient(
-      135deg,
-      hsl(42 100% 60%) 0%,
-      hsl(38 90% 48%) 40%,
-      hsl(42 100% 55%) 100%
-    );
+    background: #0e0900b3;
   }
 
   .gold-text {
@@ -610,17 +605,14 @@
 
 /* Card body v3 — clean premium, no ticket cutouts */
 .prize-card-v3 {
-  background:
-    url("data:image/svg+xml,%3Csvg width='4' height='4' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='4' height='4' fill='none'/%3E%3Ccircle cx='2' cy='2' r='0.4' fill='rgba(255,255,255,0.012)'/%3E%3C/svg%3E"),
-    linear-gradient(175deg, hsl(240 10% 13%) 0%, hsl(240 12% 8%) 100%);
   border-radius: 18px;
-  border: 1px solid hsl(42 100% 55% / 0.2);
+  border: 1px solid #ffc90054;
   box-shadow:
-    0 0 0 1px hsl(42 100% 45% / 0.08),
-    0 0 30px hsl(42 100% 55% / 0.05),
-    0 12px 40px hsl(0 0% 0% / 0.6),
-    inset 0 1px 0 hsl(42 100% 70% / 0.08),
-    inset 0 -1px 0 hsl(0 0% 0% / 0.3);
+    0 0 0 1px #e6a10014,
+    0 0 30px #ffba1a0d,
+    0 12px 40px #0009,
+    inset 0 1px #ffd16614,
+    inset 0 -1px #0000004d;
 }
 
 /* Hero number v2 */
