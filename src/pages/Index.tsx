@@ -142,18 +142,18 @@ const Index = () => {
         </div>
 
         <h1 className="text-3xl sm:text-4xl font-black leading-[1.1] mb-3 gold-text max-w-md tracking-tight">
-          Girá la rueda y desbloqueá tu bono exclusivo
+          🎰 Girá la rueda y ganá tu bono de hasta 200%
         </h1>
         <p className="text-muted-foreground text-sm mb-4 max-w-xs">
-          Más de <span className="font-semibold text-foreground">10.000+</span> jugadores activos ganando todos los días
+          <span className="font-semibold text-foreground">10.000+</span> jugadores activos
         </p>
 
         <LiveCounter />
 
-        <div className="flex gap-2.5 mb-8 flex-wrap justify-center">
+        <div className="flex gap-2 mb-7 flex-wrap justify-center">
           {TRUST_BADGES.map(({ icon: Icon, label }) => (
-            <div key={label} className="flex items-center gap-1.5 glass-card rounded-full px-3.5 py-2 text-xs text-foreground/80 premium-shadow">
-              <Icon className="w-3.5 h-3.5 text-casino-gold" />
+            <div key={label} className="flex items-center gap-1 glass-card rounded-full px-2.5 py-1.5 text-[10px] text-foreground/60">
+              <Icon className="w-3 h-3 text-casino-gold/80" />
               {label}
             </div>
           ))}
@@ -205,13 +205,13 @@ const Index = () => {
                 <div className="w-8 h-0.5 bg-casino-gold/50" />
                 <span className="w-7 h-7 rounded-full gold-border text-casino-gold text-xs font-bold flex items-center justify-center">2</span>
               </div>
-              <p className="text-xs text-muted-foreground mb-4">Paso 2 de 2 — Solo falta tu número</p>
+              <p className="text-xs text-muted-foreground mb-4">✔ Paso 1 completado — Activá tu bono</p>
 
               <h2 className="text-xl font-black text-foreground mb-1">
-                Activá tu bono de <span className="text-casino-gold">{result}</span>
+                🎁 Tu bono de <span className="text-casino-gold">{result}</span> está listo
               </h2>
               <div className="flex items-center justify-center gap-2 mb-4">
-                <span className="text-xs text-muted-foreground">Expira en</span>
+                <span className="text-xs text-muted-foreground">Tu bono expira en</span>
                 <span className={`font-mono font-bold text-sm px-2.5 py-1 rounded-lg ${isUrgent ? 'countdown-urgent bg-destructive/15' : 'text-casino-gold glass-card'}`}>
                   {formatTime(countdown)}
                 </span>
