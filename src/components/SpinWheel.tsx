@@ -263,7 +263,7 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
   const isCelebrating = phase === "celebrating";
 
   return (
-    <div className="relative flex flex-col items-center" style={{ width: "min(92vw, 420px)" }}>
+    <div className="relative flex flex-col items-center mx-auto" style={{ width: "min(92vw, 420px)" }}>
       {/* Mute toggle */}
       <button
         onClick={() => setMuted(m => !m)}
@@ -285,7 +285,7 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
       />
 
       {/* Wheel container */}
-      <div className={`relative w-full overflow-visible ${isCelebrating ? "wheel-celebrate-bounce" : ""} ${!spinning && !disabled ? "wheel-idle-wobble" : ""}`} style={{ aspectRatio: "1/1", padding: "4%" }}>
+      <div className={`relative w-full overflow-visible mx-auto ${isCelebrating ? "wheel-celebrate-bounce" : ""} ${!spinning && !disabled ? "wheel-idle-wobble" : ""}`} style={{ aspectRatio: "1/1", padding: "4%" }}>
         <LedRing state={wheelState} />
 
         {/* Soft shadow under wheel */}
