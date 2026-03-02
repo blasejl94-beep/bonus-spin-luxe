@@ -125,12 +125,25 @@ const Index = () => {
 
   const isUrgent = countdown < 60;
 
+  const [countGlow, setCountGlow] = useState(0);
+
   return (
     <div className={`min-h-screen casino-gradient relative overflow-x-hidden ${showShake ? 'screen-shake' : ''}`}>
       <AmbientParticles />
       {showConfetti && <Confetti />}
       {showFlash && (
         <div className="fixed inset-0 bg-casino-gold/30 z-50 pointer-events-none screen-flash" />
+      )}
+
+      {/* Screen-edge golden glow synchronized with count-up */}
+      {countGlow > 0 && (
+        <div
+          className="fixed inset-0 z-40 pointer-events-none transition-opacity duration-200"
+          style={{
+            opacity: countGlow,
+            boxShadow: `inset 0 0 ${60 + countGlow * 80}px ${20 + countGlow * 30}px hsl(42 100% 55% / ${0.08 + countGlow * 0.18}), inset 0 0 ${120 + countGlow * 120}px ${40 + countGlow * 60}px hsl(42 100% 50% / ${0.04 + countGlow * 0.08})`,
+          }}
+        />
       )}
       <WinnerToast />
 
@@ -174,7 +187,18 @@ const Index = () => {
 
         {step === "result" && (
           <div className="flex flex-col items-center gap-4 w-full max-w-sm relative prize-entrance">
-            <PrizeTicket result={result || "200%"} onRevealComplete={handleRevealComplete} countdownText={formatTime(countdown)} isUrgent={isUrgent} />
+            <PrizeTicket
+              result={result || "200%"}
+              onRevealComplete={handleRevealComplete}
+              countdownText={formatTime(countdown)}
+              isUrgent={isUrgent}
+              onCountProgress={(p) => {
+                setCountGlow(p);
+                if (p >= 1) {
+                  setTimeout(() => setCountGlow(0), 1500);
+                }
+              }}
+            />
 
             <div className="glass-card rounded-xl px-4 py-2.5 stagger-3">
               <p className="text-xs text-muted-foreground">
