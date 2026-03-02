@@ -210,7 +210,7 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
 
           {/* Hero number with count-up */}
           <div className="relative stagger-2">
-            <span className={`prize-hero-number-v2 ${countDone ? 'prize-number-glow' : ''} ${winPulse ? 'win-number-pulse' : ''}`}>
+            <span className={`prize-hero-number-v2 ${glowIntensity > 0 ? 'prize-number-glow' : ''} ${winPulse ? 'win-number-pulse' : ''}`}>
               {countValue}{suffix}
             </span>
           </div>
