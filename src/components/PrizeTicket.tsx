@@ -86,15 +86,15 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
 
   // Badge sparkle positions
   const [badgeSparkles] = useState(() =>
-    Array.from({ length: 6 }, (_, i) => {
-      const angle = (i * 60) * (Math.PI / 180);
-      const radius = 36 + (i % 2) * 6;
+    Array.from({ length: 14 }, (_, i) => {
+      const angle = (i * (360 / 14)) * (Math.PI / 180);
+      const radius = 28 + (i % 3) * 8;
       return {
         x: Math.cos(angle) * radius,
         y: Math.sin(angle) * radius,
-        size: 4 + (i % 3),
-        delay: i * 0.4,
-        dur: 1.8 + (i % 3) * 0.3,
+        size: 3 + (i % 4),
+        delay: i * 0.25,
+        dur: 1.4 + (i % 4) * 0.3,
       };
     })
   );
@@ -228,7 +228,7 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
               style={{ opacity: showCountdown ? 1 : 0 }}
             >
               <span className="inline-flex items-center gap-1.5 glass-card rounded-full px-3.5 py-1.5 text-[10px] text-muted-foreground/70">
-                Tu bono expira en:
+                ⏳ Tu bono expira en
                 <span className="font-mono font-bold text-xs text-destructive countdown-urgency-glow">{countdownText}</span>
               </span>
             </div>
