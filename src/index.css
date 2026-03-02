@@ -245,23 +245,28 @@
   animation: countdown-urgent 1s ease-in-out infinite;
 }
 
-/* Screen shake on win — uses outline-offset to avoid layout shift */
-@keyframes screen-shake {
-  0%, 100% { transform: translate3d(0, 0, 0); }
-  10% { transform: translate3d(-2px, 1px, 0); }
-  20% { transform: translate3d(2px, -1px, 0); }
-  30% { transform: translate3d(-1px, 2px, 0); }
-  40% { transform: translate3d(1px, -1px, 0); }
-  50% { transform: translate3d(-1px, 1px, 0); }
-  60% { transform: translate3d(1px, 0, 0); }
-  70% { transform: translate3d(-1px, -1px, 0); }
-  80% { transform: translate3d(1px, 1px, 0); }
-  90% { transform: translate3d(0, -1px, 0); }
+/* Hero entrance animations */
+@keyframes hero-logo-in {
+  0% { opacity: 0; transform: scale(0.7); filter: blur(8px); }
+  60% { opacity: 1; transform: scale(1.04); filter: blur(0); }
+  100% { opacity: 1; transform: scale(1); filter: blur(0); }
 }
 
-.screen-shake {
-  animation: screen-shake 0.5s ease-out;
-  overflow: hidden;
+@keyframes hero-text-in {
+  0% { opacity: 0; transform: translateY(16px); filter: blur(4px); }
+  100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+.hero-logo-entrance {
+  animation: hero-logo-in 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.hero-text-entrance {
+  animation: hero-text-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
+}
+
+.hero-subtitle-entrance {
+  animation: hero-text-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.5s both;
 }
 
 /* Radial burst behind bonus */

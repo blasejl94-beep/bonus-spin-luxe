@@ -57,7 +57,6 @@ const Index = () => {
   );
   const [showConfetti, setShowConfetti] = useState(false);
   const [showFlash, setShowFlash] = useState(false);
-  const [showShake, setShowShake] = useState(false);
   const [phone, setPhone] = useState("");
   const [name, setName] = useState("");
   const [countdown, setCountdown] = useState(BONUS_TIMER);
@@ -68,9 +67,7 @@ const Index = () => {
 
   const handleRevealComplete = useCallback(() => {
     setShowFlash(true);
-    setShowShake(true);
     setTimeout(() => setShowFlash(false), 600);
-    setTimeout(() => setShowShake(false), 700);
   }, []);
 
   const handleSpinComplete = useCallback((prize: string) => {
@@ -128,7 +125,7 @@ const Index = () => {
   const [countGlow, setCountGlow] = useState(0);
 
   return (
-    <div className={`min-h-screen casino-gradient relative overflow-x-hidden ${showShake ? 'screen-shake' : ''}`}>
+    <div className="min-h-screen casino-gradient relative overflow-x-hidden">
       <AmbientParticles />
       {showConfetti && <Confetti />}
       {showFlash && (
@@ -140,15 +137,15 @@ const Index = () => {
       <div className="h-px w-full bg-gradient-to-r from-transparent via-casino-gold/40 to-transparent" />
 
       <section className="relative z-10 flex flex-col items-center px-5 pt-6 pb-8 text-center max-w-lg mx-auto">
-        <div className="flex items-center justify-center mb-3">
+        <div className="flex items-center justify-center mb-3 hero-logo-entrance">
           <img src={logo} alt="Smart Play" className="w-24 h-24 object-contain drop-shadow-[0_0_20px_hsl(var(--casino-gold)/0.4)]" />
         </div>
 
-        <h1 className="text-2xl sm:text-3xl font-black leading-[1.1] mb-2 max-w-md tracking-tight">
+        <h1 className="text-2xl sm:text-3xl font-black leading-[1.1] mb-2 max-w-md tracking-tight hero-text-entrance">
           <span className="inline-block" style={{ WebkitBackgroundClip: 'unset', backgroundClip: 'unset', WebkitTextFillColor: 'unset' }}>🎰</span>{' '}
           <span className="gold-text">Girá la rueda y desbloqueá tu bono exclusivo</span>
         </h1>
-        <p className="text-muted-foreground text-xs mb-3 max-w-xs">
+        <p className="text-muted-foreground text-xs mb-3 max-w-xs hero-subtitle-entrance">
           Más de <span className="font-semibold text-foreground">10.000</span> jugadores ya reclamaron su bono
         </p>
 
