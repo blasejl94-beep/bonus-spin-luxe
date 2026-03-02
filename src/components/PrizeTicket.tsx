@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { startCountUpSound, updateCountUpSound, stopCountUpSound, playFinalDing } from "@/lib/sounds";
+import { playRewardTick, ensureRewardTickCtx, playFinalDing } from "@/lib/sounds";
 
 interface PrizeTicketProps {
   result: string;
@@ -23,54 +23,61 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
   const numericValue = parseInt(result.replace(/[^0-9]/g, ""), 10) || 0;
   const suffix = result.replace(/[0-9]/g, "");
 
-  // Count-up animation with synchronized sound — slower for more emotion
+  // Count-up animation with casino-style ticking sounds
   useEffect(() => {
     if (numericValue === 0) return;
-    const duration = 2200; // slower
+    const duration = 1400; // ~1.4s count + 0.1s pause before ding
     const startTime = performance.now();
+    let lastTickValue = -1;
 
-    startCountUpSound();
+    ensureRewardTickCtx();
 
     const tick = (now: number) => {
       const elapsed = now - startTime;
       const progress = Math.min(elapsed / duration, 1);
       const eased = 1 - Math.pow(1 - progress, 3);
-      setCountValue(Math.round(eased * numericValue));
-      updateCountUpSound(progress);
+      const currentValue = Math.round(eased * numericValue);
+      setCountValue(currentValue);
       onCountProgress?.(progress);
       setGlowIntensity(progress);
 
-      // Badge scale: grows from 0.85 to 1.15 during count, with slight bounce
+      // Play tick only when displayed number changes
+      if (currentValue !== lastTickValue) {
+        lastTickValue = currentValue;
+        playRewardTick(progress);
+      }
+
+      // Badge scale: grows from 0.85 to 1.15 during count
       const scaleProgress = 0.85 + progress * 0.3;
       setBadgeScale(scaleProgress);
 
       if (progress < 1) {
         rafRef.current = requestAnimationFrame(tick);
       } else {
-        stopCountUpSound();
-        setCountDone(true);
-        setWinPulse(true);
-        playFinalDing();
-
-        // Badge bounce back: overshoot then settle
-        setBadgeScale(1.25);
-        setTimeout(() => setBadgeScale(0.92), 150);
-        setTimeout(() => setBadgeScale(1.05), 300);
-        setTimeout(() => setBadgeScale(1), 450);
-
-        setTimeout(() => setWinPulse(false), 600);
-        // Fade glow down then start breathing
+        // 0.1s micro-pause before the final CLING
         setTimeout(() => {
-          setGlowIntensity(0.3);
-          setTimeout(() => setBreathing(true), 800);
-        }, 600);
+          setCountDone(true);
+          setWinPulse(true);
+          playFinalDing();
+
+          // Badge bounce back
+          setBadgeScale(1.25);
+          setTimeout(() => setBadgeScale(0.92), 150);
+          setTimeout(() => setBadgeScale(1.05), 300);
+          setTimeout(() => setBadgeScale(1), 450);
+
+          setTimeout(() => setWinPulse(false), 600);
+          setTimeout(() => {
+            setGlowIntensity(0.3);
+            setTimeout(() => setBreathing(true), 800);
+          }, 600);
+        }, 100);
       }
     };
 
     rafRef.current = requestAnimationFrame(tick);
     return () => {
       cancelAnimationFrame(rafRef.current);
-      stopCountUpSound();
     };
   }, [numericValue]);
 
