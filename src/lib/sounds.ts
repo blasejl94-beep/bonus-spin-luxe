@@ -20,59 +20,51 @@ export function playTick(pitch: number = 1) {
 }
 
 // Rising tone that follows the count-up progress (0 to 1)
-let countUpCtx: AudioContext | null = null;
-let countUpOsc: OscillatorNode | null = null;
-let countUpGain: GainNode | null = null;
+let rewardTickCtx: AudioContext | null = null;
 
-export function startCountUpSound() {
+export function ensureRewardTickCtx() {
   try {
-    countUpCtx = audioCtx();
-    countUpOsc = countUpCtx.createOscillator();
-    countUpGain = countUpCtx.createGain();
-    countUpOsc.type = "sine";
-    countUpOsc.frequency.value = 200;
-    countUpGain.gain.value = 0.06;
-    countUpOsc.connect(countUpGain).connect(countUpCtx.destination);
-    countUpOsc.start();
+    if (!rewardTickCtx || rewardTickCtx.state === "closed") rewardTickCtx = audioCtx();
   } catch {}
 }
 
-export function updateCountUpSound(progress: number) {
+// Casino-style tick for reward counter — short metallic click
+export function playRewardTick(progress: number) {
   try {
-    if (!countUpOsc || !countUpGain || !countUpCtx) return;
-    // Frequency rises from 200Hz to 900Hz
-    const freq = 200 + progress * 700;
-    countUpOsc.frequency.setTargetAtTime(freq, countUpCtx.currentTime, 0.02);
-    // Volume rises slightly
-    const vol = 0.04 + progress * 0.08;
-    countUpGain.gain.setTargetAtTime(vol, countUpCtx.currentTime, 0.02);
+    ensureRewardTickCtx();
+    const ctx = rewardTickCtx!;
 
-    // Add rapid ticks at higher progress for slot-machine feel
-    if (progress > 0.3 && Math.random() < 0.3) {
-      const tickOsc = countUpCtx.createOscillator();
-      const tickGain = countUpCtx.createGain();
-      tickOsc.type = "triangle";
-      tickOsc.frequency.value = freq * 1.5;
-      tickGain.gain.setValueAtTime(0.03, countUpCtx.currentTime);
-      tickGain.gain.exponentialRampToValueAtTime(0.001, countUpCtx.currentTime + 0.03);
-      tickOsc.connect(tickGain).connect(countUpCtx.destination);
-      tickOsc.start();
-      tickOsc.stop(countUpCtx.currentTime + 0.03);
-    }
+    // Base frequency rises gently: 800 → 1400 Hz (not harsh)
+    const freq = 800 + progress * 600;
+    const duration = 0.04 + (1 - progress) * 0.03; // 70ms → 40ms as it accelerates
+    const vol = 0.04 + progress * 0.04; // subtle, grows slightly
+
+    // Primary tick — triangle wave for soft metallic feel
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "triangle";
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(vol, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + duration);
+
+    // Subtle second harmonic for "coin" texture
+    const osc2 = ctx.createOscillator();
+    const gain2 = ctx.createGain();
+    osc2.type = "sine";
+    osc2.frequency.value = freq * 2.5;
+    gain2.gain.setValueAtTime(vol * 0.25, ctx.currentTime);
+    gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration * 0.6);
+    osc2.connect(gain2).connect(ctx.destination);
+    osc2.start();
+    osc2.stop(ctx.currentTime + duration * 0.6);
   } catch {}
 }
 
-export function stopCountUpSound() {
-  try {
-    if (countUpGain && countUpCtx) {
-      countUpGain.gain.setTargetAtTime(0, countUpCtx.currentTime, 0.05);
-    }
-    setTimeout(() => {
-      try { countUpOsc?.stop(); } catch {}
-      countUpOsc = null;
-      countUpGain = null;
-    }, 200);
-  } catch {}
+export function closeRewardTickCtx() {
+  // no-op, keep ctx alive for reuse
 }
 
 export function playWinSound() {
