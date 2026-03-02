@@ -85,7 +85,8 @@
   }
 
   .gold-gradient {
-    background: #0e0900b3;
+    background: linear-gradient(135deg, hsl(42, 100%, 50%), hsl(38, 85%, 40%), hsl(42, 100%, 45%));
+    color: #0e0900b3;
   }
 
   .gold-text {
