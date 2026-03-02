@@ -17,15 +17,16 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
   const [showCountdown, setShowCountdown] = useState(false);
   const [glowIntensity, setGlowIntensity] = useState(0);
   const [breathing, setBreathing] = useState(false);
+  const [badgeScale, setBadgeScale] = useState(0.85);
   const rafRef = useRef<number>(0);
 
   const numericValue = parseInt(result.replace(/[^0-9]/g, ""), 10) || 0;
   const suffix = result.replace(/[0-9]/g, "");
 
-  // Count-up animation with synchronized sound
+  // Count-up animation with synchronized sound — slower for more emotion
   useEffect(() => {
     if (numericValue === 0) return;
-    const duration = 1200;
+    const duration = 2200; // slower
     const startTime = performance.now();
 
     startCountUpSound();
@@ -39,6 +40,10 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
       onCountProgress?.(progress);
       setGlowIntensity(progress);
 
+      // Badge scale: grows from 0.85 to 1.15 during count, with slight bounce
+      const scaleProgress = 0.85 + progress * 0.3;
+      setBadgeScale(scaleProgress);
+
       if (progress < 1) {
         rafRef.current = requestAnimationFrame(tick);
       } else {
@@ -46,6 +51,13 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
         setCountDone(true);
         setWinPulse(true);
         playFinalDing();
+
+        // Badge bounce back: overshoot then settle
+        setBadgeScale(1.25);
+        setTimeout(() => setBadgeScale(0.92), 150);
+        setTimeout(() => setBadgeScale(1.05), 300);
+        setTimeout(() => setBadgeScale(1), 450);
+
         setTimeout(() => setWinPulse(false), 600);
         // Fade glow down then start breathing
         setTimeout(() => {
@@ -67,34 +79,33 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
     if (!countDone) return;
     const t = setTimeout(() => {
       setShowShine(true);
-      // Show countdown after animations settle
       setTimeout(() => setShowCountdown(true), 1800);
     }, 400);
     return () => clearTimeout(t);
   }, [countDone]);
 
-  // Stable sparkle positions
+  // Stable sparkle positions — more sparkles, wider spread
   const [sparkles] = useState(() =>
-    Array.from({ length: 8 }, (_, i) => ({
-      top: 8 + ((i * 37 + 13) % 75),
-      left: 8 + ((i * 53 + 7) % 80),
-      size: 3 + ((i * 17) % 4),
-      delay: 0.6 + i * 0.25,
-      dur: 1.5 + ((i * 11) % 10) / 10,
+    Array.from({ length: 12 }, (_, i) => ({
+      top: 5 + ((i * 31 + 11) % 85),
+      left: 3 + ((i * 47 + 5) % 90),
+      size: 3 + ((i * 13) % 5),
+      delay: i * 0.35,
+      dur: 2.0 + ((i * 7) % 12) / 10,
     }))
   );
 
-  // Badge sparkle positions
+  // Badge sparkle positions — more sparkles, wider radius
   const [badgeSparkles] = useState(() =>
-    Array.from({ length: 14 }, (_, i) => {
-      const angle = (i * (360 / 14)) * (Math.PI / 180);
-      const radius = 28 + (i % 3) * 8;
+    Array.from({ length: 20 }, (_, i) => {
+      const angle = (i * (360 / 20)) * (Math.PI / 180);
+      const radius = 22 + (i % 4) * 10;
       return {
         x: Math.cos(angle) * radius,
         y: Math.sin(angle) * radius,
-        size: 3 + (i % 4),
-        delay: i * 0.25,
-        dur: 1.4 + (i % 4) * 0.3,
+        size: 2.5 + (i % 5),
+        delay: i * 0.18,
+        dur: 1.2 + (i % 5) * 0.3,
       };
     })
   );
@@ -110,7 +121,7 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
         }}
       />
 
-      {/* Floating gold sparkles */}
+      {/* Floating gold sparkles — infinite */}
       {sparkles.map((s, i) => (
         <div
           key={i}
@@ -123,18 +134,21 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
             background: "hsl(45 100% 70%)",
             clipPath:
               "polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)",
-            animation: `sparkle ${s.dur}s ease-in-out ${s.delay}s both`,
-            animationIterationCount: "3",
+            animation: `sparkle ${s.dur}s ease-in-out ${s.delay}s infinite`,
           }}
         />
       ))}
 
-      {/* Badge premium sparkles */}
-
       {/* Gold Badge / Medallion */}
       <div className="relative z-10 flex justify-center mb-[-32px]">
-        <div className="relative">
-          {/* Permanent sparkles around badge */}
+        <div
+          className={`relative ${countDone ? 'badge-alive' : ''}`}
+          style={{
+            transform: `scale(${badgeScale})`,
+            transition: countDone ? 'transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1)' : 'transform 0.1s ease-out',
+          }}
+        >
+          {/* Permanent sparkles around badge — infinite */}
           {badgeSparkles.map((s, i) => (
             <div
               key={`bs-${i}`}
@@ -154,12 +168,12 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
             <div className="prize-badge-v2-inner">
               <span className="text-xl leading-none">🏆</span>
             </div>
-            <div className="prize-badge-shine" />
+            <div className={`prize-badge-shine ${countDone ? 'prize-badge-shine-loop' : ''}`} />
           </div>
         </div>
       </div>
 
-      {/* Card body — clean premium, no ticket cutouts */}
+      {/* Card body */}
       <div
         className={`prize-card-v3 relative z-[5] overflow-hidden ${breathing ? 'glow-breathing' : ''}`}
         style={{
@@ -169,9 +183,9 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
           transition: breathing ? undefined : 'box-shadow 0.2s ease-out',
         }}
       >
-        {/* Border shine sweep */}
+        {/* Border shine sweep — repeating subtle */}
         {showShine && (
-          <div className="absolute inset-0 pointer-events-none z-20 prize-border-shine" />
+          <div className="absolute inset-0 pointer-events-none z-20 prize-border-shine-loop" />
         )}
 
         {/* Inner golden glow */}
@@ -185,12 +199,10 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
 
         {/* Inner content */}
         <div className="relative z-10 pt-12 pb-6 px-6 text-center">
-          {/* Top label */}
           <p className="text-[10px] font-bold uppercase tracking-[0.45em] text-casino-gold/60 mb-2 stagger-1">
             PREMIO DESBLOQUEADO
           </p>
 
-          {/* Decorative separators */}
           <div className="flex items-center justify-center gap-3 mb-5 stagger-1">
             <div className="h-px w-12 bg-gradient-to-r from-transparent to-casino-gold/30" />
             <div className="flex gap-1.5">
@@ -216,12 +228,10 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
             </span>
           </div>
 
-          {/* Subtitle */}
           <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-muted-foreground mt-3 mb-4 stagger-3">
             BONO DE BIENVENIDA
           </p>
 
-          {/* Countdown inside card — always present for layout, fades in */}
           {countdownText && (
             <div
               className="flex items-center justify-center gap-2 mt-5 transition-opacity duration-1000 ease-out"
