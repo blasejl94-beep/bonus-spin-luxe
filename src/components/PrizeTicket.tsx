@@ -15,6 +15,8 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
   const [countDone, setCountDone] = useState(false);
   const [winPulse, setWinPulse] = useState(false);
   const [showCountdown, setShowCountdown] = useState(false);
+  const [glowIntensity, setGlowIntensity] = useState(0);
+  const [breathing, setBreathing] = useState(false);
   const rafRef = useRef<number>(0);
 
   const numericValue = parseInt(result.replace(/[^0-9]/g, ""), 10) || 0;
@@ -35,6 +37,7 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
       setCountValue(Math.round(eased * numericValue));
       updateCountUpSound(progress);
       onCountProgress?.(progress);
+      setGlowIntensity(progress);
 
       if (progress < 1) {
         rafRef.current = requestAnimationFrame(tick);
@@ -44,6 +47,11 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
         setWinPulse(true);
         playFinalDing();
         setTimeout(() => setWinPulse(false), 600);
+        // Fade glow down then start breathing
+        setTimeout(() => {
+          setGlowIntensity(0.3);
+          setTimeout(() => setBreathing(true), 800);
+        }, 600);
       }
     };
 
@@ -159,7 +167,15 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
       </div>
 
       {/* Card body — clean premium, no ticket cutouts */}
-      <div className="prize-card-v3 relative z-[5] overflow-hidden">
+      <div
+        className={`prize-card-v3 relative z-[5] overflow-hidden ${breathing ? 'glow-breathing' : ''}`}
+        style={{
+          boxShadow: glowIntensity > 0
+            ? `0 0 ${15 + glowIntensity * 40}px ${5 + glowIntensity * 15}px hsl(42 100% 55% / ${glowIntensity * 0.35}), 0 0 ${30 + glowIntensity * 60}px ${10 + glowIntensity * 25}px hsl(42 100% 50% / ${glowIntensity * 0.15})`
+            : undefined,
+          transition: breathing ? undefined : 'box-shadow 0.2s ease-out',
+        }}
+      >
         {/* Border shine sweep */}
         {showShine && (
           <div className="absolute inset-0 pointer-events-none z-20 prize-border-shine" />
