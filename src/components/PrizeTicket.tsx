@@ -186,14 +186,6 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete }) =
           <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-muted-foreground mt-3 mb-5 stagger-3">
             BONO DE BIENVENIDA
           </p>
-
-          {/* Thin gold separator */}
-          <div className="h-px w-3/4 mx-auto bg-gradient-to-r from-transparent via-casino-gold/20 to-transparent mb-4 stagger-3" />
-
-          {/* Countdown label */}
-          <p className="text-[10px] text-muted-foreground/60 stagger-4">
-            Tu bono expira en
-          </p>
         </div>
       </div>
     </div>

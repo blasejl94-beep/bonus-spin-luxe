@@ -185,7 +185,7 @@ const Index = () => {
             </div>
 
             <div className="flex flex-col items-center gap-1.5 stagger-3">
-              <span className="text-xs text-muted-foreground">Tu bono está reservado durante:</span>
+              <span className="text-xs text-muted-foreground">Tu bono expira en:</span>
               <span className={`font-mono font-bold text-2xl px-5 py-1.5 rounded-xl ${isUrgent ? 'countdown-urgent bg-destructive/15' : 'text-casino-gold glass-card'}`}>
                 {formatTime(countdown)}
               </span>
