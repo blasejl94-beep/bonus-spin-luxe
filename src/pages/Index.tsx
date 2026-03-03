@@ -131,7 +131,7 @@ const Index = () => {
       <section className="relative z-10 flex flex-col items-center px-5 pt-6 pb-8 text-center max-w-lg mx-auto">
         <div className="flex items-center justify-center mb-3 hero-logo-entrance">
           <img
-            src={logoIcon}
+            src={logoFull}
             alt="Smart Play"
             className="w-24 h-24 object-contain drop-shadow-[0_0_20px_hsl(var(--casino-gold)/0.4)]"
           />
@@ -385,7 +385,7 @@ const Index = () => {
         </div>
 
         <div className="flex items-center justify-center mb-2">
-          <img src={logoFull} alt="Smart Play" className="w-32 h-auto object-contain" />
+          <img src={logoIcon} alt="Smart Play" className="w-20 h-20 object-contain" />
         </div>
         <p className="text-[10px] text-muted-foreground/30">
           © {new Date().getFullYear()} {BRAND_NAME}. Todos los derechos reservados.
