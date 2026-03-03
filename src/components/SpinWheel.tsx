@@ -39,9 +39,9 @@ const LedRing: React.FC<{ state: WheelState }> = ({ state }) => {
     Array.from({ length: NUM_LEDS }, (_, i) => {
       const angle = (i / NUM_LEDS) * 360 - 90;
       const rad = (angle * Math.PI) / 180;
-      const x = 50 + 44.5 * Math.cos(rad);
-      const y = 50 + 44.5 * Math.sin(rad);
-      return { x, y, idx: i };
+      const pctX = Math.round(44.5 * Math.cos(rad) * 10) / 10;
+      const pctY = Math.round(44.5 * Math.sin(rad) * 10) / 10;
+      return { pctX, pctY, idx: i };
     }), []
   );
 
@@ -59,13 +59,13 @@ const LedRing: React.FC<{ state: WheelState }> = ({ state }) => {
           className={stateClass}
           style={{
             position: "absolute",
-            left: `${led.x}%`,
-            top: `${led.y}%`,
+            left: `${50 + led.pctX}%`,
+            top: `${50 + led.pctY}%`,
             width: 7,
             height: 7,
-            marginLeft: -3.5,
-            marginTop: -3.5,
             borderRadius: "50%",
+            transform: "translate(-50%, -50%)",
+            transformOrigin: "center center",
             background: (state === "won" || state === "celebrating") ? "hsl(42, 100%, 75%)" : "hsl(42, 100%, 65%)",
             boxShadow: (state === "won" || state === "celebrating")
               ? "0 0 10px 3px hsl(42 100% 60% / 0.8)"
