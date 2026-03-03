@@ -133,7 +133,7 @@ const Index = () => {
           <img
             src={logoFull}
             alt="Smart Play"
-            className="w-40 h-40 object-contain drop-shadow-[0_0_20px_hsl(var(--casino-gold)/0.4)]"
+            className="w-36 h-36 object-contain drop-shadow-[0_0_20px_hsl(var(--casino-gold)/0.4)]"
           />
         </div>
 
@@ -385,7 +385,7 @@ const Index = () => {
         </div>
 
         <div className="flex items-center justify-center mb-2">
-          <img src={logoIcon} alt="Smart Play" className="w-20 h-20 object-contain" />
+          <img src={logoIcon} alt="Smart Play" className="w-16 h-16 object-contain" />
         </div>
         <p className="text-[10px] text-muted-foreground/30">
           © {new Date().getFullYear()} {BRAND_NAME}. Todos los derechos reservados.
