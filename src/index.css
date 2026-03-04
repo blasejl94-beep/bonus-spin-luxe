@@ -831,3 +831,19 @@
 .glow-breathing {
   animation: glow-breathe 3s ease-in-out infinite;
 }
+
+/* Celebration modal spark particles */
+@keyframes celebration-spark {
+  0%, 100% {
+    opacity: 0;
+    transform: translate(var(--tx, 0), var(--ty, 0)) scale(0.3);
+  }
+  30% {
+    opacity: 0.8;
+    transform: translate(var(--tx, 0), var(--ty, 0)) scale(1.2);
+  }
+  60% {
+    opacity: 0.4;
+    transform: translate(var(--tx, 0), var(--ty, 0)) scale(0.7);
+  }
+}

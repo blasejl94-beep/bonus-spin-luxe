@@ -129,7 +129,7 @@ const Index = () => {
     <div className="min-h-screen casino-gradient relative overflow-x-hidden">
       <AmbientParticles />
       {showConfetti && <Confetti />}
-      {showCelebration && <CelebrationModal onComplete={handleCelebrationDone} />}
+      {showCelebration && <CelebrationModal onComplete={handleCelebrationDone} result={result} />}
       {showFlash && <div className="fixed inset-0 bg-casino-gold/30 z-50 pointer-events-none screen-flash" />}
 
       <WinnerToast />
