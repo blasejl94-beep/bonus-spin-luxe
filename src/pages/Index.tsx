@@ -11,6 +11,7 @@ import SocialProofTicker from "@/components/SocialProofTicker";
 import LiveCounter from "@/components/LiveCounter";
 import ScarcityBar from "@/components/ScarcityBar";
 import WinnerToast from "@/components/WinnerToast";
+import CelebrationModal from "@/components/CelebrationModal";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -50,6 +51,7 @@ const Index = () => {
   });
   const [result, setResult] = useState<string>(localStorage.getItem("casino_result") || "");
   const [showConfetti, setShowConfetti] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
   const [showFlash, setShowFlash] = useState(false);
   const [phone, setPhone] = useState("");
   const [name, setName] = useState("");
@@ -68,7 +70,12 @@ const Index = () => {
     localStorage.setItem("casino_spun", "true");
     localStorage.setItem("casino_result", prize);
     setResult(prize);
-    setTimeout(() => setStep("result"), 500);
+    setShowCelebration(true);
+  }, []);
+
+  const handleCelebrationDone = useCallback(() => {
+    setShowCelebration(false);
+    setStep("result");
   }, []);
 
   const handleClaim = () => {
@@ -122,6 +129,7 @@ const Index = () => {
     <div className="min-h-screen casino-gradient relative overflow-x-hidden">
       <AmbientParticles />
       {showConfetti && <Confetti />}
+      {showCelebration && <CelebrationModal onComplete={handleCelebrationDone} />}
       {showFlash && <div className="fixed inset-0 bg-casino-gold/30 z-50 pointer-events-none screen-flash" />}
 
       <WinnerToast />
@@ -142,21 +150,19 @@ const Index = () => {
             className="inline-block"
             style={{ WebkitBackgroundClip: "unset", backgroundClip: "unset", WebkitTextFillColor: "unset" }}
           >
-            {step === "result" || step === "claim" ? "🎉" : "🎰"}
+            {step === "result" || step === "claim" ? "🎁" : "🎰"}
           </span>{" "}
           <span className="gold-text">
-            {step === "result" || step === "claim" ? <><br />¡Felicidades!</> : "Girá la rueda y desbloqueá tu bono exclusivo"}
+            {step === "result" || step === "claim"
+              ? "Reclamá tu bono"
+              : "Girá la rueda y desbloqueá tu bono exclusivo"}
           </span>
         </h1>
-        <p className="text-muted-foreground text-xs mb-3 max-w-xs hero-subtitle-entrance">
-          {step === "result" || step === "claim" ? (
-            "Tu bono fue desbloqueado"
-          ) : (
-            <>
-              Más de <span className="font-semibold text-foreground">10.000</span> jugadores ya reclamaron su bono
-            </>
-          )}
-        </p>
+        {step !== "result" && step !== "claim" && (
+          <p className="text-muted-foreground text-xs mb-3 max-w-xs hero-subtitle-entrance">
+            Más de <span className="font-semibold text-foreground">10.000</span> jugadores ya reclamaron su bono
+          </p>
+        )}
 
         {step === "hero" && (
           <div className="flex flex-col items-center hero-wheel-entrance">
