@@ -11,6 +11,7 @@ import SocialProofTicker from "@/components/SocialProofTicker";
 import LiveCounter from "@/components/LiveCounter";
 import ScarcityBar from "@/components/ScarcityBar";
 import WinnerToast from "@/components/WinnerToast";
+import CelebrationModal from "@/components/CelebrationModal";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -51,6 +52,8 @@ const Index = () => {
   const [result, setResult] = useState<string>(localStorage.getItem("casino_result") || "");
   const [showConfetti, setShowConfetti] = useState(false);
   const [showFlash, setShowFlash] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
+  const [celebrationDone, setCelebrationDone] = useState(() => !!localStorage.getItem("casino_spun"));
   const [phone, setPhone] = useState("");
   const [name, setName] = useState("");
   const [countdown, setCountdown] = useState(BONUS_TIMER);
@@ -68,7 +71,13 @@ const Index = () => {
     localStorage.setItem("casino_spun", "true");
     localStorage.setItem("casino_result", prize);
     setResult(prize);
+    setShowCelebration(true);
     setTimeout(() => setStep("result"), 500);
+  }, []);
+
+  const handleCelebrationDone = useCallback(() => {
+    setShowCelebration(false);
+    setCelebrationDone(true);
   }, []);
 
   const handleClaim = () => {
@@ -123,6 +132,7 @@ const Index = () => {
       <AmbientParticles />
       {showConfetti && <Confetti />}
       {showFlash && <div className="fixed inset-0 bg-casino-gold/30 z-50 pointer-events-none screen-flash" />}
+      {showCelebration && <CelebrationModal onComplete={handleCelebrationDone} />}
 
       <WinnerToast />
 
@@ -137,26 +147,30 @@ const Index = () => {
           />
         </div>
 
-        <h1 className="text-2xl sm:text-3xl font-black leading-[1.1] mb-2 max-w-md tracking-tight hero-text-entrance">
-          <span
-            className="inline-block"
-            style={{ WebkitBackgroundClip: "unset", backgroundClip: "unset", WebkitTextFillColor: "unset" }}
-          >
-            {step === "result" || step === "claim" ? "🎉" : "🎰"}
-          </span>{" "}
-          <span className="gold-text">
-            {step === "result" || step === "claim" ? <><br />¡Felicidades!</> : "Girá la rueda y desbloqueá tu bono exclusivo"}
-          </span>
-        </h1>
-        <p className="text-muted-foreground text-xs mb-3 max-w-xs hero-subtitle-entrance">
-          {step === "result" || step === "claim" ? (
-            "Tu bono fue desbloqueado"
-          ) : (
-            <>
-              Más de <span className="font-semibold text-foreground">10.000</span> jugadores ya reclamaron su bono
-            </>
-          )}
-        </p>
+        {step !== "result" && (
+          <>
+            <h1 className="text-2xl sm:text-3xl font-black leading-[1.1] mb-2 max-w-md tracking-tight hero-text-entrance">
+              <span
+                className="inline-block"
+                style={{ WebkitBackgroundClip: "unset", backgroundClip: "unset", WebkitTextFillColor: "unset" }}
+              >
+                {step === "claim" ? "🎉" : "🎰"}
+              </span>{" "}
+              <span className="gold-text">
+                {step === "claim" ? <><br />¡Felicidades!</> : "Girá la rueda y desbloqueá tu bono exclusivo"}
+              </span>
+            </h1>
+            <p className="text-muted-foreground text-xs mb-3 max-w-xs hero-subtitle-entrance">
+              {step === "claim" ? (
+                "Tu bono fue desbloqueado"
+              ) : (
+                <>
+                  Más de <span className="font-semibold text-foreground">10.000</span> jugadores ya reclamaron su bono
+                </>
+              )}
+            </p>
+          </>
+        )}
 
         {step === "hero" && (
           <div className="flex flex-col items-center hero-wheel-entrance">
@@ -170,7 +184,7 @@ const Index = () => {
           </div>
         )}
 
-        {step !== "result" && (
+        {step !== "result" && step !== "claim" && (
           <>
             <div className="flex gap-2 mt-5 mb-4 flex-wrap justify-center hero-badges-entrance">
               {TRUST_BADGES.map(({ icon: Icon, label }) => (
@@ -189,8 +203,8 @@ const Index = () => {
           </>
         )}
 
-        {step === "result" && (
-          <div className="flex flex-col items-center gap-4 w-full max-w-sm relative prize-entrance">
+        {step === "result" && celebrationDone && (
+          <div className="flex flex-col items-center gap-5 w-full max-w-sm relative prize-entrance">
             <PrizeTicket
               result={result || "200%"}
               onRevealComplete={handleRevealComplete}
@@ -204,26 +218,16 @@ const Index = () => {
               }}
             />
 
-            <div className="glass-card rounded-xl px-4 py-2.5 stagger-3">
-              <p className="text-xs text-muted-foreground">
-                ⭐ Solo <span className="font-bold text-casino-gold">3 de cada 100</span> jugadores reciben este bono
-              </p>
+            <div className="flex items-center justify-center gap-2">
+              <span className="text-xs text-muted-foreground">Tu bono expira en</span>
+              <span
+                className={`font-mono font-bold text-sm px-2.5 py-1 rounded-lg ${isUrgent ? "countdown-urgent bg-destructive/15" : "text-casino-gold glass-card"}`}
+              >
+                {formatTime(countdown)}
+              </span>
             </div>
 
-            <div className="flex items-center gap-2 text-xs text-destructive font-semibold animate-pulse stagger-3">
-              <span>⚠️</span>
-              <span>Oferta válida por tiempo limitado</span>
-            </div>
-
-            <Button
-              onClick={handleClaim}
-              className="mt-2 w-full max-w-xs py-8 text-2xl font-black rounded-2xl gold-gradient text-white uppercase tracking-wide bounce-cta stagger-4 relative overflow-hidden shadow-[0_0_40px_hsl(42,100%,50%,0.5),0_0_80px_hsl(42,100%,50%,0.2)] hover:shadow-[0_0_60px_hsl(42,100%,50%,0.7),0_0_100px_hsl(42,100%,50%,0.3)] hover:scale-[1.03] active:scale-95 transition-all duration-300 border-2 border-casino-gold/60"
-            >
-              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
-              🎁 RECLAMAR MI BONO
-            </Button>
-
-            <p className="text-xs text-muted-foreground stagger-4 mt-3">💬 Activación en menos de 1 minuto</p>
+            <p className="text-xs text-muted-foreground">💬 Activación en menos de 1 minuto</p>
           </div>
         )}
 
