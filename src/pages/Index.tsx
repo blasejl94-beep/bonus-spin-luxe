@@ -216,10 +216,6 @@ const Index = () => {
               </p>
             </div>
 
-            <div className="flex items-center gap-2 text-xs text-destructive font-semibold animate-pulse stagger-3">
-              <span>⚠️</span>
-              <span>Oferta válida por tiempo limitado</span>
-            </div>
 
             <Button
               onClick={handleClaim}
