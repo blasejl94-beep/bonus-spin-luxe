@@ -176,24 +176,6 @@ const Index = () => {
           </div>
         )}
 
-        {step !== "result" && (
-          <>
-            <div className="flex gap-2 mt-5 mb-4 flex-wrap justify-center hero-badges-entrance">
-              {TRUST_BADGES.map(({ icon: Icon, label }) => (
-                <div
-                  key={label}
-                  className="flex items-center gap-1 glass-card rounded-full px-2.5 py-1.5 text-[10px] text-foreground/60"
-                >
-                  <Icon className="w-3 h-3 text-casino-gold/80" />
-                  {label}
-                </div>
-              ))}
-            </div>
-            <div className="hero-counter-entrance">
-              <LiveCounter />
-            </div>
-          </>
-        )}
 
         {step === "result" && (
           <div className="flex flex-col items-center gap-4 w-full max-w-sm relative prize-entrance">
@@ -212,7 +194,7 @@ const Index = () => {
 
             <div className="glass-card rounded-xl px-4 py-2.5 stagger-3">
               <p className="text-xs text-muted-foreground">
-                ⭐ Solo <span className="font-bold text-casino-gold">3 de cada 100</span> jugadores reciben este bono
+                ⭐ Este bono fue <span className="font-bold text-casino-gold">seleccionado especialmente</span> para tu sesión de hoy
               </p>
             </div>
 
@@ -309,6 +291,21 @@ const Index = () => {
             </Button>
           </div>
         )}
+
+        <div className="flex gap-2 mt-6 mb-4 flex-wrap justify-center hero-badges-entrance">
+          {TRUST_BADGES.map(({ icon: Icon, label }) => (
+            <div
+              key={label}
+              className="flex items-center gap-1 glass-card rounded-full px-2.5 py-1.5 text-[10px] text-foreground/60"
+            >
+              <Icon className="w-3 h-3 text-casino-gold/80" />
+              {label}
+            </div>
+          ))}
+        </div>
+        <div className="hero-counter-entrance">
+          <LiveCounter />
+        </div>
       </section>
 
       <div className="h-px w-4/5 mx-auto bg-gradient-to-r from-transparent via-border to-transparent" />

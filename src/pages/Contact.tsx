@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import logo from "@/assets/logo.png";
+import logo from "@/assets/logo-full.png";
 
 const BRAND = "Smart Play";
 const WHATSAPP_NUMBER = "59894619935";
@@ -23,7 +23,7 @@ const Contact = () => {
           <ArrowLeft className="w-4 h-4" /> Volver al inicio
         </Link>
 
-        <Link to="/"><img src={logo} alt={BRAND} className="w-20 h-20 object-contain mb-6" /></Link>
+        <Link to="/"><img src={logo} alt={BRAND} className="w-36 h-36 object-contain mb-6" /></Link>
 
         <h1 className="text-2xl font-black gold-text mb-3">Contacto</h1>
         <p className="text-sm text-muted-foreground mb-6">
