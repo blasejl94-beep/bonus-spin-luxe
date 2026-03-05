@@ -1,48 +1,33 @@
 
 
-## Plan: Create Legal & Contact Pages
+## Plan: Fix post-spin flow — eliminate redundant count-up, add "processing" modal
 
-### Overview
-Create 4 new pages (Terms, Privacy, Responsible Gaming, Contact) with careful language to avoid META ADS-sensitive terms. Use entertainment/gaming-friendly vocabulary instead of gambling/betting terminology. Contact page redirects to WhatsApp.
+### Problem
+The CelebrationModal currently does a full count-up animation (0→200%) and stays too long (~4s total). Then PrizeTicket on the result page does another count-up. This is redundant and the modal sometimes gets "stuck."
 
-### Language Strategy (META ADS safe)
-- Replace "apuestas" → "entretenimiento digital", "juegos de azar" → "experiencias de juego"
-- Replace "casino" → "plataforma de entretenimiento"
-- Replace "apostar" → "participar", "jugar"
-- Replace "dinero real" → "créditos", "saldo"
-- Use "bonificaciones" instead of "bonos de apuesta"
-- Frame everything as "entertainment platform" language
+### Solution
 
-### Files to Create
+**1. Rewrite CelebrationModal as a brief "processing" interstitial (~1800ms)**
 
-1. **`src/pages/Terms.tsx`** — Términos y condiciones
-   - Standard legal page structure with sections: acceptance, eligibility (18+), account usage, bonuses/promotions, intellectual property, limitation of liability, modifications
-   - Dark themed, matching site style with `casino-gradient` background
-   - Back link to home
+Remove the count-up logic entirely. Replace the hero number with a premium "processing" UX:
+- Keep: overlay blur, golden radial glow, panel scale-in animation, sparks
+- Title: "¡Felicidades!" (gold text)
+- Subtitle: "Bono desbloqueado"
+- New: elegant golden loading spinner/dots + text "Aplicando bono…"
+- Remove: trophy emoji, count-up number, bounce logic
+- Timeline: overlay→glow→panel (450ms), visible for ~1200ms, then fade-out (300ms) → call `onComplete`
+- Total: ~1800ms
 
-2. **`src/pages/Privacy.tsx`** — Política de privacidad
-   - Data collection, usage, sharing, cookies, user rights, security, contact
-   - Same styling
+**2. Ensure clean state transition in Index.tsx**
 
-3. **`src/pages/ResponsibleGaming.tsx`** — Juego responsable
-   - Self-assessment, limits, resources, support contacts
-   - Frame as "responsible entertainment" / "uso responsable"
+The current flow (`handleSpinComplete` → `setShowCelebration(true)` → `handleCelebrationDone` → `setShowCelebration(false)` + `setStep("result")`) is correct in structure. Just need to confirm the modal auto-closes reliably via the shortened timeline.
 
-4. **`src/pages/Contact.tsx`** — Contacto
-   - Simple page that auto-redirects to WhatsApp (`wa.me/59894619935`)
-   - Also show a brief contact card with WhatsApp button as fallback
+No changes needed to Index.tsx state management — the `showCelebration` boolean + `step` enum already form a clean state machine since `showCelebration` is only true during the hero→result transition.
 
-### Files to Modify
+**3. Keep PrizeTicket count-up as the single count-up**
 
-5. **`src/App.tsx`** — Add 4 routes: `/terminos`, `/privacidad`, `/juego-responsable`, `/contacto`
+PrizeTicket already has the count-up with sounds and effects. No changes needed there — it becomes the only place the number animates.
 
-6. **`src/pages/Index.tsx`** — Update footer links from `href="#"` to proper `<Link>` components pointing to the new routes. Contact link opens WhatsApp directly.
-
-### Page Template Pattern
-Each legal page will share a consistent layout:
-- Logo at top (linking home)
-- Page title
-- Scrollable content sections with headings
-- Footer with back-to-home link
-- Same dark `casino-gradient` background
+### Files to edit
+- `src/components/CelebrationModal.tsx` — Simplify: remove count-up, add processing state, shorten timeline to ~1800ms
 
