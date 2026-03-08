@@ -54,7 +54,7 @@ const LedRing: React.FC<{ state: WheelState }> = React.memo(({ state }) => {
   const isActive = state === "won" || state === "celebrating";
 
   return (
-    <div className="absolute inset-[4%] pointer-events-none" style={{ zIndex: 5, contain: "layout style", marginTop: 14 }}>
+    <div className="absolute inset-[4%] pointer-events-none" style={{ zIndex: 5, contain: "layout style", marginTop: 17 }}>
       {leds.map((led) => (
         <div
           key={led.idx}
@@ -313,7 +313,7 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
         <div
           className="absolute pointer-events-none"
           style={{
-            bottom: "2%", left: "calc(10% - 8px)", right: "10%", height: "8%",
+            bottom: "2%", left: "calc(10% - 10px)", right: "10%", height: "8%",
             borderRadius: "50%",
             background: "radial-gradient(ellipse, hsl(0 0% 0% / 0.55) 0%, transparent 70%)",
             filter: "blur(12px)",
@@ -324,7 +324,7 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
         <div
           className="absolute rounded-full wheel-rim-sheen"
           style={{
-            top: "4%", bottom: "4%", left: "calc(4% - 8px)", right: "calc(4% + 8px)",
+            top: "4%", bottom: "4%", left: "calc(4% - 10px)", right: "calc(4% + 10px)",
             padding: 4,
             background: `conic-gradient(from 0deg, hsl(42 100% 70%), hsl(38 80% 40%), hsl(42 100% 65%), hsl(38 85% 30%), hsl(42 100% 72%), hsl(38 80% 38%), hsl(42 100% 68%))`,
             boxShadow: `
@@ -469,7 +469,7 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
         <div
           ref={pointerRef}
           className={`absolute z-20 ${!spinning && !disabled ? "wiggle-idle" : ""} ${phase === "bounce" ? "pointer-bounce" : ""} ${pointerFlick ? "pointer-flick" : ""}`}
-          style={{ top: "3.5%", left: "calc(50% - 8px)", transform: "translateX(-50%)" }}
+          style={{ top: "3.5%", left: "calc(50% - 10px)", transform: "translateX(-50%)" }}
         >
           <svg width="36" height="44" viewBox="0 0 36 44">
             <defs>
