@@ -34,7 +34,7 @@ interface SpinWheelProps {
 type WheelState = "idle" | "spinning" | "celebrating" | "won";
 
 /* ── LED Ring ── */
-const LedRing: React.FC<{ state: WheelState }> = ({ state }) => {
+const LedRing: React.FC<{ state: WheelState }> = React.memo(({ state }) => {
   const leds = useMemo(() =>
     Array.from({ length: NUM_LEDS }, (_, i) => {
       const angle = (i / NUM_LEDS) * 360 - 90;
@@ -51,8 +51,10 @@ const LedRing: React.FC<{ state: WheelState }> = ({ state }) => {
     state === "won" ? "led-celebrate" :
     "led-idle";
 
+  const isActive = state === "won" || state === "celebrating";
+
   return (
-    <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 5 }}>
+    <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 5, contain: "layout style" }}>
       {leds.map((led) => (
         <div
           key={led.idx}
@@ -66,8 +68,8 @@ const LedRing: React.FC<{ state: WheelState }> = ({ state }) => {
             borderRadius: "50%",
             transform: "translate(-50%, -50%)",
             transformOrigin: "center center",
-            background: (state === "won" || state === "celebrating") ? "hsl(42, 100%, 75%)" : "hsl(42, 100%, 65%)",
-            boxShadow: (state === "won" || state === "celebrating")
+            background: isActive ? "hsl(42, 100%, 75%)" : "hsl(42, 100%, 65%)",
+            boxShadow: isActive
               ? "0 0 10px 3px hsl(42 100% 60% / 0.8)"
               : "0 0 6px 2px hsl(42 100% 55% / 0.6)",
             animationDelay: state === "spinning"
@@ -82,7 +84,7 @@ const LedRing: React.FC<{ state: WheelState }> = ({ state }) => {
       ))}
     </div>
   );
-};
+});
 
 /* ── Helpers ── */
 function getSegmentUnderPointer(rotationDeg: number): number {
@@ -105,26 +107,44 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
   const [rotation, setRotation] = useState(0);
   const [spinning, setSpinning] = useState(false);
   const [phase, setPhase] = useState<"idle" | "spinning" | "bounce" | "celebrating">("idle");
-  const [glowIntensity, setGlowIntensity] = useState(0);
+  const [glowIntensity, setGlowIntensity] = useState(0.35);
   const [highlightIndex, setHighlightIndex] = useState<number>(-1);
   const [wheelState, setWheelState] = useState<WheelState>("idle");
   const [pointerFlick, setPointerFlick] = useState(false);
   const [muted, setMuted] = useState(false);
   const wheelRef = useRef<SVGSVGElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const lastTickSegmentRef = useRef<number>(-1);
   const rafRef = useRef<number | null>(null);
   const pointerRef = useRef<HTMLDivElement>(null);
   const mutedRef = useRef(false);
+  const isVisibleRef = useRef(true);
 
   // Keep ref in sync
   useEffect(() => { mutedRef.current = muted; }, [muted]);
 
-  // Idle breathing glow
+  // IntersectionObserver to pause idle glow when offscreen
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { isVisibleRef.current = entry.isIntersecting; },
+      { threshold: 0.1 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  // Idle breathing glow — only when visible
   useEffect(() => {
     if (spinning || disabled) return;
     let frame: number;
     let start: number | null = null;
     const animate = (ts: number) => {
+      if (!isVisibleRef.current) {
+        frame = requestAnimationFrame(animate);
+        return;
+      }
       if (!start) start = ts;
       const elapsed = (ts - start) / 1000;
       setGlowIntensity(0.35 + 0.25 * Math.sin(elapsed * 1.2));
@@ -263,7 +283,7 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
   const isCelebrating = phase === "celebrating";
 
   return (
-    <div className="relative flex flex-col items-center mx-auto" style={{ width: "min(92vw, 420px)" }}>
+    <div ref={containerRef} className="relative flex flex-col items-center mx-auto" style={{ width: "min(92vw, 420px)", contain: "layout style" }}>
       {/* Mute toggle */}
       <button
         onClick={() => setMuted(m => !m)}
@@ -281,11 +301,12 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
           aspectRatio: "1/1",
           background: `radial-gradient(circle, hsl(42 100% 55% / ${glowIntensity * 0.18}) 30%, hsl(350 60% 30% / ${glowIntensity * 0.06}) 55%, transparent 70%)`,
           transition: "background 0.8s ease",
+          willChange: "background",
         }}
       />
 
       {/* Wheel container */}
-      <div className={`relative w-full overflow-visible mx-auto ${isCelebrating ? "wheel-celebrate-bounce" : ""} ${!spinning && !disabled ? "wheel-idle-wobble" : ""}`} style={{ aspectRatio: "1/1", padding: "4%" }}>
+      <div className={`relative w-full overflow-visible mx-auto ${isCelebrating ? "wheel-celebrate-bounce" : ""} ${!spinning && !disabled ? "wheel-idle-wobble" : ""}`} style={{ aspectRatio: "1/1", padding: "4%", contain: "layout paint", willChange: spinning ? "transform" : "auto" }}>
         <LedRing state={wheelState} />
 
         {/* Soft shadow under wheel */}
