@@ -39,8 +39,8 @@ const LedRing: React.FC<{ state: WheelState }> = React.memo(({ state }) => {
     Array.from({ length: NUM_LEDS }, (_, i) => {
       const angle = (i / NUM_LEDS) * 360 - 90;
       const rad = (angle * Math.PI) / 180;
-      const pctX = Math.round(44.5 * Math.cos(rad) * 10) / 10;
-      const pctY = Math.round(44.5 * Math.sin(rad) * 10) / 10;
+      const pctX = Math.round(46.5 * Math.cos(rad) * 10) / 10;
+      const pctY = Math.round(46.5 * Math.sin(rad) * 10) / 10;
       return { pctX, pctY, idx: i };
     }), []
   );
@@ -54,7 +54,7 @@ const LedRing: React.FC<{ state: WheelState }> = React.memo(({ state }) => {
   const isActive = state === "won" || state === "celebrating";
 
   return (
-    <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 5, contain: "layout style" }}>
+    <div className="absolute inset-[4%] pointer-events-none" style={{ zIndex: 5, contain: "layout style" }}>
       {leds.map((led) => (
         <div
           key={led.idx}
