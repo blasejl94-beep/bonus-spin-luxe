@@ -59,9 +59,7 @@ const CelebrationModal: React.FC<CelebrationModalProps> = ({ onComplete }) => {
       <div
         className="absolute inset-0"
         style={{
-          backgroundColor: "hsl(240 10% 4% / 0.88)",
-          backdropFilter: "blur(10px)",
-          WebkitBackdropFilter: "blur(10px)",
+          backgroundColor: "hsl(240 10% 4% / 0.92)",
           opacity: phase === "overlay" ? 0 : 1,
           transition: "opacity 300ms ease-out",
         }}
