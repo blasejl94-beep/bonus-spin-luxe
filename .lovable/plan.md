@@ -1,42 +1,25 @@
 
 
-## Plan: Update logos, reposition trust badges, and improve social proof text
+## Plan: Shift wheel rim + pointer left to align with LED ring
 
-### 1. Update old logos across all secondary pages
+### What
+The wheel face (gold rim + SVG) and the pointer are slightly offset to the right relative to the LED ring on mobile. Instead of moving LEDs, we'll nudge the wheel rim and pointer a few pixels to the left.
 
-**Files:** `Privacy.tsx`, `Terms.tsx`, `ResponsibleGaming.tsx`, `Contact.tsx`
+### Changes (file: `src/components/SpinWheel.tsx`)
 
-All four pages import `@/assets/logo.png` (old logo). Replace with `@/assets/logo-full.png` to match the main page. Also increase size from `w-20 h-20` to `w-36 h-36` for consistency with Index.tsx.
+1. **Wheel rim** (line 325): Change `absolute inset-[4%]` to add a small left offset. Use inline style to subtract ~2px from the left position:
+   - Change from `className="absolute inset-[4%] rounded-full wheel-rim-sheen"` 
+   - To: `className="absolute rounded-full wheel-rim-sheen"` with `style` adding `top: "4%", bottom: "4%", left: "calc(4% - 2px)", right: "calc(4% + 2px)"` (merged into existing style object)
 
-### 2. Move trust badges + live counter below main content on Index.tsx
+2. **Pointer** (around line 466): Adjust the pointer's `left` from `50%` to `calc(50% - 2px)` to keep it aligned with the shifted wheel face.
 
-Currently (line 179): `step !== "result"` hides trust badges and LiveCounter on the result/claim screens. Change this so they always show, but move them below the main content block (after the result/claim/expired sections) instead of between the title and the wheel.
+3. **Shadow under wheel** (line 316): Also shift slightly left to match: adjust `left: "10%"` → `left: "calc(10% - 2px)"`.
 
-Layout will become:
-```text
-Logo
-Title
-[Wheel / Result / Claim / Expired content]
-Trust badges (Plataforma verificada, Pagos instantáneos, Soporte 24/7)
-Live counter (847 personas en línea)
-```
+### What stays unchanged
+- LED ring position and radius (inset-[4%], 46.5 constant)
+- SVG segments, colors, animations, sizes
+- Container structure and layout
+- All other components
 
-Remove the `step !== "result"` condition so badges and counter appear on all steps, and move the JSX block to after the step-specific content.
-
-### 3. Replace "3 de cada 100" text with something more believable
-
-Change the text on line 213-216 from:
-> "Solo 3 de cada 100 jugadores reciben este bono"
-
-To something like:
-> "Este bono fue seleccionado especialmente para tu sesión de hoy"
-
-This feels personalized and fortunate without making a statistically dubious claim.
-
-### Files to edit
-- `src/pages/Privacy.tsx` — swap logo import
-- `src/pages/Terms.tsx` — swap logo import
-- `src/pages/ResponsibleGaming.tsx` — swap logo import
-- `src/pages/Contact.tsx` — swap logo import
-- `src/pages/Index.tsx` — move badges/counter, update social proof text
+This is a 2-3px nudge — easy to adjust further if needed.
 
