@@ -54,7 +54,7 @@ const LedRing: React.FC<{ state: WheelState }> = React.memo(({ state }) => {
   const isActive = state === "won" || state === "celebrating";
 
   return (
-    <div className="absolute inset-[4%] pointer-events-none" style={{ zIndex: 5, contain: "layout style", marginTop: 14 }}>
+    <div className="absolute inset-[4%] pointer-events-none" style={{ zIndex: 5, contain: "layout style", marginTop: 17 }}>
       {leds.map((led) => (
         <div
           key={led.idx}
