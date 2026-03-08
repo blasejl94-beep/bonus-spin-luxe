@@ -353,7 +353,7 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
               style={{
                 transform: `rotate(${rotation}deg)`,
                 transition: getTransition(),
-                filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.3))",
+                willChange: spinning ? "transform" : "auto",
                 aspectRatio: "1/1",
               }}
             >
