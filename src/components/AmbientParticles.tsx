@@ -3,7 +3,7 @@ import React, { useMemo } from "react";
 const AmbientParticles: React.FC = () => {
   const particles = useMemo(
     () =>
-      Array.from({ length: 40 }, (_, i) => ({
+      Array.from({ length: 18 }, (_, i) => ({
         id: i,
         left: Math.random() * 100,
         size: Math.random() * 2.5 + 0.5,
@@ -15,7 +15,7 @@ const AmbientParticles: React.FC = () => {
   );
 
   return (
-    <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+    <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden" style={{ contain: "strict" }}>
       {particles.map((p) => (
         <div
           key={p.id}
@@ -34,4 +34,4 @@ const AmbientParticles: React.FC = () => {
   );
 };
 
-export default AmbientParticles;
+export default React.memo(AmbientParticles);

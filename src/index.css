@@ -105,16 +105,12 @@
   }
 
   .glass-card {
-    background: hsl(240 8% 10% / 0.6);
-    backdrop-filter: blur(20px) saturate(1.4);
-    -webkit-backdrop-filter: blur(20px) saturate(1.4);
+    background: hsl(240 8% 10% / 0.82);
     border: 1px solid hsl(42 100% 55% / 0.12);
   }
 
   .glass-card-strong {
-    background: hsl(240 8% 10% / 0.8);
-    backdrop-filter: blur(24px) saturate(1.6);
-    -webkit-backdrop-filter: blur(24px) saturate(1.6);
+    background: hsl(240 8% 10% / 0.92);
     border: 1px solid hsl(42 100% 55% / 0.2);
     box-shadow: 0 8px 32px hsl(0 0% 0% / 0.4), inset 0 1px 0 hsl(42 100% 55% / 0.08);
   }
@@ -247,15 +243,14 @@
 
 /* Hero entrance animations */
 @keyframes hero-logo-in {
-  0% { opacity: 0; transform: scale(0.7); filter: blur(8px); }
-  60% { opacity: 1; transform: scale(1.04); filter: blur(0); }
-  100% { opacity: 1; transform: scale(1); filter: blur(0); }
+  0% { opacity: 0; transform: scale(0.7); }
+  60% { opacity: 1; transform: scale(1.04); }
+  100% { opacity: 1; transform: scale(1); }
 }
 
 @keyframes hero-text-in {
-  0% { opacity: 0; transform: translateY(16px); filter: blur(4px); }
-  100% { opacity: 1; transform: translateY(0); filter: blur(0); }
-}
+  0% { opacity: 0; transform: translateY(16px); }
+  100% { opacity: 1; transform: translateY(0); }
 
 @keyframes hero-fade-up {
   0% { opacity: 0; transform: translateY(24px); }
@@ -346,45 +341,49 @@
 
 /* LED idle breathing — opacity only for perf */
 @keyframes led-breathe {
-  0%, 100% { opacity: 0.2; transform: scale(0.85); }
-  50% { opacity: 0.7; transform: scale(1); }
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 0.7; }
 }
 .led-idle {
   animation: led-breathe 3s ease-in-out infinite;
+  will-change: opacity;
 }
 
 /* LED chase while spinning — opacity only */
 @keyframes led-chase {
-  0%, 70% { opacity: 0.1; transform: scale(0.8); }
-  25% { opacity: 1; transform: scale(1.15); }
+  0%, 70% { opacity: 0.1; }
+  25% { opacity: 1; }
 }
 .led-chase {
   animation: led-chase 0.8s ease-in-out infinite;
+  will-change: opacity;
 }
 
 /* LED celebrate on win — quick pulses */
 @keyframes led-celebrate {
-  0%, 100% { opacity: 0.4; transform: scale(0.9); }
-  25% { opacity: 1; transform: scale(1.3); }
-  50% { opacity: 0.6; transform: scale(1); }
-  75% { opacity: 1; transform: scale(1.2); }
+  0%, 100% { opacity: 0.4; }
+  25% { opacity: 1; }
+  50% { opacity: 0.6; }
+  75% { opacity: 1; }
 }
 .led-celebrate {
   animation: led-celebrate 0.5s ease-in-out infinite;
+  will-change: opacity;
 }
 
 /* LED celebrating — fast chase with golden flashes */
 @keyframes led-celebrating {
-  0% { opacity: 0.15; transform: scale(0.7); }
-  15% { opacity: 1; transform: scale(1.4); }
-  30% { opacity: 0.2; transform: scale(0.8); }
-  45% { opacity: 1; transform: scale(1.3); }
-  60% { opacity: 0.15; transform: scale(0.7); }
-  75% { opacity: 1; transform: scale(1.35); }
-  100% { opacity: 0.15; transform: scale(0.7); }
+  0% { opacity: 0.15; }
+  15% { opacity: 1; }
+  30% { opacity: 0.2; }
+  45% { opacity: 1; }
+  60% { opacity: 0.15; }
+  75% { opacity: 1; }
+  100% { opacity: 0.15; }
 }
 .led-celebrating {
   animation: led-celebrating 0.4s ease-in-out infinite;
+  will-change: opacity;
 }
 
 /* Wheel celebrate bounce */
@@ -496,8 +495,9 @@
 }
 
 .ambient-particle {
-  position: fixed;
+  position: absolute;
   bottom: -10px;
+  will-change: transform, opacity;
   border-radius: 50%;
   background: radial-gradient(circle, hsl(45 100% 70% / 0.8), hsl(45 100% 51% / 0.2));
   animation: float-up linear infinite;
