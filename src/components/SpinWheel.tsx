@@ -283,37 +283,30 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
   const isCelebrating = phase === "celebrating";
 
   return (
-    <div ref={containerRef} className="flex flex-col items-center mx-auto" style={{ width: "min(92vw, 420px)", contain: "layout style" }}>
+    <div ref={containerRef} className="relative flex flex-col items-center mx-auto" style={{ width: "min(92vw, 420px)", contain: "layout style" }}>
       {/* Mute toggle */}
       <button
         onClick={() => setMuted(m => !m)}
         className="absolute top-0 right-0 z-30 p-2 rounded-full glass-card text-muted-foreground hover:text-foreground transition-colors"
-        style={{ position: "relative", alignSelf: "flex-end" }}
         aria-label={muted ? "Activar sonido" : "Silenciar"}
       >
         {muted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
       </button>
 
-      {/* Single square container — all wheel elements share this origin */}
+      {/* Ambient glow */}
       <div
-        className={`relative w-full ${isCelebrating ? "wheel-celebrate-bounce" : ""} ${!spinning && !disabled ? "wheel-idle-wobble" : ""}`}
+        className="absolute pointer-events-none rounded-full"
         style={{
-          aspectRatio: "1 / 1",
-          contain: "layout paint",
-          willChange: spinning ? "transform" : "auto",
+          top: "-8%", left: "-2%", right: "-2%",
+          aspectRatio: "1/1",
+          background: `radial-gradient(circle, hsl(42 100% 55% / ${glowIntensity * 0.18}) 30%, hsl(350 60% 30% / ${glowIntensity * 0.06}) 55%, transparent 70%)`,
+          transition: "background 0.8s ease",
+          willChange: "background",
         }}
-      >
-        {/* Ambient glow — centered on the square */}
-        <div
-          className="absolute pointer-events-none rounded-full"
-          style={{
-            inset: "-6%",
-            background: `radial-gradient(circle, hsl(42 100% 55% / ${glowIntensity * 0.18}) 30%, hsl(350 60% 30% / ${glowIntensity * 0.06}) 55%, transparent 70%)`,
-            transition: "background 0.8s ease",
-          }}
-        />
+      />
 
-        {/* LED Ring — absolute inset-0 of the square */}
+      {/* Wheel container */}
+      <div className={`relative w-full overflow-visible mx-auto ${isCelebrating ? "wheel-celebrate-bounce" : ""} ${!spinning && !disabled ? "wheel-idle-wobble" : ""}`} style={{ aspectRatio: "1/1", padding: "4%", contain: "layout paint", willChange: spinning ? "transform" : "auto" }}>
         <LedRing state={wheelState} />
 
         {/* Soft shadow under wheel */}
@@ -327,11 +320,10 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
           }}
         />
 
-        {/* Metallic gold outer rim — inset from the square edges to leave room for LEDs */}
+        {/* Metallic gold outer rim */}
         <div
-          className="absolute rounded-full wheel-rim-sheen"
+          className="absolute inset-[4%] rounded-full wheel-rim-sheen"
           style={{
-            inset: "4%",
             padding: 4,
             background: `conic-gradient(from 0deg, hsl(42 100% 70%), hsl(38 80% 40%), hsl(42 100% 65%), hsl(38 85% 30%), hsl(42 100% 72%), hsl(38 80% 38%), hsl(42 100% 68%))`,
             boxShadow: `
@@ -472,15 +464,11 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
           </div>
         </div>
 
-        {/* 3D Pointer — anchored to the shared square container center */}
+        {/* 3D Pointer */}
         <div
           ref={pointerRef}
           className={`absolute z-20 ${!spinning && !disabled ? "wiggle-idle" : ""} ${phase === "bounce" ? "pointer-bounce" : ""} ${pointerFlick ? "pointer-flick" : ""}`}
-          style={{
-            top: "1%",
-            left: "50%",
-            transform: "translateX(-50%)",
-          }}
+          style={{ top: "3.5%", left: "50%", transform: "translateX(-50%)" }}
         >
           <svg width="36" height="44" viewBox="0 0 36 44">
             <defs>
@@ -501,6 +489,7 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
           </svg>
         </div>
       </div>
+
 
       {/* Spin button */}
       <button
