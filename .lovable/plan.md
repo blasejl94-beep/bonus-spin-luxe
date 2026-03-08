@@ -1,42 +1,22 @@
 
 
-## Plan: Update logos, reposition trust badges, and improve social proof text
+## Plan: Fix LED Ring Alignment on Published Mobile
 
-### 1. Update old logos across all secondary pages
+### Root Cause
 
-**Files:** `Privacy.tsx`, `Terms.tsx`, `ResponsibleGaming.tsx`, `Contact.tsx`
+The LED ring container uses `absolute inset-0` (line 57), meaning LEDs are positioned relative to the **full wheel container** which includes `padding: 4%` (line 309). The wheel rim, however, uses `absolute inset-[4%]` (line 325), creating a different coordinate space. The LED radius constant of `44.5%` was visually tuned in preview but doesn't account for the padding offset consistently across mobile browsers, causing the ring to appear shifted outward on production mobile.
 
-All four pages import `@/assets/logo.png` (old logo). Replace with `@/assets/logo-full.png` to match the main page. Also increase size from `w-20 h-20` to `w-36 h-36` for consistency with Index.tsx.
+### Fix
 
-### 2. Move trust badges + live counter below main content on Index.tsx
+**File: `src/components/SpinWheel.tsx`**
 
-Currently (line 179): `step !== "result"` hides trust badges and LiveCounter on the result/claim screens. Change this so they always show, but move them below the main content block (after the result/claim/expired sections) instead of between the title and the wheel.
+1. Change the LED ring container from `absolute inset-0` to `absolute inset-[4%]` — this makes LEDs share the exact same coordinate box as the wheel rim.
 
-Layout will become:
-```text
-Logo
-Title
-[Wheel / Result / Claim / Expired content]
-Trust badges (Plataforma verificada, Pagos instantáneos, Soporte 24/7)
-Live counter (847 personas en línea)
-```
+2. Increase the LED radius constant from `44.5` to `46.5` to compensate for the now-smaller reference box (LEDs need to sit at the outer edge of the rim within its own coordinate space).
 
-Remove the `step !== "result"` condition so badges and counter appear on all steps, and move the JSX block to after the step-specific content.
+This is a two-line change: one in the `LedRing` component (line 57, the container class), and one constant (line 42, the `44.5` multiplier).
 
-### 3. Replace "3 de cada 100" text with something more believable
+### Why This Works
 
-Change the text on line 213-216 from:
-> "Solo 3 de cada 100 jugadores reciben este bono"
-
-To something like:
-> "Este bono fue seleccionado especialmente para tu sesión de hoy"
-
-This feels personalized and fortunate without making a statistically dubious claim.
-
-### Files to edit
-- `src/pages/Privacy.tsx` — swap logo import
-- `src/pages/Terms.tsx` — swap logo import
-- `src/pages/ResponsibleGaming.tsx` — swap logo import
-- `src/pages/Contact.tsx` — swap logo import
-- `src/pages/Index.tsx` — move badges/counter, update social proof text
+By anchoring the LED ring to the same `inset-[4%]` box as the wheel rim, both layers share identical origin and dimensions regardless of how the browser resolves the outer container's padding. Subpixel rounding on the 4% padding no longer causes a mismatch because both layers are affected equally.
 
