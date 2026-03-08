@@ -283,7 +283,7 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
   const isCelebrating = phase === "celebrating";
 
   return (
-    <div ref={containerRef} className="relative flex flex-col items-center mx-auto" style={{ width: "min(92vw, 420px)", contain: "layout style" }}>
+    <div ref={containerRef} className="relative flex flex-col items-center mx-auto w-full" style={{ maxWidth: 420, contain: "layout style" }}>
       {/* Mute toggle */}
       <button
         onClick={() => setMuted(m => !m)}
