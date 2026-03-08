@@ -469,7 +469,7 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
         <div
           ref={pointerRef}
           className={`absolute z-20 ${!spinning && !disabled ? "wiggle-idle" : ""} ${phase === "bounce" ? "pointer-bounce" : ""} ${pointerFlick ? "pointer-flick" : ""}`}
-          style={{ top: "3.5%", left: "calc(50% - 8px)", transform: "translateX(-50%)" }}
+          style={{ top: "3.5%", left: "calc(50% - 10px)", transform: "translateX(-50%)" }}
         >
           <svg width="36" height="44" viewBox="0 0 36 44">
             <defs>
