@@ -310,7 +310,7 @@ const Index = () => {
 
       <div className="h-px w-4/5 mx-auto bg-gradient-to-r from-transparent via-border to-transparent" />
 
-      <section className="relative z-10 px-5 py-8 max-w-lg mx-auto section-entrance">
+      <section className="relative z-10 px-5 py-8 max-w-lg mx-auto section-entrance" style={{ contentVisibility: "auto", containIntrinsicSize: "0 400px" }}>
         <h3 className="text-center text-xs font-bold text-muted-foreground uppercase tracking-[0.25em] mb-1">
           🎉 Ganadores recientes
         </h3>
@@ -330,7 +330,7 @@ const Index = () => {
 
       <div className="h-px w-4/5 mx-auto bg-gradient-to-r from-transparent via-border to-transparent" />
 
-      <footer className="relative z-10 px-5 py-10 max-w-lg mx-auto text-center footer-entrance">
+      <footer className="relative z-10 px-5 py-10 max-w-lg mx-auto text-center footer-entrance" style={{ contentVisibility: "auto", containIntrinsicSize: "0 350px" }}>
         <div className="mb-6">
           <p className="text-[10px] text-muted-foreground/50 uppercase tracking-[0.2em] mb-3">
             Métodos de pago aceptados
