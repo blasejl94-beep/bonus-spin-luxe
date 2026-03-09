@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 
-const LiveCounter: React.FC = () => {
+const LiveCounter: React.FC = React.memo(() => {
   const [count, setCount] = useState(847);
   const [displayCount, setDisplayCount] = useState(847);
   const rafRef = useRef<number>(0);
@@ -45,6 +45,7 @@ const LiveCounter: React.FC = () => {
       </span>
     </div>
   );
-};
+});
 
+LiveCounter.displayName = "LiveCounter";
 export default LiveCounter;

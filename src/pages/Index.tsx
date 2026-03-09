@@ -124,9 +124,23 @@ const Index = () => {
   const isUrgent = countdown < 60;
 
   const [countGlow, setCountGlow] = useState(0);
+  const [claimBtnVisible, setClaimBtnVisible] = useState(true);
+  const claimBtnRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (step !== "result") return;
+    const el = claimBtnRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setClaimBtnVisible(entry.isIntersecting),
+      { threshold: 0.1 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [step]);
 
   return (
-    <div className="min-h-screen casino-gradient relative overflow-x-hidden">
+    <div className="min-h-screen casino-gradient relative overflow-x-hidden" style={{ contain: "content" }}>
       <AmbientParticles />
       {showConfetti && <Confetti />}
       {showCelebration && <CelebrationModal onComplete={handleCelebrationDone} result={result} />}
@@ -218,6 +232,7 @@ const Index = () => {
 
 
             <Button
+              ref={claimBtnRef}
               onClick={handleClaim}
               className="mt-2 w-full max-w-xs py-8 text-2xl font-black rounded-2xl gold-gradient text-white uppercase tracking-wide cta-sprout-entrance relative overflow-hidden hover:scale-[1.03] active:scale-95 transition-transform duration-300 border-2 border-casino-gold/60"
             >
@@ -402,6 +417,7 @@ const Index = () => {
 
       {step !== "claim" &&
         step !== "expired" &&
+        !(step === "result" && claimBtnVisible) &&
         createPortal(
           <a
             href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(result ? `Hola!\n\nQuiero activar mi bono de bienvenida para empezar a jugar.\n\nBono obtenido: ${result}\n\n¿Me decís la carga mínima y los medios de pago disponibles?` : WHATSAPP_MSG_NO_SPIN)}`}
