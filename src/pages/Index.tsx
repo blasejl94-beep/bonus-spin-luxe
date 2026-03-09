@@ -388,7 +388,7 @@ const Index = () => {
         </div>
 
         <div className="flex items-center justify-center mb-2">
-          <img src={logoIcon} alt="Smart Play" className="w-16 h-16 object-contain" />
+          <img src={logoIcon} alt="Smart Play" loading="lazy" width={64} height={64} decoding="async" className="w-16 h-16 object-contain" />
         </div>
         <p className="text-[10px] text-muted-foreground/30">
           © {new Date().getFullYear()} {BRAND_NAME}. Todos los derechos reservados.

@@ -707,7 +707,35 @@
 }
 /* Looping subtle golden shine on badge after reveal */
 .prize-badge-shine-loop::after {
-  animation: badge-shine-loop 6s ease-in-out 2s infinite;
+  animation: badge-shine-loop 3s ease-in-out 1s infinite;
+}
+
+/* Reflection sweep on the badge circle */
+.prize-badge-v2::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent 30%,
+    hsl(42 100% 95% / 0.35) 45%,
+    hsl(42 100% 95% / 0.5) 50%,
+    hsl(42 100% 95% / 0.35) 55%,
+    transparent 70%
+  );
+  transform: rotate(25deg);
+  animation: badge-reflection 3s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 4;
+}
+
+@keyframes badge-reflection {
+  0% { transform: rotate(25deg) translateX(-120%); }
+  30% { transform: rotate(25deg) translateX(120%); }
+  100% { transform: rotate(25deg) translateX(120%); }
 }
 @keyframes badge-shine-sweep {
   0% { left: -60%; }
