@@ -1,42 +1,47 @@
 
 
-## Plan: Update logos, reposition trust badges, and improve social proof text
+## Plan: CTA visibility inteligente + Optimización de performance móvil
 
-### 1. Update old logos across all secondary pages
+### 1. WhatsApp CTA solo visible cuando el botón amarillo sale del viewport
 
-**Files:** `Privacy.tsx`, `Terms.tsx`, `ResponsibleGaming.tsx`, `Contact.tsx`
+**Archivo:** `src/pages/Index.tsx`
 
-All four pages import `@/assets/logo.png` (old logo). Replace with `@/assets/logo-full.png` to match the main page. Also increase size from `w-20 h-20` to `w-36 h-36` for consistency with Index.tsx.
+En `step === "result"`, el CTA verde de WhatsApp (portal fijo en `bottom-4`) compite con el botón dorado "RECLAMAR MI BONO". Solución:
 
-### 2. Move trust badges + live counter below main content on Index.tsx
+- Agregar un `ref` al botón dorado "RECLAMAR MI BONO"
+- Usar `IntersectionObserver` para detectar cuándo ese botón sale del viewport (scroll down)
+- Crear estado `claimBtnVisible` (inicialmente `true`)
+- Modificar la condición del portal de WhatsApp: mostrar solo cuando `step === "result" && !claimBtnVisible` (es decir, el usuario scrolleó y ya no ve el CTA amarillo), o en `step === "hero"`
+- En los otros steps (`claim`, `expired`) sigue oculto como está ahora
 
-Currently (line 179): `step !== "result"` hides trust badges and LiveCounter on the result/claim screens. Change this so they always show, but move them below the main content block (after the result/claim/expired sections) instead of between the title and the wheel.
+### 2. Optimización de performance para scroll fluido en móviles
 
-Layout will become:
-```text
-Logo
-Title
-[Wheel / Result / Claim / Expired content]
-Trust badges (Plataforma verificada, Pagos instantáneos, Soporte 24/7)
-Live counter (847 personas en línea)
-```
+**Archivo:** `src/pages/Index.tsx`
+- Agregar `will-change: transform` al CTA dorado para evitar traba al hacer scroll (el navegador lo promueve a su propia capa compositing y no repinta la capa principal)
+- Envolver componentes pesados con `React.memo` donde no se haga ya: `ScarcityBar`, `SocialProofTicker`
+- Aplicar `contain: content` al contenedor principal de la sección hero para aislar repaints
 
-Remove the `step !== "result"` condition so badges and counter appear on all steps, and move the JSX block to after the step-specific content.
+**Archivo:** `src/components/ScarcityBar.tsx`
+- Envolver en `React.memo`
 
-### 3. Replace "3 de cada 100" text with something more believable
+**Archivo:** `src/components/SocialProofTicker.tsx`
+- Envolver en `React.memo`
+- Mover `generateWinners()` dentro de `useMemo` para evitar regenerar en cada render del módulo
 
-Change the text on line 213-216 from:
-> "Solo 3 de cada 100 jugadores reciben este bono"
+**Archivo:** `src/components/WinnerToast.tsx`
+- Envolver en `React.memo`
 
-To something like:
-> "Este bono fue seleccionado especialmente para tu sesión de hoy"
+**Archivo:** `src/components/LiveCounter.tsx`
+- Ya tiene buena lógica, envolver en `React.memo`
 
-This feels personalized and fortunate without making a statistically dubious claim.
+**Archivo:** `src/index.css`
+- Agregar `will-change: transform` y `transform: translateZ(0)` al CTA dorado (`.cta-sprout-entrance`) para que el scroll no lo trabe al pasar por él
+- Asegurar que las animaciones infinitas usen `will-change: opacity` o `will-change: transform` según corresponda, y no propiedades que fuerzan repaint como `box-shadow`
 
-### Files to edit
-- `src/pages/Privacy.tsx` — swap logo import
-- `src/pages/Terms.tsx` — swap logo import
-- `src/pages/ResponsibleGaming.tsx` — swap logo import
-- `src/pages/Contact.tsx` — swap logo import
-- `src/pages/Index.tsx` — move badges/counter, update social proof text
+### 3. CTA dorado sin trabas al scrollear
+
+El botón dorado "RECLAMAR MI BONO" no es fixed, es inline. La traba viene de que tiene animaciones (`shimmer`) y `box-shadow` pesados que causan repaint durante el scroll. Solución:
+
+**Archivo:** `src/index.css`
+- Promover el botón a su propia capa de compositing con `transform: translateZ(0)` en la clase del CTA para que las animaciones de shimmer no bloqueen el hilo principal durante scroll
 
