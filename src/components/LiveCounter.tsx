@@ -35,13 +35,13 @@ const LiveCounter: React.FC = React.memo(() => {
   }, [count]);
 
   return (
-    <div className="flex items-center justify-center gap-2.5 text-xs text-muted-foreground mb-5 glass-card rounded-full px-4 py-2 premium-shadow">
+    <div className="live-counter-card flex items-center justify-center gap-2.5 text-xs text-muted-foreground mb-5 glass-card rounded-full px-4 py-2 premium-shadow">
       <span className="relative flex h-2 w-2">
         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[hsl(142,70%,50%)] opacity-75" />
         <span className="relative inline-flex rounded-full h-2 w-2 bg-[hsl(142,70%,45%)]" />
       </span>
       <span>
-        <span className="font-bold text-foreground tabular-nums transition-colors duration-300">{displayCount.toLocaleString("es-UY")}</span> personas en línea ahora
+        <span className="counter-number-glow font-bold text-foreground tabular-nums transition-colors duration-300">{displayCount.toLocaleString("es-UY")}</span> personas en línea ahora
       </span>
     </div>
   );

@@ -1,47 +1,42 @@
 
 
-## Plan: 3 mejoras — CTA verde, bounce en card, vida al contador
+## Plan: Update logos, reposition trust badges, and improve social proof text
 
-### 1. CTA verde de WhatsApp: aparece solo cuando el CTA amarillo sale completamente del viewport
+### 1. Update old logos across all secondary pages
 
-**Archivo:** `src/pages/Index.tsx`
+**Files:** `Privacy.tsx`, `Terms.tsx`, `ResponsibleGaming.tsx`, `Contact.tsx`
 
-El problema es que en el step `"hero"` (antes de girar), el CTA verde aparece arriba porque `waCtaReady` se activa a los 2.5s y no hay `claimBtnVisible` que lo bloquee. Además en `"result"`, el `threshold: 0.1` hace que desaparezca demasiado tarde.
+All four pages import `@/assets/logo.png` (old logo). Replace with `@/assets/logo-full.png` to match the main page. Also increase size from `w-20 h-20` to `w-36 h-36` for consistency with Index.tsx.
 
-Cambios:
-- En step `"hero"`: aumentar el delay de `waCtaReady` a ~5s para que no aparezca mientras el usuario está viendo la rueda arriba
-- En step `"result"`: cambiar el `rootMargin` del IntersectionObserver a `"-100px"` para que el CTA verde solo aparezca cuando el botón amarillo está bien fuera de pantalla, no apenas tocando el borde
-- Cambiar la condición del portal: en `"hero"` solo mostrar si `waCtaReady`, en `"result"` solo si `!claimBtnVisible` (sin depender de `waCtaReady` para evitar flash inicial — pero inicializar `claimBtnVisible` a `true` para el result step)
+### 2. Move trust badges + live counter below main content on Index.tsx
 
-### 2. Bounce sutil en la card del contador cuando pasa el reflejo
+Currently (line 179): `step !== "result"` hides trust badges and LiveCounter on the result/claim screens. Change this so they always show, but move them below the main content block (after the result/claim/expired sections) instead of between the title and the wheel.
 
-**Archivo:** `src/index.css`
+Layout will become:
+```text
+Logo
+Title
+[Wheel / Result / Claim / Expired content]
+Trust badges (Plataforma verificada, Pagos instantáneos, Soporte 24/7)
+Live counter (847 personas en línea)
+```
 
-La card del `LiveCounter` tiene clase `glass-card`. Para no afectar todas las glass-card, se necesita un wrapper o clase específica.
+Remove the `step !== "result"` condition so badges and counter appear on all steps, and move the JSX block to after the step-specific content.
 
-**Archivo:** `src/components/LiveCounter.tsx`
+### 3. Replace "3 de cada 100" text with something more believable
 
-- Agregar una clase específica `live-counter-card` al div contenedor
-- En CSS, crear un `@keyframes counter-bounce` que haga un `translateY(-2px)` y vuelva, muy sutil (~0.4s), sincronizado cada ~4s
-- Aplicar la animación con un delay para que coincida con un ciclo natural
+Change the text on line 213-216 from:
+> "Solo 3 de cada 100 jugadores reciben este bono"
 
-### 3. Darle vida al número del contador en reposo
+To something like:
+> "Este bono fue seleccionado especialmente para tu sesión de hoy"
 
-**Archivo:** `src/components/LiveCounter.tsx`
+This feels personalized and fortunate without making a statistically dubious claim.
 
-Después de que la animación de conteo termina (cuando `displayCount === count`), el número queda estático. Agregar:
-
-- Un efecto de **glow pulsante** sutil en el número: usar `text-shadow` con la color dorada del sitio que pulse suavemente
-- Implementar con una clase CSS que se aplique siempre al span del número
-
-**Archivo:** `src/index.css`
-
-- Crear `@keyframes counter-number-glow` que alterne entre `text-shadow: 0 0 4px hsl(42,100%,50%,0.3)` y `text-shadow: 0 0 8px hsl(42,100%,50%,0.5)` cada ~2s
-- Clase `.counter-number-glow` que aplique esta animación
-- Usar `will-change: filter` para GPU acceleration
-
-### Archivos a editar
-- `src/pages/Index.tsx` — lógica de visibilidad del CTA verde
-- `src/components/LiveCounter.tsx` — clase para card bounce + clase glow en número
-- `src/index.css` — animaciones counter-bounce y counter-number-glow
+### Files to edit
+- `src/pages/Privacy.tsx` — swap logo import
+- `src/pages/Terms.tsx` — swap logo import
+- `src/pages/ResponsibleGaming.tsx` — swap logo import
+- `src/pages/Contact.tsx` — swap logo import
+- `src/pages/Index.tsx` — move badges/counter, update social proof text
 
