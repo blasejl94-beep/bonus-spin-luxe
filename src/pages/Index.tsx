@@ -125,6 +125,7 @@ const Index = () => {
 
   const [countGlow, setCountGlow] = useState(0);
   const [primaryCtaVisible, setPrimaryCtaVisible] = useState(true);
+  const [hasScrolledEnough, setHasScrolledEnough] = useState(false);
   const claimBtnRef = useRef<HTMLButtonElement>(null);
   const heroCtaRef = useRef<HTMLDivElement>(null);
 
@@ -134,11 +135,27 @@ const Index = () => {
     setPrimaryCtaVisible(true);
     const observer = new IntersectionObserver(
       ([entry]) => setPrimaryCtaVisible(entry.isIntersecting),
-      { threshold: 0, rootMargin: "-100px" }
+      { threshold: 0, rootMargin: "0px 0px -300px 0px" }
     );
     observer.observe(el);
     return () => observer.disconnect();
   }, [step]);
+
+  useEffect(() => {
+    let ticking = false;
+    const onScroll = () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          setHasScrolledEnough(window.scrollY > 400);
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   return (
     <div className="min-h-screen casino-gradient relative overflow-x-hidden" style={{ contain: "content" }}>
@@ -423,7 +440,7 @@ const Index = () => {
             target="_blank"
             rel="noopener noreferrer"
             className={`fixed bottom-4 left-4 right-4 z-40 flex items-center justify-center gap-2 py-4 rounded-2xl bg-[hsl(142,70%,38%)] text-white font-bold text-base max-w-lg mx-auto wa-cta-float ${
-              !primaryCtaVisible ? "wa-cta-visible" : "wa-cta-hidden"
+              !primaryCtaVisible && hasScrolledEnough ? "wa-cta-visible" : "wa-cta-hidden"
             }`}
           >
             <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current">

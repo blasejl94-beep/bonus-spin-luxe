@@ -1,27 +1,42 @@
 
 
-## Plan: Green CTA — never visible until well past the primary CTA
+## Plan: Update logos, reposition trust badges, and improve social proof text
 
-### Problem
-The `IntersectionObserver` with `rootMargin: "-100px"` triggers too early. The `heroCtaRef` covers the entire wheel section, but once you scroll just a bit past it, the green button appears — sometimes even while the LiveCounter entrance animation finishes and shifts layout.
+### 1. Update old logos across all secondary pages
 
-### Solution
+**Files:** `Privacy.tsx`, `Terms.tsx`, `ResponsibleGaming.tsx`, `Contact.tsx`
 
-**File: `src/pages/Index.tsx`**
+All four pages import `@/assets/logo.png` (old logo). Replace with `@/assets/logo-full.png` to match the main page. Also increase size from `w-20 h-20` to `w-36 h-36` for consistency with Index.tsx.
 
-Two changes:
+### 2. Move trust badges + live counter below main content on Index.tsx
 
-1. **Much larger rootMargin** — Change from `"-100px"` to `"0px 0px -300px 0px"` (only shrink from the bottom). This means the observed element must scroll 300px above the bottom of the viewport before it's considered "not intersecting." This ensures the user has scrolled well past the primary CTA.
+Currently (line 179): `step !== "result"` hides trust badges and LiveCounter on the result/claim screens. Change this so they always show, but move them below the main content block (after the result/claim/expired sections) instead of between the title and the wheel.
 
-2. **Add a minimum scroll guard** — In addition to the observer, add a simple `scroll` listener that tracks whether `window.scrollY > 400`. The green CTA only shows when BOTH conditions are met: the primary CTA is out of the observer zone AND the user has scrolled at least 400px. This prevents any edge case where the observer fires prematurely during entrance animations or layout shifts.
-
-The portal visibility condition becomes:
+Layout will become:
+```text
+Logo
+Title
+[Wheel / Result / Claim / Expired content]
+Trust badges (Plataforma verificada, Pagos instantáneos, Soporte 24/7)
+Live counter (847 personas en línea)
 ```
-!primaryCtaVisible && hasScrolledEnough
-```
 
-Where `hasScrolledEnough` is a state that turns true only after `scrollY > 400` (with a passive scroll listener, throttled via `requestAnimationFrame`).
+Remove the `step !== "result"` condition so badges and counter appear on all steps, and move the JSX block to after the step-specific content.
+
+### 3. Replace "3 de cada 100" text with something more believable
+
+Change the text on line 213-216 from:
+> "Solo 3 de cada 100 jugadores reciben este bono"
+
+To something like:
+> "Este bono fue seleccionado especialmente para tu sesión de hoy"
+
+This feels personalized and fortunate without making a statistically dubious claim.
 
 ### Files to edit
-- `src/pages/Index.tsx` — rootMargin change + scroll guard
+- `src/pages/Privacy.tsx` — swap logo import
+- `src/pages/Terms.tsx` — swap logo import
+- `src/pages/ResponsibleGaming.tsx` — swap logo import
+- `src/pages/Contact.tsx` — swap logo import
+- `src/pages/Index.tsx` — move badges/counter, update social proof text
 
