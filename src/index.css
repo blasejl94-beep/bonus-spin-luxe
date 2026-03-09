@@ -208,7 +208,8 @@
 
 .cta-sprout-entrance {
   opacity: 0;
-  animation: cta-sprout 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 1.0s forwards;
+  animation: cta-sprout 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 1.0s forwards,
+             cta-alive 2.5s ease-in-out 1.7s infinite;
 }
 
 /* CTA alive — breathing + glow pulse to draw attention */
@@ -225,8 +226,6 @@
 
 .cta-alive {
   animation: cta-alive 2.5s ease-in-out infinite;
-  animation-delay: 1.7s;
-  animation-fill-mode: backwards;
 }
 
 /* Badge final bounce — elastic settle */

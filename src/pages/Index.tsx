@@ -141,6 +141,10 @@ const Index = () => {
           <img
             src={logoFull}
             alt="Smart Play"
+            width={144}
+            height={144}
+            fetchPriority="high"
+            decoding="async"
             className="w-36 h-36 object-contain drop-shadow-[0_0_20px_hsl(var(--casino-gold)/0.4)]"
           />
         </div>
