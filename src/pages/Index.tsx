@@ -440,7 +440,7 @@ const Index = () => {
             target="_blank"
             rel="noopener noreferrer"
             className={`fixed bottom-4 left-4 right-4 z-40 flex items-center justify-center gap-2 py-4 rounded-2xl bg-[hsl(142,70%,38%)] text-white font-bold text-base max-w-lg mx-auto wa-cta-float ${
-              !primaryCtaVisible ? "wa-cta-visible" : "wa-cta-hidden"
+              !primaryCtaVisible && hasScrolledEnough ? "wa-cta-visible" : "wa-cta-hidden"
             }`}
           >
             <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current">
