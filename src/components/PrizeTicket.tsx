@@ -61,13 +61,10 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
           playFinalDing();
           onRevealComplete?.();
 
-          // Smooth bounce: overshoot from 1.15 → 1.2, then settle
-          setBadgeScale(1.2);
-          setTimeout(() => setBadgeScale(0.97), 200);
-          setTimeout(() => setBadgeScale(1.04), 400);
-          setTimeout(() => setBadgeScale(1), 550);
+          // Badge bounce handled by CSS class now
+          setBadgeScale(1);
 
-          setTimeout(() => setWinPulse(false), 600);
+          setTimeout(() => setWinPulse(false), 700);
           setTimeout(() => {
             setGlowIntensity(0.3);
             setTimeout(() => setBreathing(true), 800);
@@ -129,8 +126,8 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
         }}
       />
 
-      {/* Floating gold sparkles — infinite */}
-      {sparkles.map((s, i) => (
+      {/* Floating gold sparkles — only after count */}
+      {countDone && sparkles.map((s, i) => (
         <div
           key={i}
           className="absolute pointer-events-none"
@@ -142,7 +139,7 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
             background: "hsl(45 100% 70%)",
             clipPath:
               "polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)",
-            animation: `sparkle ${s.dur}s ease-in-out ${s.delay}s infinite`,
+            animation: `sparkle ${s.dur}s ease-in-out ${i * 0.4}s infinite`,
           }}
         />
       ))}
@@ -150,14 +147,14 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
       {/* Gold Badge / Medallion */}
       <div className="relative z-10 flex justify-center mb-[-32px]">
         <div
-          className={`relative ${countDone ? 'badge-alive' : ''}`}
+          className={`relative ${countDone ? 'badge-final-bounce badge-alive' : ''}`}
           style={{
-            transform: `scale(${badgeScale})`,
-            transition: countDone ? 'transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)' : 'transform 0.05s linear',
+            transform: countDone ? undefined : `scale(${badgeScale})`,
+            transition: countDone ? undefined : 'transform 0.05s linear',
           }}
         >
-          {/* Permanent sparkles around badge — infinite */}
-          {badgeSparkles.map((s, i) => (
+          {/* Badge sparkles — only after count */}
+          {countDone && badgeSparkles.map((s, i) => (
             <div
               key={`bs-${i}`}
               className="absolute pointer-events-none z-30 badge-sparkle-permanent"
@@ -166,7 +163,7 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
                 top: `calc(50% + ${s.y}px - ${s.size / 2}px)`,
                 width: s.size,
                 height: s.size,
-                animationDelay: `${s.delay}s`,
+                animationDelay: `${i * 0.2}s`,
                 animationDuration: `${s.dur}s`,
               }}
             />
@@ -183,7 +180,7 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
 
       {/* Card body — alive with subtle motion */}
       <div
-        className={`prize-card-v3 relative z-[5] overflow-hidden ${breathing ? 'glow-breathing card-alive' : ''}`}
+        className={`prize-card-v3 relative z-[5] overflow-hidden ${breathing ? 'glow-breathing card-alive' : ''} ${countDone ? 'card-final-bounce' : ''}`}
         style={{
           boxShadow: glowIntensity > 0
             ? `inset 0 0 ${10 + glowIntensity * 25}px ${3 + glowIntensity * 8}px hsl(42 100% 55% / ${glowIntensity * 0.18}), inset 0 0 ${20 + glowIntensity * 35}px ${6 + glowIntensity * 12}px hsl(42 100% 50% / ${glowIntensity * 0.08})`

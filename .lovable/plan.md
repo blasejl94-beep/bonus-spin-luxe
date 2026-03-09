@@ -1,41 +1,42 @@
 
 
-## Plan de Mejoras (5 cambios)
+## Plan: Update logos, reposition trust badges, and improve social proof text
 
-### 1. CTA "RECLAMAR MI BONO" — Entrada con anticipation + estado vivo
+### 1. Update old logos across all secondary pages
 
-**Archivo:** `src/index.css`
-- Crear nuevo keyframe `cta-sprout` con scale anticipation: `0.95 → 1.03 → 1.0`
-- Crear clase `.cta-sprout-entrance` con delay acorde al stagger (~1.0s)
-- Crear keyframe `cta-alive` que combine un breathing scale sutil (0.98 → 1.02) con un glow pulsante, para mantener el botón vivo tras la entrada
+**Files:** `Privacy.tsx`, `Terms.tsx`, `ResponsibleGaming.tsx`, `Contact.tsx`
 
-**Archivo:** `src/pages/Index.tsx`
-- Aplicar `cta-sprout-entrance` y `cta-alive` al botón "RECLAMAR MI BONO" en el step `result`
+All four pages import `@/assets/logo.png` (old logo). Replace with `@/assets/logo-full.png` to match the main page. Also increase size from `w-20 h-20` to `w-36 h-36` for consistency with Index.tsx.
 
-### 2. Glow cortado al girar la rueda
+### 2. Move trust badges + live counter below main content on Index.tsx
 
-**Archivo:** `src/components/SpinWheel.tsx` (línea 309)
-- El wheel container tiene `contain: "layout paint"` que recorta el glow/sombras que salen del contenedor
-- Cambiar a `contain: "layout style"` (sin `paint`) para permitir que el glow se dibuje completo sin recortes
+Currently (line 179): `step !== "result"` hides trust badges and LiveCounter on the result/claim screens. Change this so they always show, but move them below the main content block (after the result/claim/expired sections) instead of between the title and the wheel.
 
-### 3 y 3.1. Bounce suave del badge y card al terminar el contador
+Layout will become:
+```text
+Logo
+Title
+[Wheel / Result / Claim / Expired content]
+Trust badges (Plataforma verificada, Pagos instantáneos, Soporte 24/7)
+Live counter (847 personas en línea)
+```
 
-**Archivo:** `src/components/PrizeTicket.tsx`
-- Reemplazar la secuencia actual de `setBadgeScale` con setTimeout's encadenados (líneas 65-68) por una transición CSS más suave usando un keyframe `badge-final-bounce` con curva elastic/spring
-- Aplicar la misma animación bounce a la card completa (`.prize-card-v3`) al terminar el conteo: agregar una clase `card-bounce` que se active con `countDone`
+Remove the `step !== "result"` condition so badges and counter appear on all steps, and move the JSX block to after the step-specific content.
 
-**Archivo:** `src/index.css`
-- Crear `@keyframes badge-final-bounce`: escala 1.15 → 1.22 → 0.96 → 1.03 → 1.0 con curva suave (~0.6s)
-- Crear `@keyframes card-final-bounce`: escala más sutil 1.0 → 1.025 → 0.99 → 1.0 (~0.5s) aplicada a toda la card
+### 3. Replace "3 de cada 100" text with something more believable
 
-### 4. Sparkles: aparecen solo después del contador
+Change the text on line 213-216 from:
+> "Solo 3 de cada 100 jugadores reciben este bono"
 
-**Archivo:** `src/components/PrizeTicket.tsx`
-- Envolver los sparkles (tanto los floating sparkles como los badge sparkles) en un condicional `countDone` para que solo se rendericen cuando el conteo haya terminado
-- Los delays internos de cada sparkle empezarán desde 0 (ya no necesitan el offset de 2.2s)
+To something like:
+> "Este bono fue seleccionado especialmente para tu sesión de hoy"
 
-### 5. Cambiar texto del badge de tiempo
+This feels personalized and fortunate without making a statistically dubious claim.
 
-**Archivo:** `src/pages/Index.tsx`
-- En el step `result`, cambiar el texto "⏳ Bono disponible por tiempo limitado" a "⭐ Desbloqueaste tu bono de bienvenida"
+### Files to edit
+- `src/pages/Privacy.tsx` — swap logo import
+- `src/pages/Terms.tsx` — swap logo import
+- `src/pages/ResponsibleGaming.tsx` — swap logo import
+- `src/pages/Contact.tsx` — swap logo import
+- `src/pages/Index.tsx` — move badges/counter, update social proof text
 
