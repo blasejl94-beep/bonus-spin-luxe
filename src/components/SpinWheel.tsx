@@ -492,11 +492,21 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
       </div>
 
 
+      {/* Interaction hint */}
+      {!spinning && !disabled && (
+        <div className="mt-4 flex items-center gap-1.5 animate-[fadeInHint_1s_ease-out_0.8s_both] opacity-0">
+          <span className="text-[11px] text-casino-gold/50 font-medium tracking-wide">Tocá para girar</span>
+          <svg width="10" height="10" viewBox="0 0 10 10" className="animate-[gentleFloat_3s_ease-in-out_infinite] text-casino-gold/40">
+            <path d="M5 2 L5 8 M3 6 L5 8 L7 6" stroke="currentColor" strokeWidth="1.2" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </div>
+      )}
+
       {/* Spin button */}
       <button
         onClick={spin}
         disabled={spinning || disabled}
-        className={`mt-4 px-12 py-4 rounded-full font-black text-lg tracking-wide gold-gradient text-primary-foreground pulse-glow disabled:opacity-50 disabled:animate-none transition-all spin-btn-hover uppercase ${!spinning && !disabled ? "bounce-cta" : ""}`}
+        className={`mt-3 px-12 py-4 rounded-full font-black text-lg tracking-wide gold-gradient text-primary-foreground pulse-glow disabled:opacity-50 disabled:animate-none transition-all spin-btn-hover uppercase ${!spinning && !disabled ? "bounce-cta" : ""}`}
         style={{
           boxShadow: spinning
             ? "0 4px 16px hsl(42 100% 55% / 0.3)"
