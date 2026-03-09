@@ -52,8 +52,7 @@ const Index = () => {
   const [result, setResult] = useState<string>(localStorage.getItem("casino_result") || "");
   const [showConfetti, setShowConfetti] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
-  const [showFlashWhite, setShowFlashWhite] = useState(false);
-  const [showFlashGold, setShowFlashGold] = useState(false);
+  const [showFlash, setShowFlash] = useState(false);
   const [phone, setPhone] = useState("");
   const [name, setName] = useState("");
   const [countdown, setCountdown] = useState(BONUS_TIMER);
@@ -63,14 +62,8 @@ const Index = () => {
   const hasSpun = !!localStorage.getItem("casino_spun");
 
   const handleRevealComplete = useCallback(() => {
-    // Layer 1: white punch (150ms)
-    setShowFlashWhite(true);
-    setTimeout(() => setShowFlashWhite(false), 150);
-    // Layer 2: gold radial spread (600ms)
-    setTimeout(() => {
-      setShowFlashGold(true);
-      setTimeout(() => setShowFlashGold(false), 600);
-    }, 50);
+    setShowFlash(true);
+    setTimeout(() => setShowFlash(false), 600);
   }, []);
 
   const handleSpinComplete = useCallback((prize: string) => {
@@ -137,8 +130,7 @@ const Index = () => {
       <AmbientParticles />
       {showConfetti && <Confetti />}
       {showCelebration && <CelebrationModal onComplete={handleCelebrationDone} result={result} />}
-      {showFlashWhite && <div className="fixed inset-0 z-50 pointer-events-none screen-flash-white" />}
-      {showFlashGold && <div className="fixed inset-0 z-50 pointer-events-none screen-flash-gold" />}
+      {showFlash && <div className="fixed inset-0 bg-casino-gold/30 z-50 pointer-events-none screen-flash" />}
 
       <WinnerToast />
 
@@ -223,7 +215,7 @@ const Index = () => {
 
             <Button
               onClick={handleClaim}
-              className="mt-2 w-full max-w-xs py-8 text-2xl font-black rounded-2xl gold-gradient text-white uppercase tracking-wide bounce-cta stagger-4 cta-anticipation relative overflow-hidden shadow-[0_0_40px_hsl(42,100%,50%,0.5),0_0_80px_hsl(42,100%,50%,0.2)] hover:shadow-[0_0_60px_hsl(42,100%,50%,0.7),0_0_100px_hsl(42,100%,50%,0.3)] hover:scale-[1.03] active:scale-95 transition-all duration-300 border-2 border-casino-gold/60"
+              className="mt-2 w-full max-w-xs py-8 text-2xl font-black rounded-2xl gold-gradient text-white uppercase tracking-wide bounce-cta stagger-4 relative overflow-hidden shadow-[0_0_40px_hsl(42,100%,50%,0.5),0_0_80px_hsl(42,100%,50%,0.2)] hover:shadow-[0_0_60px_hsl(42,100%,50%,0.7),0_0_100px_hsl(42,100%,50%,0.3)] hover:scale-[1.03] active:scale-95 transition-all duration-300 border-2 border-casino-gold/60"
             >
               <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
               🎁 RECLAMAR MI BONO

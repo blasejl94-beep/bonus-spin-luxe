@@ -14,12 +14,10 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
   const [countValue, setCountValue] = useState(0);
   const [countDone, setCountDone] = useState(false);
   const [winPulse, setWinPulse] = useState(false);
-  const [microShake, setMicroShake] = useState(false);
   const [showCountdown, setShowCountdown] = useState(false);
   const [glowIntensity, setGlowIntensity] = useState(0);
   const [breathing, setBreathing] = useState(false);
   const [badgeScale, setBadgeScale] = useState(0.85);
-  const [cardScale, setCardScale] = useState(1);
   const rafRef = useRef<number>(0);
 
   const numericValue = parseInt(result.replace(/[^0-9]/g, ""), 10) || 0;
@@ -43,9 +41,6 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
       onCountProgress?.(progress);
       setGlowIntensity(progress);
 
-      // Card breathes during count: 1.0 → 1.015
-      setCardScale(1 + progress * 0.015);
-
       // Play tick only when displayed number changes
       if (currentValue !== lastTickValue) {
         lastTickValue = currentValue;
@@ -63,34 +58,20 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
         setTimeout(() => {
           setCountDone(true);
           setWinPulse(true);
-          setMicroShake(true);
-          setCardScale(1); // reset card scale
           playFinalDing();
           onRevealComplete?.();
 
-          // Refined spring: 1.15 → 1.22 → 0.96 → 1.05 → 0.99 → 1.0
-          setBadgeScale(1.22);
-          setTimeout(() => setBadgeScale(0.96), 150);
-          setTimeout(() => setBadgeScale(1.05), 280);
-          setTimeout(() => setBadgeScale(0.99), 380);
-          setTimeout(() => setBadgeScale(1), 450);
+          // Smooth bounce: overshoot from 1.15 → 1.2, then settle
+          setBadgeScale(1.2);
+          setTimeout(() => setBadgeScale(0.97), 200);
+          setTimeout(() => setBadgeScale(1.04), 400);
+          setTimeout(() => setBadgeScale(1), 550);
 
-          setTimeout(() => {
-            setWinPulse(false);
-            setMicroShake(false);
-          }, 500);
-          
-          // Smooth glow transition: ease down over 800ms then breathing
+          setTimeout(() => setWinPulse(false), 600);
           setTimeout(() => {
             setGlowIntensity(0.3);
-          }, 400);
-          setTimeout(() => {
-            setGlowIntensity(0.15);
-          }, 800);
-          setTimeout(() => {
-            setGlowIntensity(0);
-            setBreathing(true);
-          }, 1200);
+            setTimeout(() => setBreathing(true), 800);
+          }, 600);
         }, 100);
       }
     };
@@ -204,11 +185,10 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
       <div
         className={`prize-card-v3 relative z-[5] overflow-hidden ${breathing ? 'glow-breathing card-alive' : ''}`}
         style={{
-          transform: `scale(${cardScale})`,
           boxShadow: glowIntensity > 0
             ? `inset 0 0 ${10 + glowIntensity * 25}px ${3 + glowIntensity * 8}px hsl(42 100% 55% / ${glowIntensity * 0.18}), inset 0 0 ${20 + glowIntensity * 35}px ${6 + glowIntensity * 12}px hsl(42 100% 50% / ${glowIntensity * 0.08})`
             : undefined,
-          transition: breathing ? undefined : 'transform 0.08s linear, box-shadow 0.8s ease-out',
+          transition: breathing ? undefined : 'box-shadow 0.2s ease-out',
         }}
       >
         {/* Border shine sweep — repeating subtle */}
@@ -244,7 +224,7 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
           {/* Hero number with count-up */}
           <div className="relative stagger-2">
             <span
-              className={`prize-hero-number-v2 ${winPulse ? 'win-number-pulse' : ''} ${microShake ? 'micro-shake' : ''}`}
+              className={`prize-hero-number-v2 ${winPulse ? 'win-number-pulse' : ''}`}
               style={{
                 filter: glowIntensity > 0
                   ? `drop-shadow(0 0 ${glowIntensity * 20}px hsl(42 100% 60% / ${glowIntensity * 0.5})) drop-shadow(0 0 ${glowIntensity * 40}px hsl(42 100% 55% / ${glowIntensity * 0.2}))`
