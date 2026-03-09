@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import { createPortal } from "react-dom";
 import { Shield, Zap, Headphones, Lock, Star } from "lucide-react";
 import logoIcon from "@/assets/logo-icon.png";
-import logoFull from "@/assets/logo-full.png";
+const logoFull = "/logo-full.png";
 import SpinWheel from "@/components/SpinWheel";
 import Confetti from "@/components/Confetti";
 import PrizeTicket from "@/components/PrizeTicket";
