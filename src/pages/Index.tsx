@@ -129,6 +129,11 @@ const Index = () => {
   const claimBtnRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
+    const timer = setTimeout(() => setWaCtaReady(true), 2500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
     if (step !== "result") return;
     const el = claimBtnRef.current;
     if (!el) return;
