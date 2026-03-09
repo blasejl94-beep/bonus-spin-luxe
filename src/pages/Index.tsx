@@ -129,7 +129,7 @@ const Index = () => {
   const claimBtnRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    const timer = setTimeout(() => setWaCtaReady(true), 2500);
+    const timer = setTimeout(() => setWaCtaReady(true), 5000);
     return () => clearTimeout(timer);
   }, []);
 
@@ -139,7 +139,7 @@ const Index = () => {
     if (!el) return;
     const observer = new IntersectionObserver(
       ([entry]) => setClaimBtnVisible(entry.isIntersecting),
-      { threshold: 0.1 }
+      { threshold: 0, rootMargin: "-100px" }
     );
     observer.observe(el);
     return () => observer.disconnect();
@@ -428,7 +428,7 @@ const Index = () => {
             target="_blank"
             rel="noopener noreferrer"
             className={`fixed bottom-4 left-4 right-4 z-40 flex items-center justify-center gap-2 py-4 rounded-2xl bg-[hsl(142,70%,38%)] text-white font-bold text-base max-w-lg mx-auto wa-cta-float ${
-              !(step === "result" && claimBtnVisible) && waCtaReady ? "wa-cta-visible" : "wa-cta-hidden"
+              (step === "hero" && waCtaReady) || (step === "result" && !claimBtnVisible) ? "wa-cta-visible" : "wa-cta-hidden"
             }`}
           >
             <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current">

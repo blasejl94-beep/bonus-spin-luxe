@@ -398,6 +398,29 @@
   50% { box-shadow: 0 4px 32px hsl(142 70% 45% / 0.5); }
 }
 
+/* Live counter card bounce */
+.live-counter-card {
+  will-change: transform;
+  animation: counter-bounce 4s ease-in-out infinite;
+}
+
+@keyframes counter-bounce {
+  0%, 85%, 100% { transform: translateY(0) translateZ(0); }
+  90% { transform: translateY(-2px) translateZ(0); }
+  95% { transform: translateY(0.5px) translateZ(0); }
+}
+
+/* Counter number glow */
+.counter-number-glow {
+  will-change: filter;
+  animation: counter-number-glow 2.5s ease-in-out infinite;
+}
+
+@keyframes counter-number-glow {
+  0%, 100% { text-shadow: 0 0 4px hsl(42 100% 50% / 0.25); }
+  50% { text-shadow: 0 0 10px hsl(42 100% 50% / 0.5), 0 0 4px hsl(42 100% 60% / 0.3); }
+}
+
 /* Radial burst behind bonus */
 @keyframes radial-burst {
   0% { transform: scale(0); opacity: 0.8; }
