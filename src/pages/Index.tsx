@@ -219,7 +219,7 @@ const Index = () => {
 
             <Button
               onClick={handleClaim}
-              className="mt-2 w-full max-w-xs py-8 text-2xl font-black rounded-2xl gold-gradient text-white uppercase tracking-wide cta-sprout-entrance cta-alive relative overflow-hidden hover:scale-[1.03] active:scale-95 transition-transform duration-300 border-2 border-casino-gold/60"
+              className="mt-2 w-full max-w-xs py-8 text-2xl font-black rounded-2xl gold-gradient text-white uppercase tracking-wide cta-sprout-entrance relative overflow-hidden hover:scale-[1.03] active:scale-95 transition-transform duration-300 border-2 border-casino-gold/60"
             >
               <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
               🎁 RECLAMAR MI BONO
