@@ -1,34 +1,42 @@
 
-Objetivo: corregir que el botón “🎁 RECLAMAR MI BONO” vuelva a verse en el estado `result`, sin cambiar diseño ni layout.
 
-Diagnóstico (causa raíz)
-- En `src/pages/Index.tsx` el botón tiene ambas clases: `cta-sprout-entrance cta-alive`.
-- En `src/index.css`:
-  - `.cta-sprout-entrance` define `opacity: 0` y animación combinada (sprout + alive).
-  - `.cta-alive` vuelve a definir `animation: cta-alive ...`.
-- Al coexistir ambas clases, la regla `.cta-alive` sobreescribe la animación combinada y nunca se ejecuta correctamente el tramo que lleva opacidad a visible, dejando el botón invisible.
+## Plan: Update logos, reposition trust badges, and improve social proof text
 
-Plan de implementación
-1) Corregir conflicto de animaciones del CTA
-- Archivo: `src/pages/Index.tsx`
-- Quitar la clase `cta-alive` del botón “RECLAMAR MI BONO”.
-- Dejar únicamente `cta-sprout-entrance` (que ya incluye la entrada + estado vivo en la animación compuesta).
+### 1. Update old logos across all secondary pages
 
-2) Blindar CSS para evitar regresiones
-- Archivo: `src/index.css`
-- Mantener `.cta-sprout-entrance` como clase única responsable del ciclo completo (aparición + breathing).
-- Limitar `.cta-alive` para uso opcional en otros elementos (o documentar que no debe combinarse con `cta-sprout-entrance`).
-- (Opcional técnico mínimo) añadir comentario encima de ambas clases para evitar volver a aplicar ambas en el mismo nodo.
+**Files:** `Privacy.tsx`, `Terms.tsx`, `ResponsibleGaming.tsx`, `Contact.tsx`
 
-3) Verificación funcional visual
-- Flujo: girar rueda → llegar a `result`.
-- Confirmar:
-  - El botón aparece (opacity visible) tras su delay.
-  - Conserva el “sprout” inicial y luego el efecto “alive”.
-  - Sigue clickeable y lleva al paso `claim`.
-- Validar en mobile y desktop que no haya parpadeo ni desaparición tras re-render.
+All four pages import `@/assets/logo.png` (old logo). Replace with `@/assets/logo-full.png` to match the main page. Also increase size from `w-20 h-20` to `w-36 h-36` for consistency with Index.tsx.
 
-Criterio de aceptación
-- El CTA de reclamo se ve siempre en `step === "result"`.
-- Mantiene animación de entrada + respiración sin romper visibilidad.
-- No se altera tamaño, ubicación, copy ni estilo base del botón.
+### 2. Move trust badges + live counter below main content on Index.tsx
+
+Currently (line 179): `step !== "result"` hides trust badges and LiveCounter on the result/claim screens. Change this so they always show, but move them below the main content block (after the result/claim/expired sections) instead of between the title and the wheel.
+
+Layout will become:
+```text
+Logo
+Title
+[Wheel / Result / Claim / Expired content]
+Trust badges (Plataforma verificada, Pagos instantáneos, Soporte 24/7)
+Live counter (847 personas en línea)
+```
+
+Remove the `step !== "result"` condition so badges and counter appear on all steps, and move the JSX block to after the step-specific content.
+
+### 3. Replace "3 de cada 100" text with something more believable
+
+Change the text on line 213-216 from:
+> "Solo 3 de cada 100 jugadores reciben este bono"
+
+To something like:
+> "Este bono fue seleccionado especialmente para tu sesión de hoy"
+
+This feels personalized and fortunate without making a statistically dubious claim.
+
+### Files to edit
+- `src/pages/Privacy.tsx` — swap logo import
+- `src/pages/Terms.tsx` — swap logo import
+- `src/pages/ResponsibleGaming.tsx` — swap logo import
+- `src/pages/Contact.tsx` — swap logo import
+- `src/pages/Index.tsx` — move badges/counter, update social proof text
+
