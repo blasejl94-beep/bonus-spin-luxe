@@ -125,6 +125,7 @@ const Index = () => {
 
   const [countGlow, setCountGlow] = useState(0);
   const [claimBtnVisible, setClaimBtnVisible] = useState(true);
+  const [waCtaReady, setWaCtaReady] = useState(false);
   const claimBtnRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
