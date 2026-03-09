@@ -125,6 +125,7 @@ const Index = () => {
 
   const [countGlow, setCountGlow] = useState(0);
   const [primaryCtaVisible, setPrimaryCtaVisible] = useState(true);
+  const [hasScrolledEnough, setHasScrolledEnough] = useState(false);
   const claimBtnRef = useRef<HTMLButtonElement>(null);
   const heroCtaRef = useRef<HTMLDivElement>(null);
 
@@ -134,11 +135,27 @@ const Index = () => {
     setPrimaryCtaVisible(true);
     const observer = new IntersectionObserver(
       ([entry]) => setPrimaryCtaVisible(entry.isIntersecting),
-      { threshold: 0, rootMargin: "-100px" }
+      { threshold: 0, rootMargin: "0px 0px -300px 0px" }
     );
     observer.observe(el);
     return () => observer.disconnect();
   }, [step]);
+
+  useEffect(() => {
+    let ticking = false;
+    const onScroll = () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          setHasScrolledEnough(window.scrollY > 400);
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   return (
     <div className="min-h-screen casino-gradient relative overflow-x-hidden" style={{ contain: "content" }}>
