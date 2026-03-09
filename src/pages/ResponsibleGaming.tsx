@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
-import logo from "@/assets/logo-full.png";
+const logo = "/logo-full.png";
 
 const BRAND = "Smart Play";
 
@@ -12,7 +12,7 @@ const ResponsibleGaming = () => (
       </Link>
 
       <div className="flex justify-center mb-6">
-        <Link to="/"><img src={logo} alt={BRAND} className="w-36 h-36 object-contain" /></Link>
+        <Link to="/"><img src={logo} alt={BRAND} width={144} height={144} decoding="async" className="w-36 h-36 object-contain" /></Link>
       </div>
 
       <h1 className="text-2xl font-black text-center gold-text mb-8">Entretenimiento Responsable</h1>
