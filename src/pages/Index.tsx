@@ -124,21 +124,16 @@ const Index = () => {
   const isUrgent = countdown < 60;
 
   const [countGlow, setCountGlow] = useState(0);
-  const [claimBtnVisible, setClaimBtnVisible] = useState(true);
-  const [waCtaReady, setWaCtaReady] = useState(false);
+  const [primaryCtaVisible, setPrimaryCtaVisible] = useState(true);
   const claimBtnRef = useRef<HTMLButtonElement>(null);
+  const heroCtaRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const timer = setTimeout(() => setWaCtaReady(true), 5000);
-    return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
-    if (step !== "result") return;
-    const el = claimBtnRef.current;
-    if (!el) return;
+    const el = step === "hero" ? heroCtaRef.current : step === "result" ? claimBtnRef.current : null;
+    if (!el) { setPrimaryCtaVisible(true); return; }
+    setPrimaryCtaVisible(true);
     const observer = new IntersectionObserver(
-      ([entry]) => setClaimBtnVisible(entry.isIntersecting),
+      ([entry]) => setPrimaryCtaVisible(entry.isIntersecting),
       { threshold: 0, rootMargin: "-100px" }
     );
     observer.observe(el);
@@ -189,7 +184,7 @@ const Index = () => {
         )}
 
         {step === "hero" && (
-          <div className="flex flex-col items-center hero-wheel-entrance">
+          <div ref={heroCtaRef} className="flex flex-col items-center hero-wheel-entrance">
             <SpinWheel onSpinComplete={handleSpinComplete} disabled={hasSpun} />
             {!hasSpun && (
               <p className="mt-4 text-sm text-muted-foreground hero-hint-entrance">
@@ -428,7 +423,7 @@ const Index = () => {
             target="_blank"
             rel="noopener noreferrer"
             className={`fixed bottom-4 left-4 right-4 z-40 flex items-center justify-center gap-2 py-4 rounded-2xl bg-[hsl(142,70%,38%)] text-white font-bold text-base max-w-lg mx-auto wa-cta-float ${
-              (step === "hero" && waCtaReady) || (step === "result" && !claimBtnVisible) ? "wa-cta-visible" : "wa-cta-hidden"
+              !primaryCtaVisible ? "wa-cta-visible" : "wa-cta-hidden"
             }`}
           >
             <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current">
