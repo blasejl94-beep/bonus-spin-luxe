@@ -19,7 +19,7 @@ const generateWinners = () =>
 
 const winners = generateWinners();
 
-const SocialProofTicker: React.FC = () => {
+const SocialProofTicker: React.FC = React.memo(() => {
   return (
     <div className="w-full overflow-hidden h-48 relative rounded-xl">
       <div className="absolute inset-x-0 top-0 h-10 bg-gradient-to-b from-background to-transparent z-10" />
@@ -45,6 +45,7 @@ const SocialProofTicker: React.FC = () => {
       </div>
     </div>
   );
-};
+});
 
+SocialProofTicker.displayName = "SocialProofTicker";
 export default SocialProofTicker;

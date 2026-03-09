@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Progress } from "@/components/ui/progress";
 
-const ScarcityBar: React.FC = () => {
+const ScarcityBar: React.FC = React.memo(() => {
   const [bonos, setBonos] = useState(14);
 
   useEffect(() => {
@@ -20,6 +20,7 @@ const ScarcityBar: React.FC = () => {
       <Progress value={(bonos / 50) * 100} className="h-1.5 bg-muted/40" />
     </div>
   );
-};
+});
 
+ScarcityBar.displayName = "ScarcityBar";
 export default ScarcityBar;

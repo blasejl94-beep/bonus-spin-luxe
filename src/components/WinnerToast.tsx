@@ -4,7 +4,7 @@ const NAMES = ["Valentina", "Gonzalo", "Felipe", "Camila", "Martín", "Lucía", 
 const CITIES = ["Montevideo", "Punta del Este", "Salto", "Colonia", "Maldonado", "Rivera", "Paysandú"];
 const AMOUNTS = [15000, 22000, 8500, 45000, 31000, 12000, 67000, 19500, 28000, 55000];
 
-const WinnerToast: React.FC = () => {
+const WinnerToast: React.FC = React.memo(() => {
   const [visible, setVisible] = useState(false);
   const [winner, setWinner] = useState({ name: "", city: "", amount: 0, time: "" });
 
@@ -47,6 +47,7 @@ const WinnerToast: React.FC = () => {
       </div>
     </div>
   );
-};
+});
 
+WinnerToast.displayName = "WinnerToast";
 export default WinnerToast;
