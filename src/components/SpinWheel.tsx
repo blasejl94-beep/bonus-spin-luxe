@@ -306,7 +306,7 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
       />
 
       {/* Wheel container */}
-      <div className={`relative w-full overflow-visible mx-auto ${isCelebrating ? "wheel-celebrate-bounce" : ""} ${!spinning && !disabled ? "wheel-idle-wobble" : ""}`} style={{ aspectRatio: "1/1", padding: "4%", contain: "layout paint", willChange: spinning ? "transform" : "auto" }}>
+      <div className={`relative w-full overflow-visible mx-auto ${isCelebrating ? "wheel-celebrate-bounce" : ""} ${!spinning && !disabled ? "wheel-idle-wobble" : ""}`} style={{ aspectRatio: "1/1", padding: "4%", contain: "layout style", willChange: spinning ? "transform" : "auto" }}>
         <LedRing state={wheelState} />
 
         {/* Soft shadow under wheel */}

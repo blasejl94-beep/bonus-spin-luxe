@@ -208,14 +208,14 @@ const Index = () => {
 
             <div className="glass-card rounded-xl px-4 py-2.5 stagger-3">
               <p className="text-xs text-muted-foreground">
-                ⏳ Bono disponible por <span className="font-bold text-casino-gold">tiempo limitado</span>
+                ⭐ Desbloqueaste tu <span className="font-bold text-casino-gold">bono de bienvenida</span>
               </p>
             </div>
 
 
             <Button
               onClick={handleClaim}
-              className="mt-2 w-full max-w-xs py-8 text-2xl font-black rounded-2xl gold-gradient text-white uppercase tracking-wide bounce-cta stagger-4 relative overflow-hidden shadow-[0_0_40px_hsl(42,100%,50%,0.5),0_0_80px_hsl(42,100%,50%,0.2)] hover:shadow-[0_0_60px_hsl(42,100%,50%,0.7),0_0_100px_hsl(42,100%,50%,0.3)] hover:scale-[1.03] active:scale-95 transition-all duration-300 border-2 border-casino-gold/60"
+              className="mt-2 w-full max-w-xs py-8 text-2xl font-black rounded-2xl gold-gradient text-white uppercase tracking-wide cta-sprout-entrance cta-alive relative overflow-hidden hover:scale-[1.03] active:scale-95 transition-transform duration-300 border-2 border-casino-gold/60"
             >
               <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
               🎁 RECLAMAR MI BONO

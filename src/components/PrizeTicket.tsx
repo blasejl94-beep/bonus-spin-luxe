@@ -61,13 +61,10 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
           playFinalDing();
           onRevealComplete?.();
 
-          // Smooth bounce: overshoot from 1.15 → 1.2, then settle
-          setBadgeScale(1.2);
-          setTimeout(() => setBadgeScale(0.97), 200);
-          setTimeout(() => setBadgeScale(1.04), 400);
-          setTimeout(() => setBadgeScale(1), 550);
+          // Badge bounce handled by CSS class now
+          setBadgeScale(1);
 
-          setTimeout(() => setWinPulse(false), 600);
+          setTimeout(() => setWinPulse(false), 700);
           setTimeout(() => {
             setGlowIntensity(0.3);
             setTimeout(() => setBreathing(true), 800);
