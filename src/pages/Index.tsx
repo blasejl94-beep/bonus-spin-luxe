@@ -101,6 +101,7 @@ const Index = () => {
     const msg = encodeURIComponent(
       `Hola!\n\nQuiero activar mi bono de bienvenida para empezar a jugar.\n\nBono obtenido: ${result}\n\n¿Me decís la carga mínima y los medios de pago disponibles?`,
     );
+    track("WhatsAppClicked", { context: "claim_form" });
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`, "_blank");
   };
 
@@ -410,6 +411,7 @@ const Index = () => {
             Juego responsable
           </Link>
           <a
+            onClick={() => track("WhatsAppClicked", { context: "footer" })}
             href={`https://wa.me/${WHATSAPP_NUMBER}`}
             target="_blank"
             rel="noopener noreferrer"
