@@ -12,7 +12,7 @@ import LiveCounter from "@/components/LiveCounter";
 import ScarcityBar from "@/components/ScarcityBar";
 import WinnerToast from "@/components/WinnerToast";
 import CelebrationModal from "@/components/CelebrationModal";
-
+import { track } from "@/lib/tracking";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
