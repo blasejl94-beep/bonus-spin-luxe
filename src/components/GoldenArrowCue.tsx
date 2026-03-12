@@ -36,12 +36,12 @@ const GoldenArrowCue: React.FC = () => {
   }, [dismissed, dismiss]);
 
   useEffect(() => {
-    if (dismissed) return;
+    if (dismissed || !visible) return;
     const events = ["pointerdown", "scroll", "touchstart"] as const;
     const handler = () => dismiss();
     events.forEach((e) => window.addEventListener(e, handler, { passive: true, once: true }));
     return () => events.forEach((e) => window.removeEventListener(e, handler));
-  }, [dismissed, dismiss]);
+  }, [dismissed, dismiss, visible]);
 
   if (dismissed || !visible) return null;
 
