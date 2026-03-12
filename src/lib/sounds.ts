@@ -205,6 +205,58 @@ export function playSlotWin() {
   } catch {}
 }
 
+// Elegant confirmation chime — warm, understated, premium feel
+export function playBonusConfirmed() {
+  try {
+    const ctx = audioCtx();
+    const now = ctx.currentTime;
+
+    // Warm low tone — foundation
+    const base = ctx.createOscillator();
+    const baseGain = ctx.createGain();
+    base.type = "sine";
+    base.frequency.value = 392; // G4
+    baseGain.gain.setValueAtTime(0.09, now);
+    baseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+    base.connect(baseGain).connect(ctx.destination);
+    base.start(now);
+    base.stop(now + 0.8);
+
+    // Soft major third — warmth
+    const third = ctx.createOscillator();
+    const thirdGain = ctx.createGain();
+    third.type = "sine";
+    third.frequency.value = 493.88; // B4
+    thirdGain.gain.setValueAtTime(0.07, now + 0.08);
+    thirdGain.gain.exponentialRampToValueAtTime(0.001, now + 0.7);
+    third.connect(thirdGain).connect(ctx.destination);
+    third.start(now + 0.08);
+    third.stop(now + 0.7);
+
+    // Gentle fifth — resolve
+    const fifth = ctx.createOscillator();
+    const fifthGain = ctx.createGain();
+    fifth.type = "sine";
+    fifth.frequency.value = 587.33; // D5
+    fifthGain.gain.setValueAtTime(0.06, now + 0.18);
+    fifthGain.gain.exponentialRampToValueAtTime(0.001, now + 0.9);
+    fifth.connect(fifthGain).connect(ctx.destination);
+    fifth.start(now + 0.18);
+    fifth.stop(now + 0.9);
+
+    // Subtle octave shimmer — elegance
+    const octave = ctx.createOscillator();
+    const octGain = ctx.createGain();
+    octave.type = "sine";
+    octave.frequency.value = 784; // G5
+    octGain.gain.setValueAtTime(0.035, now + 0.3);
+    octGain.gain.exponentialRampToValueAtTime(0.001, now + 1.1);
+    octave.connect(octGain).connect(ctx.destination);
+    octave.start(now + 0.3);
+    octave.stop(now + 1.1);
+  } catch {}
+}
+
 export function playLandingClick() {
   try {
     const ctx = audioCtx();

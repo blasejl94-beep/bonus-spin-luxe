@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo, useRef } from "react";
-import { playSlotWin } from "@/lib/sounds";
+import { playBonusConfirmed } from "@/lib/sounds";
 import { createPortal } from "react-dom";
 
 interface CelebrationModalProps {
@@ -53,7 +53,7 @@ const CelebrationModal: React.FC<CelebrationModalProps> = ({ onComplete }) => {
         setPhase("confirmed");
         if (!soundPlayed.current) {
           soundPlayed.current = true;
-          playSlotWin();
+          playBonusConfirmed();
         }
       }, 1700),
       setTimeout(() => setPhase("exit"), 3000),
