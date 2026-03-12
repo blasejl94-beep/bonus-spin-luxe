@@ -205,12 +205,9 @@ const Index = () => {
           <div ref={heroCtaRef} className="flex flex-col items-center hero-wheel-entrance">
             <SpinWheel onSpinComplete={handleSpinComplete} disabled={hasSpun} />
             {!hasSpun && (
-              <>
-                <GoldenArrowCue />
                 <p className="mt-2 text-sm text-muted-foreground hero-hint-entrance">
                   🎰 Tenés <span className="font-bold text-casino-gold">1 giro</span> para desbloquear tu bono
                 </p>
-              </>
             )}
             <ScarcityBar />
             <div className="hero-counter-entrance mt-4">
