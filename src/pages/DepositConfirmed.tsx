@@ -43,7 +43,7 @@ const DepositConfirmed = () => {
   const source = searchParams.get("source");
   const cashierId = searchParams.get("cashier_id");
   const amount = searchParams.get("amount");
-  const redirectUrl = searchParams.get("redirect") || DEFAULT_REDIRECT;
+  const redirectUrl = getSafeRedirect(searchParams.get("redirect"));
 
   useEffect(() => {
     if (fired.current) return;
