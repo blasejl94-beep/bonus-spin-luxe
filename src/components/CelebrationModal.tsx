@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useRef } from "react";
+import { playSlotWin } from "@/lib/sounds";
 import { createPortal } from "react-dom";
 
 interface CelebrationModalProps {
