@@ -53,7 +53,7 @@ const CelebrationModal: React.FC<CelebrationModalProps> = ({ onComplete }) => {
         setPhase("confirmed");
         if (!soundPlayed.current) {
           soundPlayed.current = true;
-          playSlotWin();
+          playBonusConfirmed();
         }
       }, 1700),
       setTimeout(() => setPhase("exit"), 3000),
