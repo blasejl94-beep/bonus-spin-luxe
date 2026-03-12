@@ -41,15 +41,21 @@ const CelebrationModal: React.FC<CelebrationModalProps> = ({ onComplete }) => {
     [],
   );
 
+  const soundPlayed = useRef(false);
+
   useEffect(() => {
     const timers = [
       setTimeout(() => setPhase("glow"), 100),
       setTimeout(() => setPhase("panel"), 350),
       setTimeout(() => setPhase("visible"), 500),
-      // After "Aplicando bono..." plays, transition to confirmation
       setTimeout(() => setPhase("to-confirmed"), 1500),
-      setTimeout(() => setPhase("confirmed"), 1700),
-      // Hold confirmation briefly, then exit
+      setTimeout(() => {
+        setPhase("confirmed");
+        if (!soundPlayed.current) {
+          soundPlayed.current = true;
+          playSlotWin();
+        }
+      }, 1700),
       setTimeout(() => setPhase("exit"), 3000),
       setTimeout(onComplete, 3300),
     ];
