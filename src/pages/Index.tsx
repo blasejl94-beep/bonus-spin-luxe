@@ -12,7 +12,7 @@ import LiveCounter from "@/components/LiveCounter";
 import ScarcityBar from "@/components/ScarcityBar";
 import WinnerToast from "@/components/WinnerToast";
 import CelebrationModal from "@/components/CelebrationModal";
-
+import { track } from "@/lib/tracking";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -62,12 +62,15 @@ const Index = () => {
 
   const hasSpun = !!localStorage.getItem("casino_spun");
 
+  useEffect(() => { track("LandingViewed"); }, []);
+
   const handleRevealComplete = useCallback(() => {
     setShowFlash(true);
     setTimeout(() => setShowFlash(false), 600);
   }, []);
 
   const handleSpinComplete = useCallback((prize: string) => {
+    track("PrizeUnlocked", { prize });
     localStorage.setItem("casino_spun", "true");
     localStorage.setItem("casino_result", prize);
     setResult(prize);
@@ -432,6 +435,7 @@ const Index = () => {
       {step !== "claim" && step !== "expired" &&
         createPortal(
           <a
+            onClick={() => track("WhatsAppClicked", { context: step === "result" ? "bonus" : "general" })}
             href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(result ? `Hola!\n\nQuiero activar mi bono de bienvenida para empezar a jugar.\n\nBono obtenido: ${result}\n\n¿Me decís la carga mínima y los medios de pago disponibles?` : WHATSAPP_MSG_NO_SPIN)}`}
             target="_blank"
             rel="noopener noreferrer"

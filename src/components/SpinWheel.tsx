@@ -1,6 +1,7 @@
 import React, { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { Volume2, VolumeX } from "lucide-react";
 import { playTick, playLandingClick, playSlotWin } from "@/lib/sounds";
+import { track } from "@/lib/tracking";
 
 const SEGMENTS = [
   { label: "50%", color: "hsl(0, 72%, 30%)", colorDark: "hsl(0, 72%, 22%)", weight: 1 },
@@ -191,6 +192,7 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ onSpinComplete, disabled }) => {
 
   const spin = useCallback(() => {
     if (spinning || disabled) return;
+    track("SpinStarted");
     setSpinning(true);
     setPhase("spinning");
     setGlowIntensity(0.9);
