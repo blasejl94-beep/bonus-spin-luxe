@@ -9,6 +9,30 @@ import logoIcon from "@/assets/logo-icon.png";
  */
 const DEFAULT_REDIRECT = "https://smartplay2.lovable.app";
 
+/**
+ * Allowed redirect origins. Only URLs matching these are accepted;
+ * anything else falls back to DEFAULT_REDIRECT.
+ */
+const ALLOWED_REDIRECT_ORIGINS = [
+  "https://smartplay2.lovable.app",
+  // Add future casino / cashier domains here:
+  // "https://casino.example.com",
+];
+
+function getSafeRedirect(raw: string | null): string {
+  if (!raw) return DEFAULT_REDIRECT;
+  try {
+    const url = new URL(raw);
+    if (ALLOWED_REDIRECT_ORIGINS.some((o) => url.origin === new URL(o).origin)) {
+      return raw;
+    }
+  } catch {
+    // relative path — allow only simple paths starting with /
+    if (/^\/[a-zA-Z0-9/_-]*$/.test(raw)) return raw;
+  }
+  return DEFAULT_REDIRECT;
+}
+
 const REDIRECT_DELAY_MS = 1500;
 
 const DepositConfirmed = () => {
