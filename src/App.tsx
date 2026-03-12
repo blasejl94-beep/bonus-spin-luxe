@@ -9,6 +9,7 @@ import Privacy from "./pages/Privacy";
 import ResponsibleGaming from "./pages/ResponsibleGaming";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
+import DepositConfirmed from "./pages/DepositConfirmed";
 
 const queryClient = new QueryClient();
 
