@@ -243,11 +243,6 @@ const Index = () => {
               }}
             />
 
-            <div className="glass-card rounded-xl px-4 py-2.5 stagger-3">
-              <p className="text-xs text-muted-foreground">
-                ⭐ Desbloqueaste tu <span className="font-bold text-casino-gold">bono de bienvenida</span>
-              </p>
-            </div>
 
 
             <Button

@@ -998,40 +998,4 @@
   }
 }
 
-/* Golden arrow cue — luxury micro-interaction */
-@keyframes golden-arrow-drift {
-  0% { transform: translateY(-6px); opacity: 0; }
-  20% { opacity: 0.7; }
-  50% { transform: translateY(10px); opacity: 0.55; }
-  80% { opacity: 0.3; }
-  100% { transform: translateY(16px); opacity: 0; }
-}
-
-@keyframes golden-trail-fade {
-  0% { opacity: 0; height: 0; }
-  30% { opacity: 0.35; height: 2rem; }
-  70% { opacity: 0.15; height: 2.5rem; }
-  100% { opacity: 0; height: 3rem; }
-}
-
-.golden-arrow-cue {
-  animation: golden-arrow-drift 2.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-}
-
-.golden-arrow-trail {
-  background: linear-gradient(
-    to bottom,
-    transparent,
-    hsl(var(--casino-gold) / 0.25),
-    transparent
-  );
-  animation: golden-trail-fade 2.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-  filter: blur(1px);
-}
-
-.golden-arrow-head {
-  filter: drop-shadow(0 0 4px hsl(var(--casino-gold) / 0.4))
-          drop-shadow(0 0 8px hsl(var(--casino-gold) / 0.15));
-  opacity: 0.6;
-}
 
