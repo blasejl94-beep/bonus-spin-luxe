@@ -435,6 +435,7 @@ const Index = () => {
       {step !== "claim" && step !== "expired" &&
         createPortal(
           <a
+            onClick={() => track("WhatsAppClicked", { context: step === "result" ? "bonus" : "general" })}
             href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(result ? `Hola!\n\nQuiero activar mi bono de bienvenida para empezar a jugar.\n\nBono obtenido: ${result}\n\n¿Me decís la carga mínima y los medios de pago disponibles?` : WHATSAPP_MSG_NO_SPIN)}`}
             target="_blank"
             rel="noopener noreferrer"
