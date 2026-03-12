@@ -411,6 +411,7 @@ const Index = () => {
             Juego responsable
           </Link>
           <a
+            onClick={() => track("WhatsAppClicked", { context: "footer" })}
             href={`https://wa.me/${WHATSAPP_NUMBER}`}
             target="_blank"
             rel="noopener noreferrer"
