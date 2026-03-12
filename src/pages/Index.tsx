@@ -62,6 +62,8 @@ const Index = () => {
 
   const hasSpun = !!localStorage.getItem("casino_spun");
 
+  useEffect(() => { track("LandingViewed"); }, []);
+
   const handleRevealComplete = useCallback(() => {
     setShowFlash(true);
     setTimeout(() => setShowFlash(false), 600);
