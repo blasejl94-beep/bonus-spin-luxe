@@ -12,7 +12,7 @@ import LiveCounter from "@/components/LiveCounter";
 import ScarcityBar from "@/components/ScarcityBar";
 import WinnerToast from "@/components/WinnerToast";
 import CelebrationModal from "@/components/CelebrationModal";
-import GoldenArrowCue from "@/components/GoldenArrowCue";
+
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -205,12 +205,9 @@ const Index = () => {
           <div ref={heroCtaRef} className="flex flex-col items-center hero-wheel-entrance">
             <SpinWheel onSpinComplete={handleSpinComplete} disabled={hasSpun} />
             {!hasSpun && (
-              <>
-                <GoldenArrowCue />
                 <p className="mt-2 text-sm text-muted-foreground hero-hint-entrance">
                   🎰 Tenés <span className="font-bold text-casino-gold">1 giro</span> para desbloquear tu bono
                 </p>
-              </>
             )}
             <ScarcityBar />
             <div className="hero-counter-entrance mt-4">
@@ -246,11 +243,6 @@ const Index = () => {
               }}
             />
 
-            <div className="glass-card rounded-xl px-4 py-2.5 stagger-3">
-              <p className="text-xs text-muted-foreground">
-                ⭐ Desbloqueaste tu <span className="font-bold text-casino-gold">bono de bienvenida</span>
-              </p>
-            </div>
 
 
             <Button
