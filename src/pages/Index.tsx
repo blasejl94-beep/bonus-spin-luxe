@@ -68,6 +68,7 @@ const Index = () => {
   }, []);
 
   const handleSpinComplete = useCallback((prize: string) => {
+    track("PrizeUnlocked", { prize });
     localStorage.setItem("casino_spun", "true");
     localStorage.setItem("casino_result", prize);
     setResult(prize);

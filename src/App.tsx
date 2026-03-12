@@ -25,6 +25,8 @@ const App = () => (
           <Route path="/privacidad" element={<Privacy />} />
           <Route path="/juego-responsable" element={<ResponsibleGaming />} />
           <Route path="/contacto" element={<Contact />} />
+          <Route path="/deposito-confirmado" element={<DepositConfirmed />} />
+          <Route path="/recarga-confirmada" element={<DepositConfirmed />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
