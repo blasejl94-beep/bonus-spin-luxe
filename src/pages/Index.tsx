@@ -54,11 +54,7 @@ const Index = () => {
   const [showConfetti, setShowConfetti] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
   const [showFlash, setShowFlash] = useState(false);
-  const [phone, setPhone] = useState("");
-  const [name, setName] = useState("");
   const [countdown, setCountdown] = useState(BONUS_TIMER);
-  const [recentClaims] = useState(() => Math.floor(Math.random() * 8) + 12);
-  const phoneRef = useRef<HTMLInputElement>(null);
 
   const hasSpun = !!localStorage.getItem("casino_spun");
 
