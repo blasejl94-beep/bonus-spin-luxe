@@ -202,6 +202,11 @@ const PrizeTicket: React.FC<PrizeTicketProps> = ({ result, onRevealComplete, cou
           }}
         />
 
+        {/* Subtle breathing gold background — only after reveal */}
+        {countDone && (
+          <div className="absolute inset-0 pointer-events-none z-[2] rounded-[18px] card-bg-breathing" />
+        )}
+
         {/* Inner content */}
         <div className="relative z-10 pt-12 pb-6 px-6 text-center">
           <p className="text-[10px] font-bold uppercase tracking-[0.45em] text-casino-gold/60 mb-2 stagger-1">

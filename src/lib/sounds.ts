@@ -103,10 +103,14 @@ export function playFinalDing() {
     const ctx = audioCtx();
     const now = ctx.currentTime;
 
-    // Primary bell — G5 (not too high)
-    softTone(ctx, 784, 0.08, now, 0.9);
-    // Soft overtone — D5
-    softTone(ctx, 587.33, 0.04, now + 0.04, 0.7);
+    // Warm fundamental — G4
+    softTone(ctx, 392, 0.065, now, 1.2);
+    // Major third — B4 (warmth)
+    softTone(ctx, 493.88, 0.045, now + 0.05, 1.0);
+    // Gentle octave shimmer — G5
+    softTone(ctx, 784, 0.03, now + 0.1, 0.9);
+    // Sub-bass warmth — G3
+    softTone(ctx, 196, 0.035, now, 0.8);
   } catch {}
 }
 
