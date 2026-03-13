@@ -362,7 +362,7 @@ const Index = () => {
 
       <div className="h-24" />
 
-      {step !== "claim" && step !== "expired" &&
+      {step !== "expired" &&
         createPortal(
           <a
             onClick={() => track("WhatsAppClicked", { context: step === "result" ? "bonus" : "general" })}
