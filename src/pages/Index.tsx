@@ -18,7 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
-type FunnelStep = "hero" | "result" | "claim" | "expired";
+type FunnelStep = "hero" | "result" | "expired";
 
 const WHATSAPP_NUMBER = "59894619935";
 const WHATSAPP_MSG_NO_SPIN = `Hola!\n\nQuiero activar mi bono de bienvenida para empezar a jugar.\n\n¿Me decís la carga mínima y los medios de pago disponibles?`;
