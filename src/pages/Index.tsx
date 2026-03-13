@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { createPortal } from "react-dom";
-import { Shield, Zap, Headphones, Lock, Star } from "lucide-react";
+import { Shield, Zap, Headphones, Star } from "lucide-react";
 import logoIcon from "@/assets/logo-icon.png";
 const logoFull = "/logo-full.png";
 import SpinWheel from "@/components/SpinWheel";
