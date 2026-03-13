@@ -97,7 +97,7 @@ const Index = () => {
 
 
   useEffect(() => {
-    if (step !== "result" && step !== "claim") return;
+    if (step !== "result") return;
     const interval = setInterval(() => {
       setCountdown((c) => {
         if (c <= 1) {
