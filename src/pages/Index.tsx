@@ -190,7 +190,7 @@ const Index = () => {
               : "Girá la rueda y desbloqueá tu bono exclusivo"}
           </span>
         </h1>
-        {step !== "result" && step !== "claim" && (
+        {step !== "result" && (
           <p className="text-muted-foreground text-xs mb-3 max-w-xs hero-subtitle-entrance">
             Más de <span className="font-semibold text-foreground">10.000</span> jugadores ya reclamaron su bono
           </p>
