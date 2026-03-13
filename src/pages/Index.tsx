@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { createPortal } from "react-dom";
-import { Shield, Zap, Headphones, Lock, Star } from "lucide-react";
+import { Shield, Zap, Headphones, Star } from "lucide-react";
 import logoIcon from "@/assets/logo-icon.png";
 const logoFull = "/logo-full.png";
 import SpinWheel from "@/components/SpinWheel";
@@ -14,11 +14,11 @@ import WinnerToast from "@/components/WinnerToast";
 import CelebrationModal from "@/components/CelebrationModal";
 import { track } from "@/lib/tracking";
 
-import { Input } from "@/components/ui/input";
+
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
-type FunnelStep = "hero" | "result" | "claim" | "expired";
+type FunnelStep = "hero" | "result" | "expired";
 
 const WHATSAPP_NUMBER = "59894619935";
 const WHATSAPP_MSG_NO_SPIN = `Hola!\n\nQuiero activar mi bono de bienvenida para empezar a jugar.\n\n¿Me decís la carga mínima y los medios de pago disponibles?`;
@@ -54,11 +54,7 @@ const Index = () => {
   const [showConfetti, setShowConfetti] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
   const [showFlash, setShowFlash] = useState(false);
-  const [phone, setPhone] = useState("");
-  const [name, setName] = useState("");
   const [countdown, setCountdown] = useState(BONUS_TIMER);
-  const [recentClaims] = useState(() => Math.floor(Math.random() * 8) + 12);
-  const phoneRef = useRef<HTMLInputElement>(null);
 
   const hasSpun = !!localStorage.getItem("casino_spun");
 
@@ -83,8 +79,11 @@ const Index = () => {
   }, []);
 
   const handleClaim = () => {
-    setStep("claim");
-    setTimeout(() => phoneRef.current?.focus(), 400);
+    const msg = encodeURIComponent(
+      `Hola!\n\nQuiero activar mi bono de bienvenida para empezar a jugar.\n\nBono obtenido: ${result}\n\n¿Me decís la carga mínima y los medios de pago disponibles?`,
+    );
+    track("WhatsAppClicked", { context: "claim_direct" });
+    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`, "_blank");
   };
 
   const handleRetry = () => {
@@ -96,17 +95,9 @@ const Index = () => {
     setCountdown(BONUS_TIMER);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const msg = encodeURIComponent(
-      `Hola!\n\nQuiero activar mi bono de bienvenida para empezar a jugar.\n\nBono obtenido: ${result}\n\n¿Me decís la carga mínima y los medios de pago disponibles?`,
-    );
-    track("WhatsAppClicked", { context: "claim_form" });
-    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`, "_blank");
-  };
 
   useEffect(() => {
-    if (step !== "result" && step !== "claim") return;
+    if (step !== "result") return;
     const interval = setInterval(() => {
       setCountdown((c) => {
         if (c <= 1) {
@@ -191,15 +182,15 @@ const Index = () => {
             className="inline-block"
             style={{ WebkitBackgroundClip: "unset", backgroundClip: "unset", WebkitTextFillColor: "unset" }}
           >
-            {step === "result" || step === "claim" ? "🎁" : "🎰"}
+            {step === "result" ? "🎁" : "🎰"}
           </span>{" "}
           <span className="gold-text">
-            {step === "result" || step === "claim"
+            {step === "result"
               ? "Reclamá tu bono"
               : "Girá la rueda y desbloqueá tu bono exclusivo"}
           </span>
         </h1>
-        {step !== "result" && step !== "claim" && (
+        {step !== "result" && (
           <p className="text-muted-foreground text-xs mb-3 max-w-xs hero-subtitle-entrance">
             Más de <span className="font-semibold text-foreground">10.000</span> jugadores ya reclamaron su bono
           </p>
@@ -262,69 +253,6 @@ const Index = () => {
           </div>
         )}
 
-        {step === "claim" && (
-          <div className="w-full max-w-sm animate-in slide-in-from-bottom-4 duration-500">
-            <div className="glass-card-strong rounded-2xl p-6">
-              <div className="flex items-center justify-center gap-2 mb-3">
-                <span className="w-7 h-7 rounded-full gold-gradient text-primary-foreground text-xs font-bold flex items-center justify-center shadow-md">
-                  ✓
-                </span>
-                <div className="w-8 h-0.5 bg-casino-gold/50" />
-                <span className="w-7 h-7 rounded-full gold-border text-casino-gold text-xs font-bold flex items-center justify-center">
-                  2
-                </span>
-              </div>
-              <p className="text-xs text-muted-foreground mb-4">✔ Paso 1 completado — Activá tu bono</p>
-
-              <h2 className="text-xl font-black text-foreground mb-1">
-                🎁 Tu bono de <span className="text-casino-gold">{result}</span> está listo
-              </h2>
-              <div className="flex items-center justify-center gap-2 mb-4">
-                <span className="text-xs text-muted-foreground">Tu bono expira en</span>
-                <span
-                  className={`font-mono font-bold text-sm px-2.5 py-1 rounded-lg ${isUrgent ? "countdown-urgent bg-destructive/15" : "text-casino-gold glass-card"}`}
-                >
-                  {formatTime(countdown)}
-                </span>
-              </div>
-
-              <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-                <Input
-                  ref={phoneRef}
-                  type="tel"
-                  placeholder="Tu número de teléfono *"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  required
-                  className="bg-muted/40 border-border/50 text-foreground placeholder:text-muted-foreground h-12 text-base rounded-xl"
-                />
-                <Input
-                  type="text"
-                  placeholder="Tu nombre (opcional)"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="bg-muted/40 border-border/50 text-foreground placeholder:text-muted-foreground h-12 text-base rounded-xl"
-                />
-                <Button
-                  type="submit"
-                  disabled={!phone}
-                  className="w-full py-5 text-lg font-black rounded-xl gold-gradient text-primary-foreground uppercase tracking-wide disabled:opacity-40 relative overflow-hidden shadow-[0_0_30px_hsl(42,100%,50%,0.4)] hover:shadow-[0_0_50px_hsl(42,100%,50%,0.6)] hover:scale-[1.02] active:scale-95 transition-all duration-300 border border-casino-gold/50"
-                >
-                  <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
-                  ACTIVAR BONO AHORA
-                </Button>
-              </form>
-
-              <div className="flex items-center justify-center gap-1.5 mt-4 text-[11px] text-muted-foreground/60">
-                <Lock className="w-3 h-3" />
-                <span>Tu información es 100% confidencial</span>
-              </div>
-              <p className="text-[11px] text-muted-foreground/60 mt-2 text-center">
-                🔥 {recentClaims} personas activaron su bono en los últimos 10 minutos
-              </p>
-            </div>
-          </div>
-        )}
 
         {step === "expired" && (
           <div className="flex flex-col items-center gap-4 animate-in fade-in-0 duration-500">
@@ -434,7 +362,7 @@ const Index = () => {
 
       <div className="h-24" />
 
-      {step !== "claim" && step !== "expired" &&
+      {step !== "expired" &&
         createPortal(
           <a
             onClick={() => track("WhatsAppClicked", { context: step === "result" ? "bonus" : "general" })}
