@@ -182,10 +182,10 @@ const Index = () => {
             className="inline-block"
             style={{ WebkitBackgroundClip: "unset", backgroundClip: "unset", WebkitTextFillColor: "unset" }}
           >
-            {step === "result" || step === "claim" ? "🎁" : "🎰"}
+            {step === "result" ? "🎁" : "🎰"}
           </span>{" "}
           <span className="gold-text">
-            {step === "result" || step === "claim"
+            {step === "result"
               ? "Reclamá tu bono"
               : "Girá la rueda y desbloqueá tu bono exclusivo"}
           </span>
